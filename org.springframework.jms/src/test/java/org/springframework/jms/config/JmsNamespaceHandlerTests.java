@@ -30,7 +30,6 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.ComponentDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -43,6 +42,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jca.endpoint.GenericMessageEndpointManager;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.endpoint.JmsMessageEndpointManager;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Mark Fisher

@@ -35,10 +35,11 @@ import org.springframework.aop.target.CommonsPoolTargetSource;
 import org.springframework.aop.target.LazyInitTargetSource;
 import org.springframework.aop.target.PrototypeTargetSource;
 import org.springframework.aop.target.ThreadLocalTargetSource;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.CallCountingTransactionManager;
+
+import common.beans.core.ITestBean;
 
 /**
  * Tests for auto proxy creation by advisor recognition.

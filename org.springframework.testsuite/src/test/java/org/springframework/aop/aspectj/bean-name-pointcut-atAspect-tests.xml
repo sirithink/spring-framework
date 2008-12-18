@@ -7,9 +7,9 @@
 
 	<aop:aspectj-autoproxy/>
 	
-	<bean id="testBean1" class="org.springframework.beans.TestBean"/>
-	<bean id="testBean2" class="org.springframework.beans.TestBean"/>	
-	<bean id="testBean3" class="org.springframework.beans.TestBean"/>
+	<bean id="testBean1" class="common.beans.core.TestBean"/>
+	<bean id="testBean2" class="common.beans.core.TestBean"/>	
+	<bean id="testBean3" class="common.beans.core.TestBean"/>
 
 	<bean id="counterAspect" class="org.springframework.aop.aspectj.BeanNamePointcutAtAspectTests$CounterAspect"/>
 </beans>

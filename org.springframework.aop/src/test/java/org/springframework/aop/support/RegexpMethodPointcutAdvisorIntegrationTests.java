@@ -22,13 +22,14 @@ import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.interceptor.NopInterceptor;
 import org.springframework.aop.interceptor.SerializableNopInterceptor;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.Person;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.SerializationTestUtils;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

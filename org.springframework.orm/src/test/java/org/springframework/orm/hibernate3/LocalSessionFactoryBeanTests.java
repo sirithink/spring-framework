@@ -413,10 +413,10 @@ public class LocalSessionFactoryBeanTests extends TestCase {
 		sfb.setMappingResources(new String[0]);
 		sfb.setDataSource(new DriverManagerDataSource());
 		Properties classCache = new Properties();
-		classCache.setProperty("org.springframework.beans.TestBean", "read-write");
+		classCache.setProperty("common.beans.core.TestBean", "read-write");
 		sfb.setEntityCacheStrategies(classCache);
 		Properties collectionCache = new Properties();
-		collectionCache.setProperty("org.springframework.beans.TestBean.friends", "read-only");
+		collectionCache.setProperty("common.beans.core.TestBean.friends", "read-only");
 		sfb.setCollectionCacheStrategies(collectionCache);
 		sfb.afterPropertiesSet();
 
@@ -448,10 +448,10 @@ public class LocalSessionFactoryBeanTests extends TestCase {
 		sfb.setMappingResources(new String[0]);
 		sfb.setDataSource(new DriverManagerDataSource());
 		Properties classCache = new Properties();
-		classCache.setProperty("org.springframework.beans.TestBean", "read-write,myRegion");
+		classCache.setProperty("common.beans.core.TestBean", "read-write,myRegion");
 		sfb.setEntityCacheStrategies(classCache);
 		Properties collectionCache = new Properties();
-		collectionCache.setProperty("org.springframework.beans.TestBean.friends", "read-only,myRegion");
+		collectionCache.setProperty("common.beans.core.TestBean.friends", "read-only,myRegion");
 		sfb.setCollectionCacheStrategies(collectionCache);
 		sfb.afterPropertiesSet();
 

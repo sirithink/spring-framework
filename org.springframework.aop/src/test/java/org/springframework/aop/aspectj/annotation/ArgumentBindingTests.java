@@ -27,8 +27,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.junit.Test;
 import org.springframework.aop.aspectj.AspectJAdviceParameterNameDiscoverer;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Adrian Colyer

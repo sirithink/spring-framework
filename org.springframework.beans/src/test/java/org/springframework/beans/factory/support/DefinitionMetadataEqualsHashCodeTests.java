@@ -18,9 +18,10 @@ package org.springframework.beans.factory.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop

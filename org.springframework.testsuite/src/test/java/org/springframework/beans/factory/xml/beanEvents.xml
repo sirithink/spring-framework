@@ -10,7 +10,7 @@
 
 	<alias name="testBean" alias="testBeanAlias2"/>
 
-	<bean id="testBean" class="org.springframework.beans.TestBean">
+	<bean id="testBean" class="common.beans.core.TestBean">
 		<constructor-arg type="java.lang.String" value="Rob Harrop"/>
 		<property name="friends">
 			<ref bean="testBean2"/>
@@ -22,10 +22,10 @@
 		</property>
 	</bean>
 
-	<bean id="testBean2" class="org.springframework.beans.TestBean">
+	<bean id="testBean2" class="common.beans.core.TestBean">
 		<property name="name" value="Juergen Hoeller"/>
 		<property name="spouse">
-			<bean class="org.springframework.beans.TestBean">
+			<bean class="common.beans.core.TestBean">
 				<property name="name" value="Eva Schallmeiner"/>
 			</bean>
 		</property>

@@ -18,10 +18,11 @@ package org.springframework.remoting.caucho;
 
 import com.caucho.burlap.client.BurlapProxyFactory;
 import com.caucho.hessian.client.HessianProxyFactory;
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
+
 import junit.framework.TestCase;
 
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.remoting.RemoteAccessException;
 
 /**

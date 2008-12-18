@@ -29,7 +29,6 @@ import javax.servlet.jsp.tagext.Tag;
 
 import org.springframework.beans.IndexedTestBean;
 import org.springframework.beans.NestedTestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -39,6 +38,8 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.tags.form.FormTag;
 import org.springframework.web.servlet.tags.form.TagWriter;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

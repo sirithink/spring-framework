@@ -22,9 +22,10 @@ import javax.faces.el.VariableResolver;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.StaticWebApplicationContext;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

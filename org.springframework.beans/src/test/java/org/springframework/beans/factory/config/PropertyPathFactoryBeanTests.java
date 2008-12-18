@@ -18,10 +18,11 @@ package org.springframework.beans.factory.config;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

@@ -24,14 +24,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.TestListener;
 import org.springframework.context.support.StaticApplicationContext;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Dmitriy Kopylenko

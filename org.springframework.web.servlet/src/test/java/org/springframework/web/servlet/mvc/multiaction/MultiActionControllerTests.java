@@ -30,7 +30,6 @@ import javax.servlet.http.HttpSession;
 import junit.framework.TestCase;
 
 import org.springframework.beans.FatalBeanException;
-import org.springframework.beans.TestBean;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -38,6 +37,8 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.servlet.ModelAndView;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

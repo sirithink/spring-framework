@@ -10,7 +10,7 @@
 		<property name="name"><value>Rod</value></property>
 	</bean>
 	
-	<bean id="kerry" class="org.springframework.beans.TestBean"
+	<bean id="kerry" class="common.beans.core.TestBean"
 		dependency-check="none">
 	</bean>
 

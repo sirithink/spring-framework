@@ -16,7 +16,7 @@
 
 package org.springframework.beans.factory.xml;
 
-import org.springframework.beans.ITestBean;
+import common.beans.core.ITestBean;
 
 /**
  * Bean testing the ability to use both lookup method overrides

@@ -21,9 +21,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.aop.interceptor.DebugInterceptor;
-import org.springframework.beans.ITestBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import common.beans.core.ITestBean;
 
 /**
  * Tests lookup methods wrapped by a CGLIB proxy (see SPR-391).

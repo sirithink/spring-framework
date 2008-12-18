@@ -16,8 +16,9 @@
 
 package org.springframework.aop.aspectj;
 
-import org.springframework.beans.ITestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.ITestBean;
 
 /**
  * @author Rob Harrop

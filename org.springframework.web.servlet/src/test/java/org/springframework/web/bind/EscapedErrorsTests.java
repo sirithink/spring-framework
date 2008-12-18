@@ -18,11 +18,12 @@ package org.springframework.web.bind;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

@@ -26,8 +26,9 @@ import java.util.List;
 
 import org.junit.Test;
 import org.springframework.aop.SpringProxy;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

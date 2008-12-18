@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.beans;
+package common.beans.core;
 
 import java.io.IOException;
 
+import org.springframework.beans.INestedTestBean;
+import org.springframework.beans.IndexedTestBean;
+
 /**
- * Interface used for {@link TestBean}.
+ * Interface used for {@link common.beans.core.TestBean}.
  *
  * <p>Two methods are the same as on Person, but if this
  * extends person it breaks quite a few tests..
@@ -33,7 +36,7 @@ public interface ITestBean {
 
 	void setAge(int age);
 
-	String getName(); 
+	String getName();
 
 	void setName(String name);
 

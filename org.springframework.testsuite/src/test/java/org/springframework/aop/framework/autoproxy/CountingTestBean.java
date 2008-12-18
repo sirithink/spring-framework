@@ -20,7 +20,7 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

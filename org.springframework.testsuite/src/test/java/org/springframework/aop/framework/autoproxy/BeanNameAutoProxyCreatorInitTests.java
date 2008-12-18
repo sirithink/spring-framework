@@ -19,8 +19,9 @@ package org.springframework.aop.framework.autoproxy;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.springframework.beans.TestBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

@@ -16,7 +16,7 @@
 
 package org.springframework.scripting;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

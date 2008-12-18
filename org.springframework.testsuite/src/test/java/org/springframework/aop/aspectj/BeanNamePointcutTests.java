@@ -21,9 +21,10 @@ import java.util.Map;
 
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.framework.Advised;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.ITestBean;
 
 /**
  * Test for correct application of the bean() PCD for XML-based AspectJ aspects.

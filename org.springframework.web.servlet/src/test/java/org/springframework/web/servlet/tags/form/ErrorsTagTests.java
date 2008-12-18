@@ -26,7 +26,6 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTag;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.MockBodyContent;
 import org.springframework.mock.web.MockPageContext;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -34,6 +33,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop

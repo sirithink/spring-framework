@@ -31,11 +31,12 @@ import org.springframework.aop.Pointcut;
 import org.springframework.aop.interceptor.NopInterceptor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Additional and overridden tests for the CGLIB proxy.

@@ -32,7 +32,7 @@
 	<!-- Inherited tests -->
 
 	<!-- name and age values will be overridden by myinit.properties" -->
-	<bean id="rod" class="org.springframework.beans.TestBean">
+	<bean id="rod" class="common.beans.core.TestBean">
 		<property name="name">
 			<value>dummy</value>
 		</property>

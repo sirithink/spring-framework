@@ -32,12 +32,12 @@
 	/>
 	
 	<bean id="test1"
-		class="org.springframework.beans.TestBean">
+		class="common.beans.core.TestBean">
 		<property name="age"><value>4</value></property>
 	</bean>
 	
 	<bean id="test2"
-		class="org.springframework.beans.TestBean">
+		class="common.beans.core.TestBean">
 		<property name="age"><value>4</value></property>
 	</bean>
 	

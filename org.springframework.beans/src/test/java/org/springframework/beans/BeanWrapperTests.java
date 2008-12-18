@@ -46,6 +46,9 @@ import org.springframework.beans.support.DerivedFromProtectedBaseBean;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
+
 /**
  * @author Rod Johnson
  * @author Juergen Hoeller

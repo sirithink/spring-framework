@@ -28,8 +28,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.annotation.Configurable;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import junit.framework.*;
 import junit.framework.Assert;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop

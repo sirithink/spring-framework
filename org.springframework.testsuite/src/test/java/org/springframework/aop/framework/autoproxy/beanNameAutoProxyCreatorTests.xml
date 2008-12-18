@@ -73,11 +73,11 @@
 
 	<bean id="introductionNopInterceptor" class="org.springframework.aop.interceptor.NopInterceptor"/>
 
-	<bean id="introductionUsingJdk" class="org.springframework.beans.TestBean">
+	<bean id="introductionUsingJdk" class="common.beans.core.TestBean">
 		<property name="name"><value>introductionUsingJdk</value></property>
 	</bean>
 
-	<bean id="second-introductionUsingJdk" class="org.springframework.beans.TestBean">	
+	<bean id="second-introductionUsingJdk" class="common.beans.core.TestBean">	
 		<property name="name"><value>second-introductionUsingJdk</value></property>
 	</bean>
 
@@ -88,27 +88,27 @@
 			lazy-init="true">
 	</bean>
 
-	<bean id="jdk1" class="org.springframework.beans.TestBean">	
+	<bean id="jdk1" class="common.beans.core.TestBean">	
 		<property name="name"><value>jdk1</value></property>
 	</bean>
 
-	<bean id="frozenBean" class="org.springframework.beans.TestBean">
+	<bean id="frozenBean" class="common.beans.core.TestBean">
 		<property name="name" value="frozenBean"/>
 	</bean>
 
-	<bean id="cglib1" class="org.springframework.beans.TestBean">	
+	<bean id="cglib1" class="common.beans.core.TestBean">	
 		<property name="name"><value>cglib1</value></property>
 	</bean>
 
-	<bean id="onlyJdk" class="org.springframework.beans.TestBean">	
+	<bean id="onlyJdk" class="common.beans.core.TestBean">	
 		<property name="name"><value>onlyJdk</value></property>
 	</bean>
 
-	<bean id="doubleJdk" class="org.springframework.beans.TestBean">
+	<bean id="doubleJdk" class="common.beans.core.TestBean">
 		<property name="name"><value>doubleJdk</value></property>
 	</bean>
 
-	<bean id="noproxy" class="org.springframework.beans.TestBean">	
+	<bean id="noproxy" class="common.beans.core.TestBean">	
 		<property name="name"><value>noproxy</value></property>
 	</bean>
 

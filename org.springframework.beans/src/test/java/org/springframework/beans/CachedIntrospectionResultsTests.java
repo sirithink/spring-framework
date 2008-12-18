@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 
 import org.springframework.core.OverridingClassLoader;
 
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  */
@@ -32,7 +34,7 @@ public class CachedIntrospectionResultsTests extends TestCase {
 		assertTrue(CachedIntrospectionResults.classCache.containsKey(TestBean.class));
 
 		ClassLoader child = new OverridingClassLoader(getClass().getClassLoader());
-		Class tbClass = child.loadClass("org.springframework.beans.TestBean");
+		Class tbClass = child.loadClass("common.beans.core.TestBean");
 		assertFalse(CachedIntrospectionResults.classCache.containsKey(tbClass));
 		CachedIntrospectionResults.acceptClassLoader(child);
 		bw = new BeanWrapperImpl(tbClass);

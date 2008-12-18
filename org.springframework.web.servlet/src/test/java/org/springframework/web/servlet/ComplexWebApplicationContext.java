@@ -130,7 +130,7 @@ public class ComplexWebApplicationContext extends StaticWebApplicationContext {
 		registerSingleton("viewResolver2", InternalResourceViewResolver.class, pvs);
 
 		pvs = new MutablePropertyValues();
-		pvs.addPropertyValue("commandClass", "org.springframework.beans.TestBean");
+		pvs.addPropertyValue("commandClass", "common.beans.core.TestBean");
 		pvs.addPropertyValue("formView", "form");
 		registerSingleton("formHandler", SimpleFormController.class, pvs);
 

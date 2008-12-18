@@ -17,7 +17,8 @@
 package org.springframework.aop.config;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.beans.ITestBean;
+
+import common.beans.core.ITestBean;
 
 /**
  * @author Rob Harrop

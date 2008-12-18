@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.support.PropertiesBeanDefinitionReader;
 import org.springframework.context.ACATester;
 import org.springframework.context.AbstractApplicationContextTests;
@@ -32,6 +31,8 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests for static application context with custom application event multicaster.

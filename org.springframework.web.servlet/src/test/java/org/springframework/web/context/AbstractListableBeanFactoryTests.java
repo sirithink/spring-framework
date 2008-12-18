@@ -2,10 +2,11 @@ package org.springframework.web.context;
 
 import junit.framework.Assert;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.ListableBeanFactory;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson
@@ -36,13 +37,13 @@ public abstract class AbstractListableBeanFactoryTests extends AbstractBeanFacto
 
 	public void assertTestBeanCount(int count) {
 		String[] defNames = getListableBeanFactory().getBeanNamesForType(TestBean.class, true, false);
-		Assert.assertTrue("We should have " + count + " beans for class org.springframework.beans.TestBean, not " +
+		Assert.assertTrue("We should have " + count + " beans for class common.beans.core.TestBean, not " +
 				defNames.length, defNames.length == count);
 
 		int countIncludingFactoryBeans = count + 2;
 		String[] names = getListableBeanFactory().getBeanNamesForType(TestBean.class, true, true);
 		Assert.assertTrue("We should have " + countIncludingFactoryBeans +
-				" beans for class org.springframework.beans.TestBean, not " + names.length,
+				" beans for class common.beans.core.TestBean, not " + names.length,
 				names.length == countIncludingFactoryBeans);
 	}
 

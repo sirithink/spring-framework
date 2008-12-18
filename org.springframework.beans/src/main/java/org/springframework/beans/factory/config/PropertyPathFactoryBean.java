@@ -37,10 +37,10 @@ import org.springframework.util.StringUtils;
  * <p>Usage examples:
  *
  * <pre class="code">&lt;!-- target bean to be referenced by name --&gt;
- * &lt;bean id="tb" class="org.springframework.beans.TestBean" singleton="false"&gt;
+ * &lt;bean id="tb" class="common.beans.core.TestBean" singleton="false"&gt;
  *   &lt;property name="age" value="10"/&gt;
  *   &lt;property name="spouse"&gt;
- *     &lt;bean class="org.springframework.beans.TestBean"&gt;
+ *     &lt;bean class="common.beans.core.TestBean"&gt;
  *       &lt;property name="age" value="11"/&gt;
  *     &lt;/bean&gt;
  *   &lt;/property&gt;
@@ -49,7 +49,7 @@ import org.springframework.util.StringUtils;
  * &lt;!-- will result in 12, which is the value of property 'age' of the inner bean --&gt;
  * &lt;bean id="propertyPath1" class="org.springframework.beans.factory.config.PropertyPathFactoryBean"&gt;
  *   &lt;property name="targetObject"&gt;
- *     &lt;bean class="org.springframework.beans.TestBean"&gt;
+ *     &lt;bean class="common.beans.core.TestBean"&gt;
  *       &lt;property name="age" value="12"/&gt;
  *     &lt;/bean&gt;
  *   &lt;/property&gt;

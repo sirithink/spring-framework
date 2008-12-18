@@ -16,8 +16,9 @@
 package org.springframework.aop.aspectj;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.beans.TestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests to check if the first implicit join point argument is correctly processed.

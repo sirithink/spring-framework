@@ -6,6 +6,6 @@
 				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
 	<context:component-scan base-package="example.scannable"
-	    name-generator="org.springframework.context.annotation.TestBeanNameGenerator"/>
+	    name-generator="common.beans.core.TestBeanNameGenerator"/>
 
 </beans>

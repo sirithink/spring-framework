@@ -6,8 +6,9 @@ package org.springframework.aop.aspectj.annotation;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 @Aspect("perthis(execution(* *.getSpouse()))")
 public class PerThisAspect {

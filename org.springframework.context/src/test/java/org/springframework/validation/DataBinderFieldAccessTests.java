@@ -26,7 +26,8 @@ import org.springframework.beans.FieldAccessBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.TestBean;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

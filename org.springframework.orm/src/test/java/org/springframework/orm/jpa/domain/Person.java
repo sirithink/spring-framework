@@ -27,8 +27,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.annotation.Configurable;
+
+import common.beans.core.TestBean;
 
 /**
  * Simple JavaBean domain object representing an person.

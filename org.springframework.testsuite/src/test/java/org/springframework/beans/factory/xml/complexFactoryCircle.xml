@@ -22,7 +22,7 @@
 	<bean id="target1" class="org.springframework.beans.factory.xml.ConstructorDependenciesBean"
 		autowire="constructor"/>
 
-	<bean id="toBeFoundByType" class="org.springframework.beans.TestBean"/>
+	<bean id="toBeFoundByType" class="common.beans.core.TestBean"/>
 
 	<bean id="proxy2" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref local="transactionManager"/></property>
@@ -36,7 +36,7 @@
 
 	<bean id="target2" class="org.springframework.beans.factory.xml.DependenciesBean">
 		<property name="spouse">
-			<bean class="org.springframework.beans.TestBean">
+			<bean class="common.beans.core.TestBean">
 				<property name="someSet">
 					<set>
 						<ref local="proxy1"/>

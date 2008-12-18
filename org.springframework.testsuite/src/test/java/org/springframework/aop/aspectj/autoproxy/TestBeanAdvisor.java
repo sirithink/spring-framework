@@ -20,7 +20,8 @@ import java.lang.reflect.Method;
 
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-import org.springframework.beans.ITestBean;
+
+import common.beans.core.ITestBean;
 
 public class TestBeanAdvisor extends StaticMethodMatcherPointcutAdvisor {
 	

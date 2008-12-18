@@ -36,6 +36,8 @@ import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  * @since 18.01.2006

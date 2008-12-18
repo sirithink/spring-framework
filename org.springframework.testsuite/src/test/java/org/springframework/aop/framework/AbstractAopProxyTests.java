@@ -56,14 +56,15 @@ import org.springframework.aop.support.Pointcuts;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.aop.target.HotSwappableTargetSource;
 import org.springframework.aop.target.SingletonTargetSource;
-import org.springframework.beans.IOther;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.Person;
 import org.springframework.beans.SerializablePerson;
-import org.springframework.beans.TestBean;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.util.SerializationTestUtils;
 import org.springframework.util.StopWatch;
+
+import common.beans.core.IOther;
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

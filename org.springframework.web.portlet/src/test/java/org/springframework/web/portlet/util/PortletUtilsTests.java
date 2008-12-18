@@ -31,14 +31,15 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
 import org.junit.Test;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.portlet.MockActionRequest;
 import org.springframework.mock.web.portlet.MockActionResponse;
 import org.springframework.mock.web.portlet.MockPortletContext;
 import org.springframework.mock.web.portlet.MockPortletRequest;
 import org.springframework.mock.web.portlet.MockPortletSession;
 import org.springframework.web.util.WebUtils;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Unit tests for {@link PortletUtils}.

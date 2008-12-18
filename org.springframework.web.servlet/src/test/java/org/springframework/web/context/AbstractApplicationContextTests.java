@@ -1,7 +1,6 @@
 package org.springframework.web.context;
 import java.util.Locale;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.LifecycleBean;
 import org.springframework.context.ACATester;
@@ -11,6 +10,8 @@ import org.springframework.context.BeanThatListens;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.TestListener;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

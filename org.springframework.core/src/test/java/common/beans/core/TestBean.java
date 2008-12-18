@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.beans;
+package common.beans.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +28,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.springframework.beans.Colour;
+import org.springframework.beans.INestedTestBean;
+import org.springframework.beans.IndexedTestBean;
+import org.springframework.beans.NestedTestBean;
 import org.springframework.util.ObjectUtils;
 
 /**

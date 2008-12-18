@@ -42,13 +42,14 @@ import org.quartz.TriggerListener;
 import org.quartz.impl.SchedulerRepository;
 import org.quartz.spi.JobFactory;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TestMethodInvokingTask;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

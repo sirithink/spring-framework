@@ -29,12 +29,13 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.TimeStamped;
 import org.springframework.aop.interceptor.SerializableNopInterceptor;
 import org.springframework.beans.INestedTestBean;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.NestedTestBean;
 import org.springframework.beans.Person;
 import org.springframework.beans.SerializablePerson;
-import org.springframework.beans.TestBean;
 import org.springframework.util.SerializationTestUtils;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

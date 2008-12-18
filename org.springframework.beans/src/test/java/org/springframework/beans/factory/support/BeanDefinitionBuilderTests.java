@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

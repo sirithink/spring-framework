@@ -25,13 +25,14 @@ import javax.portlet.RenderResponse;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.validation.BindException;
 import org.springframework.web.portlet.context.StaticPortletApplicationContext;
 import org.springframework.web.portlet.handler.ParameterHandlerMapping;
 import org.springframework.web.portlet.mvc.SimpleFormController;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Mark Fisher

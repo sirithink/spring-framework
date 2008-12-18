@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -40,6 +39,8 @@ import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockServletContext;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests for various ServletContext-related support classes.

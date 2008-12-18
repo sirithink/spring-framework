@@ -16,8 +16,9 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.FactoryBean;
+
+import common.beans.core.TestBean;
 
 /**
  * 

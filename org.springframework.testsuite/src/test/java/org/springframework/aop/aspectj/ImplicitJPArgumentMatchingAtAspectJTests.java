@@ -18,8 +18,9 @@ package org.springframework.aop.aspectj;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.TestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests to check if the first implicit join point argument is correctly processed.
@@ -45,7 +46,7 @@ public class ImplicitJPArgumentMatchingAtAspectJTests extends AbstractDependency
 	
 	@Aspect
 	public static class CounterAtAspectJAspect {
-		@Around(value="execution(* org.springframework.beans.TestBean.*(..)) and this(bean) and args(argument)",
+		@Around(value="execution(* common.beans.core.TestBean.*(..)) and this(bean) and args(argument)",
 				argNames="bean,argument")
 		public void increment(ProceedingJoinPoint pjp, TestBean bean, Object argument) throws Throwable {
 			pjp.proceed();

@@ -23,7 +23,6 @@ import junit.framework.Assert;
 
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.target.dynamic.Refreshable;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -31,7 +30,9 @@ import org.springframework.scripting.Calculator;
 import org.springframework.scripting.ConfigurableMessenger;
 import org.springframework.scripting.Messenger;
 import org.springframework.scripting.ScriptCompilationException;
-import org.springframework.scripting.TestBeanAwareMessenger;
+import common.beans.core.TestBeanAwareMessenger;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop

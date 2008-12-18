@@ -21,9 +21,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.springframework.aop.*;
 import org.springframework.aop.framework.Advised;
-import org.springframework.beans.ITestBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import common.beans.core.ITestBean;
 
 /**
  * TestCase for AdvisorAdapterRegistrationManager mechanism.

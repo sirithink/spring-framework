@@ -20,7 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.ITestBean;
+
+import common.beans.core.ITestBean;
 
 /**
  * @author Rob Harrop

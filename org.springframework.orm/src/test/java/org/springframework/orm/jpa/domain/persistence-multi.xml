@@ -10,7 +10,7 @@
 	</persistence-unit>
 
 	<persistence-unit name="Test" transaction-type="RESOURCE_LOCAL">
-		<class>org.springframework.beans.TestBean</class>
+		<class>common.beans.core.TestBean</class>
 		<exclude-unlisted-classes/>
 	</persistence-unit>
 

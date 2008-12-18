@@ -32,9 +32,10 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.beans.TestBean;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rick Evans

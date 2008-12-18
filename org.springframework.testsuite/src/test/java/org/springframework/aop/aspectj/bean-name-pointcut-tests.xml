@@ -21,11 +21,11 @@
 		</aop:aspect>
 	</aop:config>
 
-	<bean id="testBean1" name="myBean" class="org.springframework.beans.TestBean"/>
+	<bean id="testBean1" name="myBean" class="common.beans.core.TestBean"/>
 
-	<bean id="testBean2" class="org.springframework.beans.TestBean"/>
+	<bean id="testBean2" class="common.beans.core.TestBean"/>
 
-	<bean id="testBeanContainingNestedBean" class="org.springframework.beans.TestBean">
+	<bean id="testBeanContainingNestedBean" class="common.beans.core.TestBean">
 		<property name="doctor">
 			<bean class="org.springframework.beans.NestedTestBean"/>
 		</property>
@@ -53,9 +53,9 @@
      <aop:advisor pointcut="bean(*This) and !bean(dont*)" advice-ref="testInterceptor"/>
 	</aop:config> 
 
-	<bean id="interceptThis" class="org.springframework.beans.TestBean"/>
+	<bean id="interceptThis" class="common.beans.core.TestBean"/>
 
-	<bean id="dontInterceptThis" class="org.springframework.beans.TestBean"/>
+	<bean id="dontInterceptThis" class="common.beans.core.TestBean"/>
 	
 	<bean id="testInterceptor" class="org.springframework.aop.aspectj.BeanNamePointcutTests$TestInterceptor"/>
 	

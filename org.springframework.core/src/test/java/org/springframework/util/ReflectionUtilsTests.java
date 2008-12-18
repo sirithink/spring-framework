@@ -28,7 +28,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * <p> JUnit 4 based unit tests for {@link ReflectionUtils}. </p>

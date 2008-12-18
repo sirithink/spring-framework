@@ -74,20 +74,20 @@
 	
 	<!-- These two beans would otherwise be eligible for autoproxying -->
 	
-	<bean id="singletonDependency" class="org.springframework.beans.TestBean" scope="singleton"/>
+	<bean id="singletonDependency" class="common.beans.core.TestBean" scope="singleton"/>
 		
-	<bean id="prototypeDependency" class="org.springframework.beans.TestBean" scope="prototype"/>
+	<bean id="prototypeDependency" class="common.beans.core.TestBean" scope="prototype"/>
 	
 	<!-- ====== End test for prototype definitions to try to provoke circular references ========================= -->
 
 	<bean class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
 		<property name="advice"><ref bean="countingAdvice"/></property>
-		<property name="pattern"><value>org.springframework.beans.ITestBean.getName</value></property>
+		<property name="pattern"><value>common.beans.core.ITestBean.getName</value></property>
 	</bean>
 
 	<bean id="countingAdvice" class="org.springframework.aop.framework.CountingAfterReturningAdvice"/>
 
-	<bean id="test" class="org.springframework.beans.TestBean">
+	<bean id="test" class="common.beans.core.TestBean">
 		<property name="age"><value>4</value></property>
 	</bean>
 	
@@ -97,7 +97,7 @@
 
 	<!-- The following beans test whether auto-proxying falls over for a null value -->
 
-	<bean id="tb" class="org.springframework.beans.TestBean"/>
+	<bean id="tb" class="common.beans.core.TestBean"/>
 
 	<bean id="nullValueReturned" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
 		<property name="targetObject" ref="tb"/>

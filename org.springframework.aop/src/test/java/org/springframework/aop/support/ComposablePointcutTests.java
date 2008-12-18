@@ -25,8 +25,9 @@ import org.junit.Test;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.MethodMatcher;
 import org.springframework.aop.Pointcut;
-import org.springframework.beans.TestBean;
 import org.springframework.core.NestedRuntimeException;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

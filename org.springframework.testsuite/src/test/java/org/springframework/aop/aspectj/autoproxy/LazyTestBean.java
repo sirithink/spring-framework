@@ -16,7 +16,7 @@
 
 package org.springframework.aop.aspectj.autoproxy;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

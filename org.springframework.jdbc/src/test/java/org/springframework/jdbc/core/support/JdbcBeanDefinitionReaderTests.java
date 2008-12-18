@@ -22,10 +22,11 @@ import java.sql.Statement;
 import org.easymock.MockControl;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.jdbc.AbstractJdbcTests;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson
@@ -46,7 +47,7 @@ public class JdbcBeanDefinitionReaderTests extends AbstractJdbcTests {
 		// first row
 		ctrlResultSet.expectAndReturn(mockResultSet.getString(1), "one");
 		ctrlResultSet.expectAndReturn(mockResultSet.getString(2), "(class)");
-		ctrlResultSet.expectAndReturn(mockResultSet.getString(3), "org.springframework.beans.TestBean");
+		ctrlResultSet.expectAndReturn(mockResultSet.getString(3), "common.beans.core.TestBean");
 
 		// second row
 		ctrlResultSet.expectAndReturn(mockResultSet.getString(1), "one");

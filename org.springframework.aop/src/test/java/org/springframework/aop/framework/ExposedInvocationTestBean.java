@@ -18,7 +18,8 @@ package org.springframework.aop.framework;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
-import org.springframework.beans.TestBean;
+
+import common.beans.core.TestBean;
 
 
 /**

@@ -26,6 +26,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  * @since 11.11.2003

@@ -17,7 +17,7 @@ import java.io.Serializable;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * Utilities for testing serializability of objects.

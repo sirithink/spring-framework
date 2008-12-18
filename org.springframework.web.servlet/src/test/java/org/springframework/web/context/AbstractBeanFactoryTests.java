@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyBatchUpdateException;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanIsNotAFactoryException;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.LifecycleBean;
 import org.springframework.beans.factory.MustBeInitialized;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+
+import common.beans.core.TestBean;
 
 /**
  * Subclasses must implement setUp() to initialize bean factory

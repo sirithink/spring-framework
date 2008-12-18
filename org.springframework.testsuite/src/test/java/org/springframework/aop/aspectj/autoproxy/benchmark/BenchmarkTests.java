@@ -21,9 +21,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.ITestBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
+
+import common.beans.core.ITestBean;
 
 /**
  * Integration tests for AspectJ auto proxying. Includes mixing with Spring AOP 

@@ -29,6 +29,9 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceEditor;
 
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  * @author Rob Harrop

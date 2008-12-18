@@ -30,7 +30,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockPageContext;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -39,6 +38,8 @@ import org.springframework.validation.Errors;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop

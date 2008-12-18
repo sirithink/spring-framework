@@ -17,7 +17,8 @@
 package org.springframework.beans.factory.xml;
 
 import org.springframework.beans.IndexedTestBean;
-import org.springframework.beans.TestBean;
+
+import common.beans.core.TestBean;
 
 /**
  * Simple bean used to check constructor dependency checking.

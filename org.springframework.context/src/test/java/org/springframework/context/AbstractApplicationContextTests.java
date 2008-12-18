@@ -18,10 +18,11 @@ package org.springframework.context;
 
 import java.util.Locale;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.AbstractListableBeanFactoryTests;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.LifecycleBean;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

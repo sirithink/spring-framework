@@ -3,7 +3,7 @@
 
 <beans>
 
-	<bean id="targetDependency" class="org.springframework.beans.TestBean">
+	<bean id="targetDependency" class="common.beans.core.TestBean">
 		<property name="name"><value>dependency</value></property>
 	</bean>
 
@@ -22,16 +22,16 @@
 		<property name="transactionManager"><ref local="mockMan"/></property>
 		<property name="transactionAttributeSource">
 			<value>
-				org.springframework.beans.ITestBean.s*=PROPAGATION_MANDATORY
-				org.springframework.beans.ITestBean.setAg*=PROPAGATION_REQUIRED
-				org.springframework.beans.ITestBean.set*= PROPAGATION_SUPPORTS , readOnly
+				common.beans.core.ITestBean.s*=PROPAGATION_MANDATORY
+				common.beans.core.ITestBean.setAg*=PROPAGATION_REQUIRED
+				common.beans.core.ITestBean.set*= PROPAGATION_SUPPORTS , readOnly
 			</value>
 		</property>
 	</bean>
 
 	<bean id="proxyFactory1" class="org.springframework.aop.framework.ProxyFactoryBean">
 		<property name="proxyInterfaces">
-			<value>org.springframework.beans.ITestBean</value>
+			<value>common.beans.core.ITestBean</value>
 		</property>
 		<property name="interceptorNames">
 			<list>

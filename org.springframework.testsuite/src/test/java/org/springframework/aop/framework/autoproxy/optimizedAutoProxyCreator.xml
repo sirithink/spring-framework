@@ -3,7 +3,7 @@
 
 <beans>
 
-	<bean id="optimizedTestBean" class="org.springframework.beans.TestBean">
+	<bean id="optimizedTestBean" class="common.beans.core.TestBean">
 		<property name="name" value="Optimized"/>
 	</bean>
 

@@ -16,8 +16,9 @@
 
 package org.springframework.web.servlet.tags.form;
 
-import org.springframework.beans.TestBean;
 import org.springframework.validation.BeanPropertyBindingResult;
+
+import common.beans.core.TestBean;
 
 import javax.servlet.jsp.tagext.Tag;
 

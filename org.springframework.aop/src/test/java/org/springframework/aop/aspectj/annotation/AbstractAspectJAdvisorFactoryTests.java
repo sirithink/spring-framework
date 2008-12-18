@@ -43,11 +43,12 @@ import org.springframework.aop.framework.Lockable;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 import example.aspects.PerTargetAspect;
 import example.aspects.TwoAdviceAspect;

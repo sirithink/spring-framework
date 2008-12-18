@@ -5,13 +5,13 @@
 		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 				http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="service" class="org.springframework.beans.TestBean" scope="prototype"/>
+	<bean id="service" class="common.beans.core.TestBean" scope="prototype"/>
 
-	<bean id="serviceDependent1" class="org.springframework.beans.TestBean">
+	<bean id="serviceDependent1" class="common.beans.core.TestBean">
 		<constructor-arg ref="service"/>
 	</bean>
 
-	<bean id="serviceDependent2" class="org.springframework.beans.TestBean">
+	<bean id="serviceDependent2" class="common.beans.core.TestBean">
 		<constructor-arg ref="service"/>
 	</bean>
 
@@ -20,7 +20,7 @@
 	<bean id="serviceInterceptor" class="org.springframework.aop.interceptor.DebugInterceptor"/>
 
 	<aop:config proxy-target-class="false"> 
-		<aop:pointcut id="servicePointcut" expression="target(org.springframework.beans.ITestBean)"/>
+		<aop:pointcut id="servicePointcut" expression="target(common.beans.core.ITestBean)"/>
 		<aop:advisor advice-ref="serviceInterceptor" pointcut-ref="servicePointcut"/>
 	</aop:config>
 

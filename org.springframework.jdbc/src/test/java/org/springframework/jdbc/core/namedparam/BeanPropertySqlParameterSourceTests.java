@@ -22,7 +22,7 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rick Evans

@@ -18,17 +18,17 @@
 
 	<lang:jruby id="messengerByType"
 			script-source="classpath:org/springframework/scripting/jruby/Messenger.rb"
-			script-interfaces="org.springframework.scripting.TestBeanAwareMessenger" scope="prototype"
+			script-interfaces="common.beans.core.TestBeanAwareMessenger" scope="prototype"
 			autowire="byType" dependency-check="objects">
 	</lang:jruby>
 
 	<lang:jruby id="messengerByName"
 			script-source="classpath:org/springframework/scripting/jruby/Messenger.rb"
-			script-interfaces="org.springframework.scripting.TestBeanAwareMessenger" scope="prototype"
+			script-interfaces="common.beans.core.TestBeanAwareMessenger" scope="prototype"
 			autowire="byName">
 	</lang:jruby>
 
-	<bean id="testBean" class="org.springframework.beans.TestBean"/>
+	<bean id="testBean" class="common.beans.core.TestBean"/>
 
 	<lang:jruby id="calculator"
 			script-interfaces="org.springframework.scripting.Calculator">

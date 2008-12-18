@@ -17,6 +17,8 @@
 
 package org.springframework.beans;
 
+import common.beans.core.TestBean;
+
 public class Employee extends TestBean {
 	
 	private String co;

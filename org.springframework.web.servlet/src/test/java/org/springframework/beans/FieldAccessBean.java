@@ -16,6 +16,8 @@
 
 package org.springframework.beans;
 
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  * @since 07.03.2006

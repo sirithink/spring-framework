@@ -24,13 +24,14 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.core.CollectionFactory;
 import org.springframework.mock.web.portlet.MockPortletRequest;
 import org.springframework.validation.BindingResult;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Mark Fisher

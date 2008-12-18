@@ -19,7 +19,8 @@ package org.springframework.aop.framework;
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.beans.ITestBean;
+
+import common.beans.core.ITestBean;
 
 
 public class InvocationCheckExposedInvocationTestBean extends ExposedInvocationTestBean {

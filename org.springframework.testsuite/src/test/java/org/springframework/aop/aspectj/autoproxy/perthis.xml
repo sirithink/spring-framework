@@ -7,7 +7,7 @@
 
 	<bean class="example.aspects.PerThisAspect" scope="prototype"/>
 
-	<bean id="adrian" class="org.springframework.beans.TestBean" scope="prototype">
+	<bean id="adrian" class="common.beans.core.TestBean" scope="prototype">
 		<property name="name" value="adrian"/>
 		<property name="age" value="34"/>
 	</bean>

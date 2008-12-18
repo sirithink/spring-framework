@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Adrian Colyer

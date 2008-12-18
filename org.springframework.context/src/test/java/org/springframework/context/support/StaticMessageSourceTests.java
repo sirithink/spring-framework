@@ -200,9 +200,9 @@ public class StaticMessageSourceTests extends AbstractApplicationContextTests {
 
 		Map m = new HashMap();
 		m.put("name", "Roderick");
-		parent.registerPrototype("rod", org.springframework.beans.TestBean.class, new MutablePropertyValues(m));
+		parent.registerPrototype("rod", common.beans.core.TestBean.class, new MutablePropertyValues(m));
 		m.put("name", "Albert");
-		parent.registerPrototype("father", org.springframework.beans.TestBean.class, new MutablePropertyValues(m));
+		parent.registerPrototype("father", common.beans.core.TestBean.class, new MutablePropertyValues(m));
 
 		parent.refresh();
 		parent.addListener(parentListener);

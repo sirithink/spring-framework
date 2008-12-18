@@ -16,9 +16,10 @@
 
 package org.springframework.beans.factory.xml;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+
+import common.beans.core.TestBean;
 
 /**
  * Simple bean used to test dependency checking.

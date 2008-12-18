@@ -21,9 +21,10 @@ import org.aspectj.lang.annotation.Before;
 
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.aop.framework.Advised;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Test for correct application of the bean() PCD for &#64;AspectJ-based aspects.

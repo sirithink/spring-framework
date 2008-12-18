@@ -19,9 +19,10 @@ package org.springframework.aop.aspectj.autoproxy;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.springframework.beans.ITestBean;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import common.beans.core.ITestBean;
 
 import java.io.IOException;
 

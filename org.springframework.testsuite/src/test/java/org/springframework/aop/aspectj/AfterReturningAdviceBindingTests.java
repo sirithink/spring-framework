@@ -21,9 +21,10 @@ import org.easymock.MockControl;
 import org.springframework.aop.aspectj.AfterReturningAdviceBindingTestAspect.AfterReturningAdviceBindingCollaborator;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Tests for various parameter binding scenarios with before advice.

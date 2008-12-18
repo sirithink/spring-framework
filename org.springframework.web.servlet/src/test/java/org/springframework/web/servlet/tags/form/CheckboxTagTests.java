@@ -31,10 +31,11 @@ import org.dom4j.io.SAXReader;
 
 import org.springframework.beans.Colour;
 import org.springframework.beans.Pet;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop

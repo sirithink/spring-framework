@@ -24,9 +24,10 @@ import javax.naming.NamingException;
 
 import org.junit.Test;
 import org.springframework.beans.DerivedTestBean;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.mock.jndi.ExpectedLookupTemplate;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

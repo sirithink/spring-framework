@@ -25,9 +25,7 @@ import javax.ejb.EJB;
 
 import org.junit.Test;
 import org.springframework.beans.INestedTestBean;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.NestedTestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -37,6 +35,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.jndi.support.SimpleJndiBeanFactory;
 import org.springframework.mock.jndi.ExpectedLookupTemplate;
 import org.springframework.util.SerializationTestUtils;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

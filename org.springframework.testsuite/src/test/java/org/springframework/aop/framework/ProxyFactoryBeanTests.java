@@ -41,9 +41,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.DefaultIntroductionAdvisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.DynamicMethodMatcherPointcut;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.Person;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -56,7 +54,9 @@ import org.springframework.context.TestListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.SerializationTestUtils;
 
+import common.beans.core.ITestBean;
 import common.beans.core.SideEffectBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

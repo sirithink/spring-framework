@@ -22,8 +22,9 @@ import junit.framework.TestCase;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.DerivedTestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

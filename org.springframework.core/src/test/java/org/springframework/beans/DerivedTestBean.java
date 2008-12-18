@@ -18,6 +18,8 @@ package org.springframework.beans;
 
 import java.io.Serializable;
 
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  * @since 21.08.2003

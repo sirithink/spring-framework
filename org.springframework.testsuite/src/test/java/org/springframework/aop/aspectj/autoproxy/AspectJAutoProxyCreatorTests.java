@@ -32,10 +32,8 @@ import org.springframework.aop.config.AopConfigUtils;
 import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.INestedTestBean;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.NestedTestBean;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -45,6 +43,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.util.StopWatch;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Integration tests for AspectJ auto-proxying. Includes mixing with Spring AOP Advisors

@@ -30,19 +30,20 @@ import junit.framework.TestCase;
 import junit.framework.Assert;
 
 import org.springframework.beans.BeanWithObjectProperty;
-import org.springframework.beans.DerivedTestBean;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.IndexedTestBean;
+import common.beans.core.TestBean;
+import common.beans.core.TestBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.SerializablePerson;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.util.StringUtils;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson
@@ -1031,7 +1032,7 @@ public class DataBinderTests extends TestCase {
 		assertEquals("NOT_ROD.tb.array", errors.getFieldError("array[0]").getCodes()[1]);
 		assertEquals("NOT_ROD.array[0]", errors.getFieldError("array[0]").getCodes()[2]);
 		assertEquals("NOT_ROD.array", errors.getFieldError("array[0]").getCodes()[3]);
-		assertEquals("NOT_ROD.org.springframework.beans.DerivedTestBean", errors.getFieldError("array[0]").getCodes()[4]);
+		assertEquals("NOT_ROD.common.beans.core.TestBean", errors.getFieldError("array[0]").getCodes()[4]);
 		assertEquals("NOT_ROD", errors.getFieldError("array[0]").getCodes()[5]);
 		assertEquals("arraya", errors.getFieldValue("array[0]"));
 
@@ -1041,7 +1042,7 @@ public class DataBinderTests extends TestCase {
 		assertEquals("NOT_ROD.tb.map", errors.getFieldError("map[key1]").getCodes()[1]);
 		assertEquals("NOT_ROD.map[key1]", errors.getFieldError("map[key1]").getCodes()[2]);
 		assertEquals("NOT_ROD.map", errors.getFieldError("map[key1]").getCodes()[3]);
-		assertEquals("NOT_ROD.org.springframework.beans.TestBean", errors.getFieldError("map[key1]").getCodes()[4]);
+		assertEquals("NOT_ROD.common.beans.core.TestBean", errors.getFieldError("map[key1]").getCodes()[4]);
 		assertEquals("NOT_ROD", errors.getFieldError("map[key1]").getCodes()[5]);
 
 		assertEquals(1, errors.getFieldErrorCount("map[key0]"));
@@ -1077,7 +1078,7 @@ public class DataBinderTests extends TestCase {
 		assertEquals("NOT_NULL.map", errors.getFieldError("map[key0]").getCodes()[3]);
 		// This next code is only generated because of the registered editor, using the
 		// registered type of the editor as guess for the content type of the collection.
-		assertEquals("NOT_NULL.org.springframework.beans.TestBean", errors.getFieldError("map[key0]").getCodes()[4]);
+		assertEquals("NOT_NULL.common.beans.core.TestBean", errors.getFieldError("map[key0]").getCodes()[4]);
 		assertEquals("NOT_NULL", errors.getFieldError("map[key0]").getCodes()[5]);
 	}
 
@@ -1105,7 +1106,7 @@ public class DataBinderTests extends TestCase {
 		assertEquals("NOT_NULL.map", errors.getFieldError("map[key0]").getCodes()[3]);
 		// This next code is only generated because of the registered editor, using the
 		// registered type of the editor as guess for the content type of the collection.
-		assertEquals("NOT_NULL.org.springframework.beans.TestBean", errors.getFieldError("map[key0]").getCodes()[4]);
+		assertEquals("NOT_NULL.common.beans.core.TestBean", errors.getFieldError("map[key0]").getCodes()[4]);
 		assertEquals("NOT_NULL", errors.getFieldError("map[key0]").getCodes()[5]);
 	}
 
@@ -1135,7 +1136,7 @@ public class DataBinderTests extends TestCase {
 		assertEquals("NOT_ROD.tb.array", errors.getFieldError("array[0]").getCodes()[1]);
 		assertEquals("NOT_ROD.array[0]", errors.getFieldError("array[0]").getCodes()[2]);
 		assertEquals("NOT_ROD.array", errors.getFieldError("array[0]").getCodes()[3]);
-		assertEquals("NOT_ROD.org.springframework.beans.DerivedTestBean", errors.getFieldError("array[0]").getCodes()[4]);
+		assertEquals("NOT_ROD.common.beans.core.TestBean", errors.getFieldError("array[0]").getCodes()[4]);
 		assertEquals("NOT_ROD", errors.getFieldError("array[0]").getCodes()[5]);
 		assertEquals("arraya", errors.getFieldValue("array[0]"));
 	}

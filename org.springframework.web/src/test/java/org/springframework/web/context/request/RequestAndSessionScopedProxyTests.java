@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -28,6 +27,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.StaticWebApplicationContext;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

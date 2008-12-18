@@ -9,20 +9,20 @@
 		<property name="multiple" value="3"/>
 	</bean>
 
-	<bean id="adrian" class="org.springframework.beans.TestBean">
+	<bean id="adrian" class="common.beans.core.TestBean">
 		<property name="name" value="Adrian"/>
 		<property name="age" value="34"/>
 	</bean>
 
-	<bean id="adrian2" class="org.springframework.beans.TestBean" scope="prototype">
+	<bean id="adrian2" class="common.beans.core.TestBean" scope="prototype">
 		<property name="name" value="Adrian"/>
 		<property name="age" value="34"/>
 	</bean>
 
-	<bean id="i21" class="org.springframework.beans.NestedTestBean" scope="prototype">
+	<bean id="i21" class="common.beans.core.TestBean" scope="prototype">
 		<property name="company" value="i21"/>
 	</bean>
 
-	<bean id="advisor" class="org.springframework.aop.aspectj.autoproxy.TestBeanAdvisor"/>
+	<bean id="advisor" class="common.beans.core.TestBeanAdvisor"/>
 
 </beans>

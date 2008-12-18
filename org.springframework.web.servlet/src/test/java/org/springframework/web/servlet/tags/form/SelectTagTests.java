@@ -38,13 +38,14 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.tags.TransformTag;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rob Harrop
@@ -189,7 +190,7 @@ public class SelectTagTests extends AbstractFormTagTests {
 		catch (JspException expected) {
 			String message = expected.getMessage();
 			assertTrue(message.indexOf("items") > -1);
-			assertTrue(message.indexOf("org.springframework.beans.TestBean") > -1);
+			assertTrue(message.indexOf("common.beans.core.TestBean") > -1);
 		}
 	}
 

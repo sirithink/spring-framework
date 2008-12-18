@@ -20,11 +20,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.springframework.aop.framework.autoproxy.CountingTestBean;
-import org.springframework.beans.IOther;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+
+import common.beans.core.IOther;
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Unit tests for the {@link TypePatternClassFilter} class.

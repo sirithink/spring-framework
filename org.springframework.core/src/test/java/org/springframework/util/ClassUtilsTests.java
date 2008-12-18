@@ -29,10 +29,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
-import org.springframework.beans.DerivedTestBean;
-import org.springframework.beans.IOther;
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
+import common.beans.core.TestBean;
+
+import common.beans.core.IOther;
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * @author Colin Sampaleanu
@@ -59,10 +60,10 @@ public class ClassUtilsTests extends TestCase {
 		assertEquals(String[].class, ClassUtils.forName(String[].class.getName()));
 		assertEquals(String[][].class, ClassUtils.forName(String[][].class.getName()));
 		assertEquals(String[][][].class, ClassUtils.forName(String[][][].class.getName()));
-		assertEquals(TestBean.class, ClassUtils.forName("org.springframework.beans.TestBean"));
-		assertEquals(TestBean[].class, ClassUtils.forName("org.springframework.beans.TestBean[]"));
+		assertEquals(TestBean.class, ClassUtils.forName("common.beans.core.TestBean"));
+		assertEquals(TestBean[].class, ClassUtils.forName("common.beans.core.TestBean[]"));
 		assertEquals(TestBean[].class, ClassUtils.forName(TestBean[].class.getName()));
-		assertEquals(TestBean[][].class, ClassUtils.forName("org.springframework.beans.TestBean[][]"));
+		assertEquals(TestBean[][].class, ClassUtils.forName("common.beans.core.TestBean[][]"));
 		assertEquals(TestBean[][].class, ClassUtils.forName(TestBean[][].class.getName()));
 	}
 

@@ -22,6 +22,6 @@
 
 	<bean id="introduction" class="org.springframework.aop.aspectj.NonAnnotatedMakeLockable"/>
 
-	<bean id="testBean" class="org.springframework.beans.TestBean"/>
+	<bean id="testBean" class="common.beans.core.TestBean"/>
 
 </beans>

@@ -21,9 +21,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.TestBean;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.support.RequestContext;
+
+import common.beans.core.TestBean;
 
 /**
  * Dummy request context used for VTL and FTL macro tests.

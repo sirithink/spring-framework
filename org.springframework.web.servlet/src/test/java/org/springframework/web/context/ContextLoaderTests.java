@@ -27,7 +27,6 @@ import javax.servlet.ServletContextListener;
 
 import org.junit.Test;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.LifecycleBean;
@@ -40,6 +39,8 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.SimpleWebApplicationContext;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests for {@link ContextLoader}, {@link ContextLoaderListener},
@@ -125,9 +126,9 @@ public class ContextLoaderTests {
 		assertTrue("Has kerry", context.containsBean("kerry"));
 		assertTrue("Not destroyed", !lb.isDestroyed());
 		assertTrue(context.containsBean("beans1.bean1"));
-		assertTrue(context.isTypeMatch("beans1.bean1", org.springframework.beans.factory.access.TestBean.class));
+		assertTrue(context.isTypeMatch("beans1.bean1", common.beans.core.TestBean.class));
 		assertTrue(context.containsBean("beans1.bean2"));
-		assertTrue(context.isTypeMatch("beans1.bean2", org.springframework.beans.factory.access.TestBean.class));
+		assertTrue(context.isTypeMatch("beans1.bean2", common.beans.core.TestBean.class));
 		listener.contextDestroyed(event);
 		assertTrue("Destroyed", lb.isDestroyed());
 	}

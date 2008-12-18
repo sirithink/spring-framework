@@ -30,7 +30,6 @@ import junit.framework.TestCase;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.TestBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -55,6 +54,8 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.theme.AbstractThemeResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.util.WebUtils;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

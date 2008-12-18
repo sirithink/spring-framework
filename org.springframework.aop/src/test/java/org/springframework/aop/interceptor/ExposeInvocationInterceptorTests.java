@@ -19,9 +19,10 @@ package org.springframework.aop.interceptor;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.springframework.beans.ITestBean;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
+
+import common.beans.core.ITestBean;
 
 /**
  * Non-XML tests are in AbstractAopProxyTests

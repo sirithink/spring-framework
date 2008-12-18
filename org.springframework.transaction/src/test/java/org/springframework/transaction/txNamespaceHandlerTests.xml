@@ -28,6 +28,6 @@
 
 	<bean id="transactionManager" class="org.springframework.transaction.CallCountingTransactionManager"/>
 
-	<bean id="testBean" class="org.springframework.beans.TestBean"/>
+	<bean id="testBean" class="common.beans.core.TestBean"/>
 
 </beans>

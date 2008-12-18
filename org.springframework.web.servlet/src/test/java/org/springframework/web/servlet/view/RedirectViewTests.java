@@ -29,9 +29,10 @@ import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import org.easymock.MockControl;
 
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests for redirect view, and query string construction.

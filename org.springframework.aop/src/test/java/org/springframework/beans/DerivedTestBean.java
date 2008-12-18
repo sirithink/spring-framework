@@ -21,6 +21,8 @@ import java.io.Serializable;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 
+import common.beans.core.TestBean;
+
 /**
  * @author Juergen Hoeller
  * @since 21.08.2003

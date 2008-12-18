@@ -22,7 +22,6 @@ import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -30,6 +29,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.mock.web.portlet.MockPortletConfig;
 import org.springframework.mock.web.portlet.MockPortletContext;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

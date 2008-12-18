@@ -21,7 +21,6 @@ import java.util.Locale;
 import javax.servlet.ServletException;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -32,6 +31,8 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.TestListener;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Rod Johnson

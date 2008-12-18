@@ -18,8 +18,9 @@ package org.springframework.aop.aspectj.autoproxy;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.aop.framework.Advised;
-import org.springframework.beans.ITestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.ITestBean;
 
 /**
  * Test for ensuring the aspects aren't advised. See SPR-3893 for more details.

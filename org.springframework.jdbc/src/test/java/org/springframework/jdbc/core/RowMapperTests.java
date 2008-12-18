@@ -28,9 +28,10 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.beans.TestBean;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+
+import common.beans.core.TestBean;
 
 /**
  * @author Juergen Hoeller

@@ -21,8 +21,6 @@ import java.lang.reflect.Method;
 import junit.framework.TestCase;
 import org.easymock.MockControl;
 
-import org.springframework.beans.ITestBean;
-import org.springframework.beans.TestBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.MockCallbackPreferringTransactionManager;
@@ -33,6 +31,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.TransactionAspectSupport.TransactionInfo;
+
+import common.beans.core.ITestBean;
+import common.beans.core.TestBean;
 
 /**
  * Mock object based tests for transaction aspects.

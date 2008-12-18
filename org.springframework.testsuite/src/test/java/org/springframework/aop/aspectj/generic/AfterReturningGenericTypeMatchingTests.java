@@ -24,8 +24,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
 import org.springframework.beans.Employee;
-import org.springframework.beans.TestBean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import common.beans.core.TestBean;
 
 /**
  * Tests ensuring that after-returning advice for generic parameters bound to

@@ -30,7 +30,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.IndexedTestBean;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -42,6 +41,8 @@ import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
+import common.beans.core.TestBean;
 
 /**
  * Unit tests for various {@link PropertyResourceConfigurer} implementations including:

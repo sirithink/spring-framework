@@ -17,9 +17,14 @@
 package org.springframework.web.servlet.tags.form;
 
 import java.beans.PropertyEditorSupport;
+import java.text.ParseException;
+import java.util.Locale;
+
+import org.springframework.model.ui.format.Formatter;
 
 /**
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  */
 public class ItemPet {
 
@@ -66,6 +71,19 @@ public class ItemPet {
 		public String getAsText() {
 			return ((ItemPet) getValue()).getName();
 		}
+	}
+	
+	public static class CustomFormatter implements Formatter<ItemPet> {
+
+        @Override
+        public String format(ItemPet object, Locale locale) {
+            return object.getName();
+        }
+
+        @Override
+        public ItemPet parse(String formatted, Locale locale) throws ParseException {
+            return new ItemPet(formatted);
+        } 
 	}
 
 }

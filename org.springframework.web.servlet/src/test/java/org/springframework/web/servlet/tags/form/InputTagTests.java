@@ -20,7 +20,10 @@ import java.io.Writer;
 
 import javax.servlet.jsp.tagext.Tag;
 
-import org.springframework.beans.TestBean;
+import org.springframework.model.alert.AlertContext;
+import org.springframework.model.alert.Alerts;
+import org.springframework.model.alert.support.DefaultAlertContext;
+import org.springframework.model.ui.support.DefaultPresentationModel;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.tags.BindTag;
@@ -29,6 +32,7 @@ import org.springframework.web.servlet.tags.NestedPathTag;
 /**
  * @author Rob Harrop
  * @author Rick Evans
+ * @author Jeremy Grelle
  */
 public class InputTagTests extends AbstractFormTagTests {
 
@@ -41,6 +45,10 @@ public class InputTagTests extends AbstractFormTagTests {
 		this.tag = createTag(getWriter());
 		this.tag.setParent(getFormTag());
 		this.tag.setPageContext(getPageContext());
+		
+	    DefaultPresentationModel presentationModel = new DefaultPresentationModel(this.rob);
+	    this.tag.setPresentationModel(presentationModel);    
+	    this.tag.setLegacyBinding(false);
 	}
 
 	protected TestBean createTestBean() {
@@ -73,32 +81,50 @@ public class InputTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "type", getType());
 		assertValueAttribute(output, "Rob");
 	}
+	
+	public void testSimpleBindLegacy() throws Exception {
+        enableLegacyBinding(this.tag);
+        testSimpleBind();
+    }
 
+	//TODO - Should the bind tag be supported at all with the new binding system?
 	public void testSimpleBindTagWithinForm() throws Exception {
-		BindTag bindTag = new BindTag();
-		bindTag.setPath("name");
-		bindTag.setPageContext(getPageContext());
-		bindTag.doStartTag();
-
-		BindStatus bindStatus = (BindStatus) getPageContext().findAttribute(BindTag.STATUS_VARIABLE_NAME);
-		assertEquals("Rob", bindStatus.getValue());
+		fail("Not implemented");
 	}
+	
+	public void testSimpleBindTagWithinFormLegacy() throws Exception {
+        enableLegacyBinding(this.tag);
+        
+        BindTag bindTag = new BindTag();
+        bindTag.setPath("name");
+        bindTag.setPageContext(getPageContext());
+        bindTag.doStartTag();
+
+        BindStatus bindStatus = (BindStatus) getPageContext().findAttribute(BindTag.STATUS_VARIABLE_NAME);
+        assertEquals("Rob", bindStatus.getValue());
+    }
 
 	public void testSimpleBindWithHtmlEscaping() throws Exception {
-		final String NAME = "Rob \"I Love Mangos\" Harrop";
-		final String HTML_ESCAPED_NAME = "Rob &quot;I Love Mangos&quot; Harrop";
+        final String NAME = "Rob \"I Love Mangos\" Harrop";
+        final String HTML_ESCAPED_NAME = "Rob &quot;I Love Mangos&quot; Harrop";
 
-		this.tag.setPath("name");
-		this.rob.setName(NAME);
+        this.tag.setPath("name");
+        this.rob.setName(NAME);
 
-		assertEquals(Tag.SKIP_BODY, this.tag.doStartTag());
+        assertEquals(Tag.SKIP_BODY, this.tag.doStartTag());
 
-		String output = getOutput();
-		assertTagOpened(output);
-		assertTagClosed(output);
+        String output = getOutput();
+        assertTagOpened(output);
+        assertTagClosed(output);
 
-		assertContainsAttribute(output, "type", getType());
-		assertValueAttribute(output, HTML_ESCAPED_NAME);
+        assertContainsAttribute(output, "type", getType());
+        assertValueAttribute(output, HTML_ESCAPED_NAME);
+    }
+	
+	public void testSimpleBindWithHtmlEscapingLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    
+		testSimpleBindWithHtmlEscaping();
 	}
 
 	protected void assertValueAttribute(String output, String expectedValue) {
@@ -118,6 +144,11 @@ public class InputTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "name", "spouse.name");
 		assertContainsAttribute(output, "type", getType());
 		assertValueAttribute(output, "Sally");
+	}
+	
+	public void testComplexBindLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testComplexBind();
 	}
 
 	public void testWithAllAttributes() throws Exception {
@@ -218,6 +249,11 @@ public class InputTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "readonly", "readonly");
 		assertContainsAttribute(output, "autocomplete", autocomplete);
 	}
+	
+	public void testWithAllAttributesLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithAllAttributes();
+	}
 
 	public void testWithNestedBind() throws Exception {
 		NestedPathTag nestedPathTag = new NestedPathTag();
@@ -236,8 +272,19 @@ public class InputTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "type", getType());
 		assertValueAttribute(output, "Sally");
 	}
+	
+	public void testWithNestedBindLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithNestedBind();
+	}
 
+	//TODO - Should the bind tag be supported at all with the new binding system?
 	public void testWithNestedBindTagWithinForm() throws Exception {
+	    fail("Not implemented");
+	}
+	
+	public void testWithNestedBindTagWithinFormLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
 		NestedPathTag nestedPathTag = new NestedPathTag();
 		nestedPathTag.setPath("spouse.");
 		nestedPathTag.setPageContext(getPageContext());
@@ -252,7 +299,29 @@ public class InputTagTests extends AbstractFormTagTests {
 		assertEquals("Sally", bindStatus.getValue());
 	}
 
+	public void testWithErrorAlerts() throws Exception {
+        this.tag.setPath("name");
+        this.tag.setCssClass("good");
+        this.tag.setCssErrorClass("bad");
+        
+        AlertContext context = new DefaultAlertContext();
+        context.add("name", Alerts.error("Default Message"));
+        context.add("name", Alerts.error("Too Short"));
+        this.tag.setAlertContext(context);
+
+        assertEquals(Tag.SKIP_BODY, this.tag.doStartTag());
+
+        String output = getOutput();
+        assertTagOpened(output);
+        assertTagClosed(output);
+
+        assertContainsAttribute(output, "type", getType());
+        assertValueAttribute(output, "Rob");
+        assertContainsAttribute(output, "class", "bad");
+    }
+	
 	public void testWithErrors() throws Exception {
+	    enableLegacyBinding(this.tag);
 		this.tag.setPath("name");
 		this.tag.setCssClass("good");
 		this.tag.setCssErrorClass("bad");
@@ -281,8 +350,14 @@ public class InputTagTests extends AbstractFormTagTests {
 		String output = getOutput();
 		assertAttributeNotPresent(output, "disabled");
 	}
+	
+	//TODO - Implement custom binding test with new binding system
+	public void testWithCustomBinder() {
+	    fail("Not implemented");
+	}
 
-	public void testWithCustomBinder() throws Exception {
+	public void testWithCustomBinderLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
 		this.tag.setPath("myFloat");
 
 		BeanPropertyBindingResult errors = new BeanPropertyBindingResult(this.rob, COMMAND_NAME);

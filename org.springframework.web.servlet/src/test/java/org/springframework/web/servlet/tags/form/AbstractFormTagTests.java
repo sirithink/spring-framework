@@ -18,7 +18,6 @@ package org.springframework.web.servlet.tags.form;
 
 import javax.servlet.jsp.JspException;
 
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockPageContext;
 
@@ -28,24 +27,23 @@ import org.springframework.mock.web.MockPageContext;
  */
 public abstract class AbstractFormTagTests extends AbstractHtmlElementTagTests {
 
-	private FormTag formTag = new FormTag();
+    private FormTag formTag = new FormTag();
 
+    protected void extendRequest(MockHttpServletRequest request) {
+        request.setAttribute(COMMAND_NAME, createTestBean());
+    }
 
-	protected void extendRequest(MockHttpServletRequest request) {
-		request.setAttribute(COMMAND_NAME, createTestBean());
-	}
+    protected abstract TestBean createTestBean();
 
-	protected abstract TestBean createTestBean();
+    protected void extendPageContext(MockPageContext pageContext) throws JspException {
+        this.formTag.setCommandName(COMMAND_NAME);
+        this.formTag.setAction("myAction");
+        this.formTag.setPageContext(pageContext);
+        this.formTag.doStartTag();
+    }
 
-	protected void extendPageContext(MockPageContext pageContext) throws JspException {
-		this.formTag.setCommandName(COMMAND_NAME);
-		this.formTag.setAction("myAction");
-		this.formTag.setPageContext(pageContext);
-		this.formTag.doStartTag();
-	}
-
-	protected final FormTag getFormTag() {
-		return this.formTag;
-	}
+    protected final FormTag getFormTag() {
+        return this.formTag;
+    }
 
 }

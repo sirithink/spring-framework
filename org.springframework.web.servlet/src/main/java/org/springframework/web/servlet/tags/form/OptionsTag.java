@@ -18,6 +18,7 @@ package org.springframework.web.servlet.tags.form;
 
 import javax.servlet.jsp.JspException;
 
+import org.springframework.model.ui.FieldModel;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -151,8 +152,12 @@ public class OptionsTag extends AbstractHtmlElementTag {
 		if (items != null) {
 			itemsObject = (items instanceof String ? evaluate("items", (String) items) : items);
 		} else {
-			Class<?> selectTagBoundType = ((SelectTag) findAncestorWithClass(this, SelectTag.class))
-				.getBindStatus().getValueType();
+			Class<?> selectTagBoundType;
+			if (isLegacyBinding()) {
+			    selectTagBoundType = ((SelectTag) findAncestorWithClass(this, SelectTag.class)).getBindStatus().getValueType();
+			} else {
+			    selectTagBoundType = ((SelectTag) findAncestorWithClass(this, SelectTag.class)).getFieldModel().getValueType();
+			}
 			if (selectTagBoundType != null && selectTagBoundType.isEnum()) {
 				itemsObject = selectTagBoundType.getEnumConstants();
 			}
@@ -164,7 +169,13 @@ public class OptionsTag extends AbstractHtmlElementTag {
 					(itemValue != null ? ObjectUtils.getDisplayString(evaluate("itemValue", itemValue)) : null);
 			String labelProperty =
 					(itemLabel != null ? ObjectUtils.getDisplayString(evaluate("itemLabel", itemLabel)) : null);
-			OptionsWriter optionWriter = new OptionsWriter(itemsObject, valueProperty, labelProperty);
+			OptionsWriter optionWriter;
+			if (isLegacyBinding()) {
+			    optionWriter = new OptionsWriter(itemsObject, getBindStatus(), valueProperty, labelProperty);
+			} else {
+			    optionWriter = new OptionsWriter(itemsObject, getFieldModel(), valueProperty, labelProperty);
+			}
+			
 			optionWriter.writeOptions(tagWriter);
 		}
 		return SKIP_BODY;
@@ -192,18 +203,27 @@ public class OptionsTag extends AbstractHtmlElementTag {
 	protected BindStatus getBindStatus() {
 		return (BindStatus) this.pageContext.getAttribute(SelectTag.LIST_VALUE_PAGE_ATTRIBUTE);
 	}
+	
+	@Override
+    protected FieldModel getFieldModel() throws JspException {
+        return (FieldModel) this.pageContext.getAttribute(SelectTag.LIST_VALUE_PAGE_ATTRIBUTE);
+    }
 
 
 	/**
 	 * Inner class that adapts OptionWriter for multiple options to be rendered.
 	 */
 	private class OptionsWriter extends OptionWriter {
+		
+		public OptionsWriter(Object optionSource, BindStatus bindStatus, String valueProperty, String labelProperty) {
+            super(optionSource, bindStatus, valueProperty, labelProperty, isHtmlEscape());
+        }
 
-		public OptionsWriter(Object optionSource, String valueProperty, String labelProperty) {
-			super(optionSource, getBindStatus(), valueProperty, labelProperty, isHtmlEscape());
-		}
+        public OptionsWriter(Object optionSource, FieldModel fieldModel, String valueProperty, String labelProperty) {
+            super(optionSource, fieldModel, valueProperty, labelProperty, isHtmlEscape());
+        }
 
-		@Override
+        @Override
 		protected boolean isOptionDisabled() {
 			return isDisabled();
 		}

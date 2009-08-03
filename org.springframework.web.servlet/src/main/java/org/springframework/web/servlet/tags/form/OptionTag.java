@@ -20,6 +20,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTag;
 
+import org.springframework.model.ui.FieldModel;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.util.TagUtils;
@@ -175,15 +176,24 @@ public class OptionTag extends AbstractHtmlElementBodyTag implements BodyTag {
 		this.oldValue = this.pageContext.getAttribute(VALUE_VARIABLE_NAME);
 		this.pageContext.setAttribute(VALUE_VARIABLE_NAME, value);
 		this.oldDisplayValue = this.pageContext.getAttribute(DISPLAY_VALUE_VARIABLE_NAME);
-		this.pageContext.setAttribute(DISPLAY_VALUE_VARIABLE_NAME, getDisplayString(value, getBindStatus().getEditor()));
+		if (isLegacyBinding()) {
+		    this.pageContext.setAttribute(DISPLAY_VALUE_VARIABLE_NAME, getDisplayString(value, getBindStatus().getEditor()));
+		} else {
+		    this.pageContext.setAttribute(DISPLAY_VALUE_VARIABLE_NAME, getDisplayString(value, getFieldModel()));
+		}
 	}
 
 	@Override
 	protected BindStatus getBindStatus() {
 		return (BindStatus) this.pageContext.getAttribute(SelectTag.LIST_VALUE_PAGE_ATTRIBUTE);
 	}
-
+	
 	@Override
+    protected FieldModel getFieldModel() throws JspException {
+	    return (FieldModel) this.pageContext.getAttribute(SelectTag.LIST_VALUE_PAGE_ATTRIBUTE);
+    }
+
+    @Override
 	protected void removeAttributes() {
 		if (this.oldValue != null) {
 			this.pageContext.setAttribute(VALUE_ATTRIBUTE, this.oldValue);
@@ -206,7 +216,12 @@ public class OptionTag extends AbstractHtmlElementBodyTag implements BodyTag {
 		tagWriter.startTag("option");
 		writeOptionalAttribute(tagWriter, "id", resolveId());
 		writeOptionalAttributes(tagWriter);
-		String renderedValue = getDisplayString(value, getBindStatus().getEditor());
+		String renderedValue;
+		if (isLegacyBinding()) {
+		    renderedValue = getDisplayString(value, getBindStatus().getEditor());
+		} else {
+		    renderedValue = getDisplayString(value, getFieldModel());
+		}
 		tagWriter.writeAttribute(VALUE_ATTRIBUTE, renderedValue);
 		if (isSelected(value)) {
 			tagWriter.writeAttribute(SELECTED_ATTRIBUTE, SELECTED_ATTRIBUTE);
@@ -232,15 +247,23 @@ public class OptionTag extends AbstractHtmlElementBodyTag implements BodyTag {
 	private String getLabelValue(Object resolvedValue) throws JspException {
 		String label = getLabel();
 		Object labelObj = (label == null ? resolvedValue : evaluate("label", label));
-		return  getDisplayString(labelObj, getBindStatus().getEditor());
+		if (isLegacyBinding()) {
+		    return  getDisplayString(labelObj, getBindStatus().getEditor());
+		} else {
+		    return  getDisplayString(labelObj, getFieldModel());
+		}
 	}
 
 	private void assertUnderSelectTag() {
 		TagUtils.assertHasAncestorOfType(this, SelectTag.class, "option", "select");
 	}
 
-	private boolean isSelected(Object resolvedValue) {
-		return SelectedValueComparator.isSelected(getBindStatus(), resolvedValue);
+	private boolean isSelected(Object resolvedValue) throws JspException {
+	    if (isLegacyBinding()) {
+	        return SelectedValueComparator.isSelected(getBindStatus(), resolvedValue);
+	    } else {
+	        return SelectedValueComparator.isSelected(getFieldModel(), resolvedValue);
+	    }
 	}
 
 	private Object resolveValue() throws JspException {

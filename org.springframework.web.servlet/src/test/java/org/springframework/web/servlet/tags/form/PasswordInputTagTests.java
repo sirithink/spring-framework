@@ -23,6 +23,7 @@ import javax.servlet.jsp.tagext.Tag;
 /**
  * @author Rob Harrop
  * @author Rick Evans
+ * @author Jeremy Grelle
  */
 public class PasswordInputTagTests extends InputTagTests {
 
@@ -41,6 +42,11 @@ public class PasswordInputTagTests extends InputTagTests {
 		assertContainsAttribute(output, "type", getType());
 		assertValueAttribute(output, "");
 	}
+	
+	public void testPasswordValueIsNotRenderedByDefaultLegacy() throws Exception {
+	    enableLegacyBinding(this.getTag());
+	    testPasswordValueIsNotRenderedByDefault();
+	}
 
 	/*
 	 * http://opensource.atlassian.com/projects/spring/browse/SPR-2866
@@ -58,6 +64,11 @@ public class PasswordInputTagTests extends InputTagTests {
 		assertContainsAttribute(output, "type", getType());
 		assertValueAttribute(output, "Rob");
 	}
+	
+	public void testPasswordValueIsRenderedIfShowPasswordAttributeIsSetToTrueLegacy() throws Exception {
+	    enableLegacyBinding(this.getTag());
+	    testPasswordValueIsRenderedIfShowPasswordAttributeIsSetToTrue();
+	}
 
 	/*
 	 * http://opensource.atlassian.com/projects/spring/browse/SPR-2866
@@ -74,6 +85,11 @@ public class PasswordInputTagTests extends InputTagTests {
 
 		assertContainsAttribute(output, "type", getType());
 		assertValueAttribute(output, "");
+	}
+	
+	public void testPasswordValueIsNotRenderedIfShowPasswordAttributeIsSetToFalseLegacy() throws Exception {
+	    enableLegacyBinding(this.getTag());
+	    testPasswordValueIsNotRenderedIfShowPasswordAttributeIsSetToFalse();
 	}
 
 

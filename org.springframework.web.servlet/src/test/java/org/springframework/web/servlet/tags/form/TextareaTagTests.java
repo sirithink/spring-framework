@@ -18,19 +18,24 @@ package org.springframework.web.servlet.tags.form;
 
 import javax.servlet.jsp.tagext.Tag;
 
-import org.springframework.beans.TestBean;
+import org.springframework.model.ui.support.DefaultPresentationModel;
+import org.springframework.model.ui.support.FormatterRegistry;
+import org.springframework.model.ui.support.GenericFormatterRegistry;
 import org.springframework.validation.BeanPropertyBindingResult;
 
 /**
  * @author Rob Harrop
  * @author Rick Evans
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  */
 public class TextareaTagTests extends AbstractFormTagTests {
 
 	private TextareaTag tag;
 
 	private TestBean rob;
+
+    private FormatterRegistry formatterRegistry;
 
 	protected void onSetUp() {
 		this.tag = new TextareaTag() {
@@ -39,6 +44,12 @@ public class TextareaTagTests extends AbstractFormTagTests {
 			}
 		};
 		this.tag.setPageContext(getPageContext());
+		
+		DefaultPresentationModel presentationModel = new DefaultPresentationModel(this.rob);
+		this.formatterRegistry = new GenericFormatterRegistry();
+        presentationModel.setFormatterRegistry(this.formatterRegistry);
+        this.tag.setPresentationModel(presentationModel);    
+        this.tag.setLegacyBinding(false);
 	}
 
 	public void testSimpleBind() throws Exception {
@@ -50,6 +61,11 @@ public class TextareaTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "name", "name");
 		assertContainsAttribute(output, "readonly", "readonly");
 		assertBlockTagContains(output, "Rob");
+	}
+	
+	public void testSimpleBindLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testSimpleBind();
 	}
 
 	public void testComplexBind() throws Exception {
@@ -63,6 +79,11 @@ public class TextareaTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "name", "spouse.name");
 		assertContainsAttribute(output, "onselect", onselect);
 		assertAttributeNotPresent(output, "readonly");
+	}
+	
+	public void testComplexBindLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testComplexBind();
 	}
 
 	public void testSimpleBindWithHtmlEscaping() throws Exception {
@@ -78,8 +99,24 @@ public class TextareaTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "name", "name");
 		assertBlockTagContains(output, HTML_ESCAPED_NAME);
 	}
+	
+	public void testSimpleBindWithHtmlEscapingLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testSimpleBindWithHtmlEscaping();
+	}
 
-	public void testCustomBind() throws Exception {
+	public void testCustomFormatter() throws Exception {
+       	formatterRegistry.add(Float.class, new SimpleFloatFormatter());
+	    
+        this.tag.setPath("myFloat");
+        assertEquals(Tag.SKIP_BODY, this.tag.doStartTag());
+        String output = getOutput();
+        assertContainsAttribute(output, "name", "myFloat");
+        assertBlockTagContains(output, "12.34f");
+    }
+	
+	public void testCustomEditor() throws Exception {
+	    enableLegacyBinding(this.tag);
 		BeanPropertyBindingResult result = new BeanPropertyBindingResult(createTestBean(), "testBean");
 		result.getPropertyAccessor().registerCustomEditor(Float.class, new SimpleFloatEditor());
 		exposeBindingResult(result);

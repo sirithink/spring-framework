@@ -24,6 +24,7 @@ import javax.servlet.jsp.JspException;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.model.ui.FieldModel;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.support.BindStatus;
@@ -92,6 +93,8 @@ class OptionWriter {
 	private final Object optionSource;
 
 	private final BindStatus bindStatus;
+	
+	private final FieldModel fieldModel;
 
 	private final String valueProperty;
 
@@ -116,10 +119,33 @@ class OptionWriter {
 		Assert.notNull(bindStatus, "'bindStatus' must not be null");
 		this.optionSource = optionSource;
 		this.bindStatus = bindStatus;
+		this.fieldModel = null;
 		this.valueProperty = valueProperty;
 		this.labelProperty = labelProperty;
 		this.htmlEscape = htmlEscape;
 	}
+	
+	/**
+    * Creates a new <code>OptionWriter</code> for the supplied <code>objectSource</code>.
+    * @param optionSource the source of the <code>options</code> (never <code>null</code>)
+    * @param fieldModel the {@link FieldModel} for the bound value (never <code>null</code>)
+    * @param valueProperty the name of the property used to render <code>option</code> values
+    * (optional)
+    * @param labelProperty the name of the property used to render <code>option</code> labels
+    * (optional)
+    */
+   public OptionWriter(
+           Object optionSource, FieldModel fieldModel, String valueProperty, String labelProperty, boolean htmlEscape) {
+
+       Assert.notNull(optionSource, "'optionSource' must not be null");
+       Assert.notNull(fieldModel, "'fieldModel' must not be null");
+       this.optionSource = optionSource;
+       this.bindStatus = null;
+       this.fieldModel = fieldModel;
+       this.valueProperty = valueProperty;
+       this.labelProperty = labelProperty;
+       this.htmlEscape = htmlEscape;
+   }
 
 
 	/**
@@ -244,7 +270,11 @@ class OptionWriter {
 	 * HTML-escaped as required.
 	 */
 	private String getDisplayString(Object value) {
-		return ValueFormatter.getDisplayString(value, this.bindStatus.getEditor(), this.htmlEscape);
+	    if (this.bindStatus != null) {
+	        return ValueFormatter.getDisplayString(value, this.bindStatus.getEditor(), this.htmlEscape);
+	    } else {
+	        return ValueFormatter.getDisplayString(value, this.fieldModel, this.htmlEscape);
+	    }
 	}
 
 	/**
@@ -252,7 +282,11 @@ class OptionWriter {
 	 * Delegates to {@link SelectedValueComparator#isSelected}.
 	 */
 	private boolean isOptionSelected(Object resolvedValue) {
-		return SelectedValueComparator.isSelected(this.bindStatus, resolvedValue);
+		if (this.bindStatus != null) {
+		    return SelectedValueComparator.isSelected(this.bindStatus, resolvedValue);
+		} else {
+		    return SelectedValueComparator.isSelected(this.fieldModel, resolvedValue);
+		}
 	}
 
 	/**

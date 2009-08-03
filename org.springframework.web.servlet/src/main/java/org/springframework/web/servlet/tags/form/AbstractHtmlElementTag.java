@@ -16,8 +16,13 @@
 
 package org.springframework.web.servlet.tags.form;
 
+import java.util.List;
+
 import javax.servlet.jsp.JspException;
 
+import org.springframework.beans.PropertyAccessor;
+import org.springframework.model.alert.Alert;
+import org.springframework.model.alert.Severity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -27,6 +32,7 @@ import org.springframework.util.StringUtils;
  * across elements.
  * 
  * @author Rob Harrop
+ * @author Jeremy Grelle
  * @since 2.0
  */
 public abstract class AbstractHtmlElementTag extends AbstractDataBoundFormElementTag {
@@ -410,12 +416,31 @@ public abstract class AbstractHtmlElementTag extends AbstractDataBoundFormElemen
 	 * {@link org.springframework.web.servlet.support.BindStatus} object.
 	 */
 	protected String resolveCssClass() throws JspException {
-		if (getBindStatus().isError() && StringUtils.hasText(getCssErrorClass())) {
+	    if (isLegacyBinding() && getBindStatus().isError() && StringUtils.hasText(getCssErrorClass())) {
+	        return ObjectUtils.getDisplayString(evaluate("cssErrorClass", getCssErrorClass()));
+	    } else if (hasErrorAlerts() && StringUtils.hasText(getCssErrorClass())) {
 			return ObjectUtils.getDisplayString(evaluate("cssErrorClass", getCssErrorClass()));
 		}
-		else {
-			return ObjectUtils.getDisplayString(evaluate("cssClass", getCssClass()));
-		}
+		return ObjectUtils.getDisplayString(evaluate("cssClass", getCssClass()));
+		
+	}
+	
+	private boolean hasErrorAlerts() throws JspException {
+	    String nestedPath = getNestedPath();
+        String propertyPath = (nestedPath != null ? nestedPath + getPath() : getPath());
+        if (propertyPath.endsWith(PropertyAccessor.NESTED_PROPERTY_SEPARATOR)) {
+            propertyPath = propertyPath.substring(0, propertyPath.length() - 1);
+        }
+        int dotPos = propertyPath.indexOf('.');
+        propertyPath = propertyPath.substring(dotPos + 1);
+	    
+	    List<Alert> alerts = getAlertContext().getAlerts(propertyPath);
+        for (Alert alert : alerts) {
+            if (alert.getSeverity().equals(Severity.ERROR)) {
+                return true;
+            }
+        }
+	    return false;
 	}
 
 }

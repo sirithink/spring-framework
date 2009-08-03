@@ -20,6 +20,7 @@ import java.beans.PropertyEditor;
 
 import javax.servlet.jsp.JspException;
 
+import org.springframework.model.ui.FieldModel;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.tags.HtmlEscapingAwareTag;
 import org.springframework.web.util.ExpressionEvaluationUtils;
@@ -37,6 +38,7 @@ import org.springframework.web.util.ExpressionEvaluationUtils;
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  * @since 2.0
  */
 public abstract class AbstractFormTag extends HtmlEscapingAwareTag {
@@ -108,6 +110,10 @@ public abstract class AbstractFormTag extends HtmlEscapingAwareTag {
 	protected String getDisplayString(Object value, PropertyEditor propertyEditor) {
 		return ValueFormatter.getDisplayString(value, propertyEditor, isHtmlEscape());
 	}
+	
+	protected String getDisplayString(Object value, FieldModel fieldModel) {
+        return ValueFormatter.getDisplayString(value, fieldModel, isHtmlEscape());
+    }
 
 	/**
 	 * Overridden to default to <code>true</code> in case of no explicit default given.

@@ -44,7 +44,11 @@ public class HiddenInputTag extends AbstractDataBoundFormElementTag {
 		tagWriter.startTag("input");
 		writeDefaultAttributes(tagWriter);
 		tagWriter.writeAttribute("type", "hidden");
-		tagWriter.writeAttribute("value", getDisplayString(getBoundValue(), getPropertyEditor()));
+		if (isLegacyBinding()) {
+		    tagWriter.writeAttribute("value", getDisplayString(getBoundValue(), getPropertyEditor()));
+		} else {
+		    tagWriter.writeAttribute("value", getDisplayString(getFieldModel().getRenderValue()));
+		}
 		tagWriter.endTag();
 		return SKIP_BODY;
 	}

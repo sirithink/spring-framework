@@ -27,6 +27,7 @@ import javax.servlet.jsp.JspException;
  *
  * @author Thomas Risberg
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  * @since 2.5
  */
 public abstract class AbstractCheckedElementTag extends AbstractHtmlInputElementTag {
@@ -46,8 +47,12 @@ public abstract class AbstractCheckedElementTag extends AbstractHtmlInputElement
 	 * bound value.
 	 */
 	protected void renderFromValue(Object item, Object value, TagWriter tagWriter) throws JspException {
-		PropertyEditor editor = (value != null ? getBindStatus().findEditor(value.getClass()) : null);
-		tagWriter.writeAttribute("value", getDisplayString(value, editor));
+	    if (isLegacyBinding()) {
+    		PropertyEditor editor = (value != null ? getBindStatus().findEditor(value.getClass()) : null);
+    		tagWriter.writeAttribute("value", getDisplayString(value, editor));
+	    } else {
+	        tagWriter.writeAttribute("value", getDisplayString(value, getFieldModel()));
+	    }
 		if (isOptionSelected(value) || (value != item && isOptionSelected(item))) {
 			tagWriter.writeAttribute("checked", "checked");
 		}
@@ -58,7 +63,11 @@ public abstract class AbstractCheckedElementTag extends AbstractHtmlInputElement
 	 * through delegating to {@link SelectedValueComparator#isSelected}.
 	 */
 	private boolean isOptionSelected(Object value) throws JspException {
-		return SelectedValueComparator.isSelected(getBindStatus(), value);
+	    if (isLegacyBinding()) {
+	        return SelectedValueComparator.isSelected(getBindStatus(), value);
+	    } else {
+	        return SelectedValueComparator.isSelected(getFieldModel(), value);
+	    }
 	}
 
 	/**

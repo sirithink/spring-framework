@@ -158,7 +158,11 @@ public class InputTag extends AbstractHtmlInputElementTag {
 	 * when the value is written.
 	 */
 	protected void writeValue(TagWriter tagWriter) throws JspException {
-		tagWriter.writeAttribute("value", getDisplayString(getBoundValue(), getPropertyEditor()));
+	    if (isLegacyBinding()) {
+	        tagWriter.writeAttribute("value", getDisplayString(getBoundValue(), getPropertyEditor()));
+	    } else {
+	        tagWriter.writeAttribute("value", getDisplayString(getFieldModel().getRenderValue()));
+	    }
 	}
 
 	/**

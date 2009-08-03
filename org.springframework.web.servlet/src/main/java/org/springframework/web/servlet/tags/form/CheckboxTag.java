@@ -43,6 +43,7 @@ import org.springframework.web.bind.WebDataBinder;
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  * @since 2.0
  */
 public class CheckboxTag extends AbstractSingleCheckedElementTag {
@@ -68,7 +69,8 @@ public class CheckboxTag extends AbstractSingleCheckedElementTag {
 		tagWriter.writeAttribute("type", "checkbox");
 
 		Object boundValue = getBoundValue();
-		Class valueType = getBindStatus().getValueType();
+		
+		Class<?> valueType = getBoundValueType();
 
 		if (Boolean.class.equals(valueType) || boolean.class.equals(valueType)) {
 			// the concrete type may not be a Boolean - can be String

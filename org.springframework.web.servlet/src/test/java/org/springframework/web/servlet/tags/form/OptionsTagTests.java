@@ -31,9 +31,11 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockPageContext;
+import org.springframework.model.ui.support.DefaultPresentationModel;
+import org.springframework.model.ui.support.FormatterRegistry;
+import org.springframework.model.ui.support.GenericFormatterRegistry;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
@@ -45,13 +47,18 @@ import org.springframework.web.servlet.tags.RequestContextAwareTag;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @author Scott Andrews
+ * @author Jeremy Grelle
  */
-public final class OptionsTagTests extends AbstractHtmlElementTagTests {
+public final class OptionsTagTests extends AbstractFormTagTests {
 
 	private static final String COMMAND_NAME = "testBean";
 
 	private SelectTag selectTag;
 	private OptionsTag tag;
+
+    private FormatterRegistry formatterRegistry;
+    private DefaultPresentationModel presentationModel;
+    private TestBean bean;
 
 	protected void onSetUp() {
 		this.tag = new OptionsTag() {
@@ -64,14 +71,29 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 				return new TagWriter(getWriter());
 			}
 		};
-		selectTag.setPageContext(getPageContext());
+		this.selectTag.setPageContext(getPageContext());
 		this.tag.setParent(selectTag);
 		this.tag.setPageContext(getPageContext());
-	}
+		
+		this.presentationModel = new DefaultPresentationModel(this.bean);
+		this.formatterRegistry = new GenericFormatterRegistry();
+        this.presentationModel.setFormatterRegistry(this.formatterRegistry);
+		this.selectTag.setPresentationModel(this.presentationModel);
+		
+		this.tag.setLegacyBinding(false);
+		this.selectTag.setLegacyBinding(false);
+    }
+    
+    private void setupPropertyBinding(String property) {
+        if (this.tag.isLegacyBinding()) {
+            getPageContext().setAttribute(SelectTag.LIST_VALUE_PAGE_ATTRIBUTE, new BindStatus(getRequestContext(), property, false));
+        } else {
+            getPageContext().setAttribute(SelectTag.LIST_VALUE_PAGE_ATTRIBUTE, this.presentationModel.getFieldModel(property.replaceFirst("testBean\\.", "")));
+        }
+    }
 
 	public void testWithCollection() throws Exception {
-		getPageContext().setAttribute(
-				SelectTag.LIST_VALUE_PAGE_ATTRIBUTE, new BindStatus(getRequestContext(), "testBean.country", false));
+	    setupPropertyBinding("testBean.country");
 
 		this.tag.setItems("${countries}");
 		this.tag.setItemValue("isoCode");
@@ -97,8 +119,48 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		assertEquals("myClass", element.attribute("class").getValue());
 		assertEquals("CLICK", element.attribute("onclick").getValue());
 	}
+	
+	public void testWithCollectionLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    enableLegacyBinding(this.selectTag);
+	    testWithCollection();
+	}
 
+	public void testWithCollectionAndCustomFormatter() throws Exception {
+        TestBean target = new TestBean();
+        target.setMyFloat(new Float("12.34"));
+        setupPropertyBinding("testBean.myFloat");
+        
+        this.formatterRegistry.add(Float.class, new SimpleFloatFormatter());
+
+        this.tag.setItems("${floats}");
+        int result = this.tag.doStartTag();
+        assertEquals(Tag.SKIP_BODY, result);
+        String output = getOutput();
+        output = "<doc>" + output + "</doc>";
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new StringReader(output));
+        Element rootElement = document.getRootElement();
+
+        List children = rootElement.elements();
+        assertEquals("Incorrect number of children", 6, children.size());
+
+        Element element = (Element) rootElement.selectSingleNode("option[text() = '12.34f']");
+        assertNotNull("Option node should not be null", element);
+        assertEquals("12.34 node not selected", "selected", element.attribute("selected").getValue());
+        assertNull("No id rendered", element.attribute("id"));
+
+        element = (Element) rootElement.selectSingleNode("option[text() = '12.35f']");
+        assertNotNull("Option node should not be null", element);
+        assertNull("12.35 node incorrectly selected", element.attribute("selected"));
+        assertNull("No id rendered", element.attribute("id"));
+    }
+	
 	public void testWithCollectionAndCustomEditor() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    enableLegacyBinding(this.selectTag);
+	    
 		PropertyEditor propertyEditor = new SimpleFloatEditor();
 
 		TestBean target = new TestBean();
@@ -108,8 +170,7 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		errors.getPropertyAccessor().registerCustomEditor(Float.class, propertyEditor);
 		exposeBindingResult(errors);
 
-		getPageContext().setAttribute(
-				SelectTag.LIST_VALUE_PAGE_ATTRIBUTE, new BindStatus(getRequestContext(), "testBean.myFloat", false));
+		setupPropertyBinding("testBean.myFloat");
 
 		this.tag.setItems("${floats}");
 		int result = this.tag.doStartTag();
@@ -137,8 +198,7 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 
 	public void testWithItemsNullReference() throws Exception {
 		getPageContext().getRequest().removeAttribute("countries");
-		getPageContext().setAttribute(
-				SelectTag.LIST_VALUE_PAGE_ATTRIBUTE, new BindStatus(getRequestContext(), "testBean.country", false));
+		setupPropertyBinding("testBean.country");
 
 		this.tag.setItems("${countries}");
 		this.tag.setItemValue("isoCode");
@@ -155,11 +215,17 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		List children = rootElement.elements();
 		assertEquals("Incorrect number of children", 0, children.size());
 	}
+	
+	public void testWithItemsNullReferenceLegacy() throws Exception {
+	    enableLegacyBinding(selectTag);
+	    enableLegacyBinding(tag);
+	    testWithItemsNullReference();
+	}
 
 	public void testWithoutItems() throws Exception {
 		this.tag.setItemValue("isoCode");
 		this.tag.setItemLabel("name");
-		this.selectTag.setPath("testBean");
+		this.selectTag.setPath("spouse");
 		
 		this.selectTag.doStartTag();
 		int result = this.tag.doStartTag();
@@ -175,13 +241,15 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		List children = rootElement.elements();
 		assertEquals("Incorrect number of children", 0, children.size());
 	}
+	
+	public void testWithoutItemsLegacy() throws Exception {
+	    enableLegacyBinding(selectTag);
+	    enableLegacyBinding(tag);
+	    testWithoutItems();
+	}
 
 	public void testWithoutItemsEnumParent() throws Exception {
-		BeanWithEnum testBean = new BeanWithEnum();
-		testBean.setTestEnum(TestEnum.VALUE_2);
-		getPageContext().getRequest().setAttribute("testBean", testBean);
-		
-		this.selectTag.setPath("testBean.testEnum");
+		this.selectTag.setPath("testEnum");
 
 		this.selectTag.doStartTag();
 		int result = this.tag.doStartTag();
@@ -202,13 +270,15 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		assertEquals("TestEnum: VALUE_2", value2.getText());
 		assertEquals(value2, rootElement.selectSingleNode("option[@selected]"));
 	}
+	
+	public void testWithoutItemsEnumParentLegacy() throws Exception { 
+	    enableLegacyBinding(selectTag);
+	    enableLegacyBinding(tag);
+	    testWithoutItemsEnumParent();
+	}
 
 	public void testWithoutItemsEnumParentWithExplicitLabelsAndValues() throws Exception {
-		BeanWithEnum testBean = new BeanWithEnum();
-		testBean.setTestEnum(TestEnum.VALUE_2);
-		getPageContext().getRequest().setAttribute("testBean", testBean);
-		
-		this.selectTag.setPath("testBean.testEnum");
+		this.selectTag.setPath("testEnum");
 		this.tag.setItemLabel("enumLabel");
 		this.tag.setItemValue("enumValue");
 
@@ -231,16 +301,18 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		assertEquals("Label: VALUE_2", value2.getText());
 		assertEquals(value2, rootElement.selectSingleNode("option[@selected]"));
 	}
+	
+	public void testWithoutItemsEnumParentWithExplicitLabelsAndValuesLegacy() throws Exception {
+	    enableLegacyBinding(selectTag);
+	    enableLegacyBinding(tag);
+	    testWithoutItemsEnumParentWithExplicitLabelsAndValues();
+	}
 
 	protected void extendRequest(MockHttpServletRequest request) {
-		TestBean bean = new TestBean();
-		bean.setName("foo");
-		bean.setCountry("UK");
-		bean.setMyFloat(new Float("12.34"));
-		request.setAttribute(COMMAND_NAME, bean);
+	    super.extendRequest(request);
 		request.setAttribute("countries", Country.getCountries());
 
-		List floats = new ArrayList();
+		List<Float> floats = new ArrayList<Float>();
 		floats.add(new Float("12.30"));
 		floats.add(new Float("12.31"));
 		floats.add(new Float("12.32"));
@@ -261,5 +333,15 @@ public final class OptionsTagTests extends AbstractHtmlElementTagTests {
 		RequestContext context = new RequestContext((HttpServletRequest) pageContext.getRequest(), model);
 		pageContext.setAttribute(RequestContextAwareTag.REQUEST_CONTEXT_PAGE_ATTRIBUTE, context);
 	}
+
+    @Override
+    protected TestBean createTestBean() {
+        bean = new TestBean();
+        bean.setName("foo");
+        bean.setCountry("UK");
+        bean.setMyFloat(new Float("12.34"));
+        bean.setTestEnum(TestEnum.VALUE_2);
+        return bean;
+    }
 
 }

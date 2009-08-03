@@ -19,7 +19,6 @@ package org.springframework.web.servlet.tags.form;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.springframework.beans.TestBean;
 import org.springframework.mock.web.MockPageContext;
 import org.springframework.web.servlet.tags.NestedPathTag;
 

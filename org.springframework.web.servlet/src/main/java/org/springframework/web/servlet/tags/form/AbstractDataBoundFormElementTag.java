@@ -23,6 +23,10 @@ import javax.servlet.jsp.PageContext;
 
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.core.Conventions;
+import org.springframework.model.alert.AlertContext;
+import org.springframework.model.alert.support.DefaultAlertContext;
+import org.springframework.model.ui.FieldModel;
+import org.springframework.model.ui.PresentationModel;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.tags.EditorAwareTag;
@@ -38,6 +42,7 @@ import org.springframework.web.servlet.tags.NestedPathTag;
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  * @since 2.0
  */
 public abstract class AbstractDataBoundFormElementTag extends AbstractFormTag implements EditorAwareTag {
@@ -72,7 +77,20 @@ public abstract class AbstractDataBoundFormElementTag extends AbstractFormTag im
 	 * The {@link BindStatus} of this tag.
 	 */
 	private BindStatus bindStatus;
+	
+	/**
+	 * The {@link FieldModel} for this tag.
+	 */
+	private FieldModel fieldModel;
+	
+	//TODO - this will go away - to be replaced by contextual lookup
+	private boolean legacyBinding;
 
+	//TODO - this will go away - to be replaced by contextual lookup
+	private PresentationModel presentationModel;
+
+	//TODO - this will go away - to be replaced by contextual lookup
+    private AlertContext alertContext = new DefaultAlertContext();
 
 	/**
 	 * Set the property path from the {@link FormTag#setModelAttribute form object}.
@@ -176,8 +194,24 @@ public abstract class AbstractDataBoundFormElementTag extends AbstractFormTag im
 		}
 		return this.bindStatus;
 	}
+	
+	protected FieldModel getFieldModel() throws JspException {
+	    if (this.fieldModel == null) {
+	        String nestedPath = getNestedPath();
+            String propertyPath = (nestedPath != null ? nestedPath + getPath() : getPath());
+            if (propertyPath.endsWith(PropertyAccessor.NESTED_PROPERTY_SEPARATOR)) {
+                propertyPath = propertyPath.substring(0, propertyPath.length() - 1);
+            }
+            // determine name of the object and property
+            int dotPos = propertyPath.indexOf('.');
+            propertyPath = propertyPath.substring(dotPos + 1);
+            
+            this.fieldModel = getPresentationModel().getFieldModel(propertyPath);
+	    }
+	    return this.fieldModel;
+	}
 
-	/**
+    /**
 	 * Get the value of the nested path that may have been exposed by the
 	 * {@link NestedPathTag}.
 	 */
@@ -192,7 +226,20 @@ public abstract class AbstractDataBoundFormElementTag extends AbstractFormTag im
 	 * @see #getPath()
 	 */
 	protected String getPropertyPath() throws JspException {
-		String expression = getBindStatus().getExpression();
+		String expression;
+		if (isLegacyBinding()) {
+		    expression = getBindStatus().getExpression();
+		} else {
+		    //TODO - Really shouldn't need to recalculate this - should be available in FieldModel
+		    String nestedPath = getNestedPath();
+            expression = (nestedPath != null ? nestedPath + getPath() : getPath());
+            if (expression.endsWith(PropertyAccessor.NESTED_PROPERTY_SEPARATOR)) {
+                expression = expression.substring(0, expression.length() - 1);
+            }
+            // determine name of the object and property
+            int dotPos = expression.indexOf('.');
+            expression = expression.substring(dotPos + 1);
+		}
 		return (expression != null ? expression : "");
 	}
 
@@ -201,14 +248,30 @@ public abstract class AbstractDataBoundFormElementTag extends AbstractFormTag im
 	 * @see #getBindStatus()
 	 */
 	protected final Object getBoundValue() throws JspException {
-		return getBindStatus().getValue();
+	    if (isLegacyBinding()) {
+	        return getBindStatus().getValue();
+	    } else {
+	        return getFieldModel().getValue();
+	    }
+	}
+	
+	protected final Class<?> getBoundValueType() throws JspException {
+	    if (isLegacyBinding()) {
+	        return getBindStatus().getValueType();
+	    } else {
+	        return getFieldModel().getValueType();
+	    }
 	}
 
 	/**
 	 * Get the {@link PropertyEditor}, if any, in use for value bound to this tag.
 	 */
 	protected PropertyEditor getPropertyEditor() throws JspException {
-		return getBindStatus().getEditor();
+	    if (isLegacyBinding()) {
+	        return getBindStatus().getEditor();
+	    } else {
+	        return null;
+	    }
 	}
 
 	/**
@@ -218,6 +281,36 @@ public abstract class AbstractDataBoundFormElementTag extends AbstractFormTag im
 	public final PropertyEditor getEditor() throws JspException {
 		return getPropertyEditor();
 	}
+	
+	//TODO This needs to ultimately be some sort of context lookup
+	protected final boolean isLegacyBinding() {
+	    return this.legacyBinding;
+	}
+	
+	//TODO - temporary just for facilitating testing
+	protected final void setLegacyBinding(boolean legacyBinding) {
+	    this.legacyBinding = legacyBinding;
+	}
+	
+	//TODO This needs to ultimately be some sort of context lookup
+    protected PresentationModel getPresentationModel() {
+        return this.presentationModel;
+    }
+    
+    //TODO - temporary just for facilitating testing
+    protected void setPresentationModel(PresentationModel presentationModel) {
+        this.presentationModel = presentationModel;
+    }
+    
+    //TODO This needs to ultimately be some sort of context lookup
+    protected AlertContext getAlertContext() {
+        return this.alertContext;
+    }
+    
+    //TODO - temporary just for facilitating testing
+    protected void setAlertContext(AlertContext alertContext) {
+        this.alertContext = alertContext;
+    }
 
 	/**
 	 * Disposes of the {@link BindStatus} instance.

@@ -16,13 +16,14 @@
 
 package org.springframework.web.servlet.tags.form;
 
-import org.springframework.beans.TestBean;
-import org.springframework.validation.BeanPropertyBindingResult;
-
 import javax.servlet.jsp.tagext.Tag;
+
+import org.springframework.model.ui.support.DefaultPresentationModel;
+import org.springframework.validation.BeanPropertyBindingResult;
 
 /**
  * @author Rob Harrop
+ * @author Jeremy Grelle
  */
 public class HiddenInputTagTests extends AbstractFormTagTests {
 
@@ -37,6 +38,10 @@ public class HiddenInputTagTests extends AbstractFormTagTests {
 			}
 		};
 		this.tag.setPageContext(getPageContext());
+		
+		DefaultPresentationModel presentationModel = new DefaultPresentationModel(this.bean);
+        this.tag.setPresentationModel(presentationModel);    
+		this.tag.setLegacyBinding(false);
 	}
 
 	public void testRender() throws Exception {
@@ -52,8 +57,19 @@ public class HiddenInputTagTests extends AbstractFormTagTests {
 		assertContainsAttribute(output, "type", "hidden");
 		assertContainsAttribute(output, "value", "Sally Greenwood");
 	}
+	
+	public void testRenderLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testRender();
+	}
 
-	public void testWithCustomBinder() throws Exception {
+	//TODO - Implement custom binding test with new binding system
+    public void testWithCustomBinder() {
+        fail("Not implemented");
+    }
+    
+	public void testWithCustomEditor() throws Exception {
+	    enableLegacyBinding(this.tag);
 		this.tag.setPath("myFloat");
 
 		BeanPropertyBindingResult errors = new BeanPropertyBindingResult(this.bean, COMMAND_NAME);

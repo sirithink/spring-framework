@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.core.enums.LabeledEnum;
+import org.springframework.model.ui.FieldModel;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.support.BindStatus;
@@ -55,6 +56,7 @@ import org.springframework.web.servlet.support.BindStatus;
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
+ * @author Jeremy Grelle
  * @since 2.0
  */
 abstract class SelectedValueComparator {
@@ -94,18 +96,139 @@ abstract class SelectedValueComparator {
 			selected = collectionCompare(CollectionUtils.arrayToList(boundValue), candidateValue, bindStatus);
 		}
 		else if (boundValue instanceof Collection) {
-			selected = collectionCompare((Collection) boundValue, candidateValue, bindStatus);
+			selected = collectionCompare((Collection<?>) boundValue, candidateValue, bindStatus);
 		}
 		else if (boundValue instanceof Map) {
-			selected = mapCompare((Map) boundValue, candidateValue, bindStatus);
+			selected = mapCompare((Map<?,?>) boundValue, candidateValue, bindStatus);
 		}
 		if (!selected) {
 			selected = exhaustiveCompare(boundValue, candidateValue, bindStatus.getEditor(), null);
 		}
 		return selected;
 	}
+	
+	/**
+     * Returns <code>true</code> if the supplied candidate value is equal to the value bound to
+     * the supplied {@link BindStatus}. Equality in this case differs from standard Java equality and
+     * is described in more detail <a href="#equality-contract">here</a>.
+     */
+    public static boolean isSelected(FieldModel fieldModel, Object candidateValue) {
+        if (fieldModel == null) {
+            return (candidateValue == null);
+        }
 
-	private static boolean collectionCompare(Collection boundCollection, Object candidateValue, BindStatus bindStatus) {
+        // Check obvious equality matches with the candidate first,
+        // both with the rendered value and with the original value.
+        Object boundValue = fieldModel.getValue();
+        if (ObjectUtils.nullSafeEquals(boundValue, candidateValue)) {
+            return true;
+        }
+        
+        if (boundValue == null) {
+            return false;
+        }
+
+        // Non-null value but no obvious equality with the candidate value:
+        // go into more exhaustive comparisons.
+        boolean selected = false;
+        if (fieldModel.getValueType().isArray()) {
+            selected = collectionCompare(CollectionUtils.arrayToList(boundValue), candidateValue, fieldModel);
+        }
+        else if (boundValue instanceof Collection) {
+            selected = collectionCompare((Collection<?>) boundValue, candidateValue, fieldModel);
+        }
+        else if (boundValue instanceof Map) {
+            selected = mapCompare((Map<?,?>) boundValue, candidateValue, fieldModel);
+        }
+        if (!selected) {
+            selected = exhaustiveCompare(boundValue, candidateValue, fieldModel, null);
+        }
+        return selected;
+    }
+
+    private static boolean collectionCompare(Collection<?> boundCollection, Object candidateValue, FieldModel fieldModel) {
+        try {
+            if (boundCollection.contains(candidateValue)) {
+                return true;
+            }
+        }
+        catch (ClassCastException ex) {
+            // Probably from a  - ignore.
+        }
+        return exhaustiveCollectionCompare(boundCollection, candidateValue, fieldModel);
+    }
+    
+    private static boolean exhaustiveCollectionCompare(
+        Collection<?> collection, Object candidateValue, FieldModel fieldModel) { 
+        Map<Object, String> convertedValueCache = new HashMap<Object, String>(1);
+        for (Object element : collection) {
+            if (exhaustiveCompare(element, candidateValue, fieldModel, convertedValueCache)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private static boolean exhaustiveCompare(Object boundValue, Object candidate,
+        FieldModel fieldModel, Map<Object, String> formattedCandidateValueCache) {
+        
+        String candidateDisplayString;
+        if (candidate instanceof String && !(boundValue instanceof String)) {
+            candidateDisplayString = (String) candidate;
+        } else if (formattedCandidateValueCache != null && formattedCandidateValueCache.containsKey(candidate)) {
+            candidateDisplayString = formattedCandidateValueCache.get(candidate);
+        } else {
+            //TODO - What to do if the candidate object is of a different type than the target bound object (or in the case of a multi-value target, the target's contained elements)?
+            candidateDisplayString = fieldModel.formatValue(candidate);
+            if (formattedCandidateValueCache != null) {
+                formattedCandidateValueCache.put(candidate, candidateDisplayString);
+            }
+        }
+        
+        if (boundValue.equals(candidateDisplayString)) {
+            return true;
+        } else if (fieldModel.getValue() != boundValue && fieldModel.formatValue(boundValue).equals(candidateDisplayString)) {
+            return true;
+        } else if (fieldModel.getRenderValue().equals(candidateDisplayString)) {
+            return true;
+        } else if (boundValue instanceof LabeledEnum) {
+            LabeledEnum labeledEnum = (LabeledEnum) boundValue;
+            String enumCodeAsString = fieldModel.formatValue(labeledEnum.getCode());
+            if (enumCodeAsString.equals(candidateDisplayString)) {
+                return true;
+            }
+            String enumLabelAsString = fieldModel.formatValue(labeledEnum.getLabel());
+            if (enumLabelAsString.equals(candidateDisplayString)) {
+                return true;
+            }
+        }
+        else if (boundValue.getClass().isEnum()) {
+            Enum<?> boundEnum = (Enum<?>) boundValue;
+            String enumCodeAsString = fieldModel.formatValue(boundEnum.name());
+            if (enumCodeAsString.equals(candidateDisplayString)) {
+                return true;
+            }
+            String enumLabelAsString = fieldModel.formatValue(boundEnum.toString());
+            if (enumLabelAsString.equals(candidateDisplayString)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean mapCompare(Map<?,?> boundMap, Object candidateValue, FieldModel fieldModel) {
+        try {
+            if (boundMap.containsKey(candidateValue)) {
+                return true;
+            }
+        }
+        catch (ClassCastException ex) {
+            // Probably from a TreeMap - ignore.
+        }
+        return exhaustiveCollectionCompare(boundMap.keySet(), candidateValue, fieldModel);
+    }
+
+    private static boolean collectionCompare(Collection<?> boundCollection, Object candidateValue, BindStatus bindStatus) {
 		try {
 			if (boundCollection.contains(candidateValue)) {
 				return true;
@@ -117,7 +240,7 @@ abstract class SelectedValueComparator {
 		return exhaustiveCollectionCompare(boundCollection, candidateValue, bindStatus);
 	}
 
-	private static boolean mapCompare(Map boundMap, Object candidateValue, BindStatus bindStatus) {
+	private static boolean mapCompare(Map<?,?> boundMap, Object candidateValue, BindStatus bindStatus) {
 		try {
 			if (boundMap.containsKey(candidateValue)) {
 				return true;
@@ -130,7 +253,7 @@ abstract class SelectedValueComparator {
 	}
 
 	private static boolean exhaustiveCollectionCompare(
-			Collection collection, Object candidateValue, BindStatus bindStatus) {
+			Collection<?> collection, Object candidateValue, BindStatus bindStatus) {
 
 		Map<PropertyEditor, Object> convertedValueCache = new HashMap<PropertyEditor, Object>(1);
 		PropertyEditor editor = null;
@@ -165,7 +288,7 @@ abstract class SelectedValueComparator {
 			}
 		}
 		else if (boundValue.getClass().isEnum()) {
-			Enum boundEnum = (Enum) boundValue;
+			Enum<?> boundEnum = (Enum<?>) boundValue;
 			String enumCodeAsString = ObjectUtils.getDisplayString(boundEnum.name());
 			if (enumCodeAsString.equals(candidateDisplayString)) {
 				return true;

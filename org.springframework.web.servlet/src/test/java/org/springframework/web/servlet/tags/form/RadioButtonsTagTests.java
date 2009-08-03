@@ -18,12 +18,14 @@ package org.springframework.web.servlet.tags.form;
 
 import java.beans.PropertyEditorSupport;
 import java.io.StringReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,8 +37,11 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.springframework.beans.Colour;
 import org.springframework.beans.Pet;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.model.ui.format.Formatter;
+import org.springframework.model.ui.support.DefaultPresentationModel;
+import org.springframework.model.ui.support.FormatterRegistry;
+import org.springframework.model.ui.support.GenericFormatterRegistry;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
@@ -44,12 +49,15 @@ import org.springframework.validation.BindingResult;
  * @author Thomas Risberg
  * @author Juergen Hoeller
  * @author Scott Andrews
+ * @author Jeremy Grelle
  */
 public final class RadioButtonsTagTests extends AbstractFormTagTests {
 
 	private RadioButtonsTag tag;
 
 	private TestBean bean;
+
+    private FormatterRegistry formatterRegistry;
 
 	protected void onSetUp() {
 		this.tag = new RadioButtonsTag() {
@@ -58,6 +66,13 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 			}
 		};
 		this.tag.setPageContext(getPageContext());
+		
+		DefaultPresentationModel presentationModel = new DefaultPresentationModel(this.bean);
+        this.formatterRegistry = new GenericFormatterRegistry();
+        presentationModel.setFormatterRegistry(this.formatterRegistry);
+        
+        this.tag.setPresentationModel(presentationModel);     
+        this.tag.setLegacyBinding(false);
 	}
 
 	public void testWithMultiValueArray() throws Exception {
@@ -97,6 +112,12 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals("baz", radioButtonElement3.attribute("value").getValue());
 		assertEquals("baz", spanElement3.getStringValue());
 	}
+	
+	public void testWithMultiValueArrayLegacy() throws Exception { 
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueArray();
+	}
+	
 
 	public void testWithMultiValueArrayWithDelimiter() throws Exception {
 		this.tag.setDelimiter("<br/>");
@@ -142,6 +163,11 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals("baz", radioButtonElement3.attribute("value").getValue());
 		assertEquals("baz", spanElement3.getStringValue());
 	}
+	
+	public void testWithMultiValueArrayWithDelimiterLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueArrayWithDelimiter();
+	}
 
 	public void testWithMultiValueMap() throws Exception {
 		this.tag.setPath("stringArray");
@@ -184,6 +210,11 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertNull("not checked", radioButtonElement3.attribute("checked"));
 		assertEquals("baz", radioButtonElement3.attribute("value").getValue());
 		assertEquals("BAZ", spanElement3.getStringValue());
+	}
+	
+	public void testWithMultiValueMapLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueMap();
 	}
 
 	public void testWithMultiValueMapWithDelimiter() throws Exception {
@@ -230,8 +261,53 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals("baz", radioButtonElement3.attribute("value").getValue());
 		assertEquals(delimiter + "BAZ", spanElement3.getStringValue());
 	}
+	
+	public void testWithMultiValueMapWithDelimiterLegacy() throws Exception { 
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueMapWithDelimiter();
+	}
+	
+	public void testWithMultiValueWithFormatter() throws Exception {
+        this.tag.setPath("stringArray");
+        this.tag.setItems(new Object[] {"   foo", "   bar", "   baz"});
+        
+        formatterRegistry.add(String.class, new MyStringTrimmerFormatter());
+
+        int result = this.tag.doStartTag();
+        assertEquals(Tag.SKIP_BODY, result);
+
+        String output = getOutput();
+
+        // wrap the output so it is valid XML
+        output = "<doc>" + output + "</doc>";
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new StringReader(output));
+        Element spanElement1 = (Element) document.getRootElement().elements().get(0);
+        Element radioButtonElement1 = (Element) spanElement1.elements().get(0);
+        assertEquals("input", radioButtonElement1.getName());
+        assertEquals("radio", radioButtonElement1.attribute("type").getValue());
+        assertEquals("stringArray", radioButtonElement1.attribute("name").getValue());
+        assertEquals("checked", radioButtonElement1.attribute("checked").getValue());
+        assertEquals("   foo", radioButtonElement1.attribute("value").getValue());
+        Element spanElement2 = (Element) document.getRootElement().elements().get(1);
+        Element radioButtonElement2 = (Element) spanElement2.elements().get(0);
+        assertEquals("input", radioButtonElement2.getName());
+        assertEquals("radio", radioButtonElement2.attribute("type").getValue());
+        assertEquals("stringArray", radioButtonElement2.attribute("name").getValue());
+        assertEquals("checked", radioButtonElement2.attribute("checked").getValue());
+        assertEquals("   bar", radioButtonElement2.attribute("value").getValue());
+        Element spanElement3 = (Element) document.getRootElement().elements().get(2);
+        Element radioButtonElement3 = (Element) spanElement3.elements().get(0);
+        assertEquals("input", radioButtonElement3.getName());
+        assertEquals("radio", radioButtonElement3.attribute("type").getValue());
+        assertEquals("stringArray", radioButtonElement3.attribute("name").getValue());
+        assertNull("not checked", radioButtonElement3.attribute("checked"));
+        assertEquals("   baz", radioButtonElement3.attribute("value").getValue());
+    }
 
 	public void testWithMultiValueWithEditor() throws Exception {
+	    enableLegacyBinding(this.tag);
 		this.tag.setPath("stringArray");
 		this.tag.setItems(new Object[] {"   foo", "   bar", "   baz"});
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(this.bean, COMMAND_NAME);
@@ -336,8 +412,80 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals("Mufty", radioButtonElement5.attribute("value").getValue());
 		assertEquals("MUFTY", spanElement5.getStringValue());
 	}
+	
+	public void testCollectionOfPetsLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testCollectionOfPets();
+	}
 
+	public void testCollectionOfPetsWithFormatter() throws Exception {
+        this.tag.setPath("pets");
+        List<ItemPet> allPets = new ArrayList<ItemPet>();
+        allPets.add(new ItemPet("Rudiger"));
+        allPets.add(new ItemPet("Spot"));
+        allPets.add(new ItemPet("Checkers"));
+        allPets.add(new ItemPet("Fluffy"));
+        allPets.add(new ItemPet("Mufty"));
+        this.tag.setItems(allPets);
+        this.tag.setItemLabel("label");
+        this.tag.setId("myId");
+
+        formatterRegistry.add(ItemPet.class, new ItemPet.CustomFormatter());
+
+        int result = this.tag.doStartTag();
+        assertEquals(Tag.SKIP_BODY, result);
+
+        String output = getOutput();
+
+        // wrap the output so it is valid XML
+        output = "<doc>" + output + "</doc>";
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new StringReader(output));
+        Element spanElement1 = (Element) document.getRootElement().elements().get(0);
+        Element radioButtonElement1 = (Element) spanElement1.elements().get(0);
+        assertEquals("input", radioButtonElement1.getName());
+        assertEquals("radio", radioButtonElement1.attribute("type").getValue());
+        assertEquals("pets", radioButtonElement1.attribute("name").getValue());
+        assertEquals("Rudiger", radioButtonElement1.attribute("value").getValue());
+        assertEquals("RUDIGER", spanElement1.getStringValue());
+        assertEquals("checked", radioButtonElement1.attribute("checked").getValue());
+        Element spanElement2 = (Element) document.getRootElement().elements().get(1);
+        Element radioButtonElement2 = (Element) spanElement2.elements().get(0);
+        assertEquals("input", radioButtonElement2.getName());
+        assertEquals("radio", radioButtonElement2.attribute("type").getValue());
+        assertEquals("pets", radioButtonElement2.attribute("name").getValue());
+        assertEquals("Spot", radioButtonElement2.attribute("value").getValue());
+        assertEquals("SPOT", spanElement2.getStringValue());
+        assertEquals("checked", radioButtonElement2.attribute("checked").getValue());
+        Element spanElement3 = (Element) document.getRootElement().elements().get(2);
+        Element radioButtonElement3 = (Element) spanElement3.elements().get(0);
+        assertEquals("input", radioButtonElement3.getName());
+        assertEquals("radio", radioButtonElement3.attribute("type").getValue());
+        assertEquals("pets", radioButtonElement3.attribute("name").getValue());
+        assertEquals("Checkers", radioButtonElement3.attribute("value").getValue());
+        assertEquals("CHECKERS", spanElement3.getStringValue());
+        assertNull("not checked", radioButtonElement3.attribute("checked"));
+        Element spanElement4 = (Element) document.getRootElement().elements().get(3);
+        Element radioButtonElement4 = (Element) spanElement4.elements().get(0);
+        assertEquals("input", radioButtonElement4.getName());
+        assertEquals("radio", radioButtonElement4.attribute("type").getValue());
+        assertEquals("pets", radioButtonElement4.attribute("name").getValue());
+        assertEquals("Fluffy", radioButtonElement4.attribute("value").getValue());
+        assertEquals("FLUFFY", spanElement4.getStringValue());
+        assertEquals("checked", radioButtonElement4.attribute("checked").getValue());
+        Element spanElement5 = (Element) document.getRootElement().elements().get(4);
+        Element radioButtonElement5 = (Element) spanElement5.elements().get(0);
+        assertEquals("input", radioButtonElement5.getName());
+        assertEquals("radio", radioButtonElement5.attribute("type").getValue());
+        assertEquals("pets", radioButtonElement5.attribute("name").getValue());
+        assertEquals("Mufty", radioButtonElement5.attribute("value").getValue());
+        assertEquals("MUFTY", spanElement5.getStringValue());
+        assertEquals("checked", radioButtonElement5.attribute("checked").getValue());
+    }
+	
 	public void testCollectionOfPetsWithEditor() throws Exception {
+	    enableLegacyBinding(this.tag);
 		this.tag.setPath("pets");
 		List allPets = new ArrayList();
 		allPets.add(new ItemPet("Rudiger"));
@@ -407,10 +555,6 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 	}
 	
 	public void testWithoutItemsEnumBindTarget() throws Exception {
-		BeanWithEnum testBean = new BeanWithEnum();
-		testBean.setTestEnum(TestEnum.VALUE_2);
-		getPageContext().getRequest().setAttribute("testBean", testBean);
-		
 		this.tag.setPath("testEnum");
 		int result = this.tag.doStartTag();
 		assertEquals(Tag.SKIP_BODY, result);
@@ -428,11 +572,12 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals(value2, rootElement.selectSingleNode("//input[@checked]"));
 	}
 	
+	public void testWithoutItemsEnumBindTargetLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithoutItemsEnumBindTarget();
+	}
+	
 	public void testWithoutItemsEnumBindTargetWithExplicitLabelsAndValues() throws Exception {
-		BeanWithEnum testBean = new BeanWithEnum();
-		testBean.setTestEnum(TestEnum.VALUE_2);
-		getPageContext().getRequest().setAttribute("testBean", testBean);
-		
 		this.tag.setPath("testEnum");
 		this.tag.setItemLabel("enumLabel");
 		this.tag.setItemValue("enumValue");
@@ -451,6 +596,11 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals("Label: VALUE_2", rootElement.selectSingleNode("//label[@for = '" + value2.valueOf("@id") + "']").getText());
 		assertEquals(value2, rootElement.selectSingleNode("//input[@checked]"));
 	}
+	
+	public void testWithoutItemsEnumBindTargetWithExplicitLabelsAndValuesLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithoutItemsEnumBindTargetWithExplicitLabelsAndValues();
+	}
 
 	public void testWithNullValue() throws Exception {
 		try {
@@ -461,6 +611,11 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		catch (IllegalArgumentException ex) {
 			// success
 		}
+	}
+	
+	public void testWithNullValueLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithNullValue();
 	}
 
 	public void testHiddenElementOmittedOnDisabled() throws Exception {
@@ -487,6 +642,11 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		assertEquals("disabled", radioButtonElement.attribute("disabled").getValue());
 		assertEquals("foo", radioButtonElement.attribute("value").getValue());
 	}
+	
+	public void testHiddenElementOmittedOnDisabledLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testHiddenElementOmittedOnDisabled();
+	}
 
 	public void testSpanElementCustomizable() throws Exception {
 		this.tag.setPath("stringArray");
@@ -504,6 +664,11 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		Element spanElement = (Element) document.getRootElement().elements().get(0);
 		assertEquals("element", spanElement.getName());
 	}
+	
+	public void testSpanElementCustomizableLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testSpanElementCustomizable();
+	}
 
 	private Date getDate() {
 		Calendar cal = Calendar.getInstance();
@@ -517,12 +682,12 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 	}
 
 	protected TestBean createTestBean() {
-		List colours = new ArrayList();
+		List<Colour> colours = new ArrayList<Colour>();
 		colours.add(Colour.BLUE);
 		colours.add(Colour.RED);
 		colours.add(Colour.GREEN);
 
-		List pets = new ArrayList();
+		List<Pet> pets = new ArrayList<Pet>();
 		pets.add(new Pet("Rudiger"));
 		pets.add(new Pet("Spot"));
 		pets.add(new Pet("Fluffy"));
@@ -537,17 +702,18 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 		this.bean.setSomeIntegerArray(new Integer[] {new Integer(2), new Integer(1)});
 		this.bean.setOtherColours(colours);
 		this.bean.setPets(pets);
-		List list = new ArrayList();
+		this.bean.setTestEnum(TestEnum.VALUE_2);
+		List<String> list = new ArrayList<String>();
 		list.add("foo");
 		list.add("bar");
-		this.bean.setSomeList(list);
+		this.bean.setStringList(list);
 		return this.bean;
 	}
 
-
+	@SuppressWarnings("unchecked")
 	private static class MyStringTrimmerEditor extends StringTrimmerEditor {
 
-		public final Set allProcessedValues = new HashSet();
+        public final Set allProcessedValues = new HashSet();
 
 		public MyStringTrimmerEditor() {
 			super(false);
@@ -558,5 +724,35 @@ public final class RadioButtonsTagTests extends AbstractFormTagTests {
 			this.allProcessedValues.add(getValue());
 		}
 	}
+	
+	private class MyStringTrimmerFormatter implements Formatter<String> {
+
+        public int count = 0;
+        
+        @Override
+        public String format(String object, Locale locale) {
+            this.count++;
+            return object.trim();
+        }
+
+        @Override
+        public String parse(String formatted, Locale locale) throws ParseException {
+            return formatted.trim();
+        }
+        
+    }
+	
+	public static class MyPetFormatter implements Formatter<Pet> {
+
+        @Override
+        public String format(Pet object, Locale locale) {
+            return object.getName();
+        }
+
+        @Override
+        public Pet parse(String formatted, Locale locale) throws ParseException {
+            return new Pet(formatted);
+        } 
+    }
 
 }

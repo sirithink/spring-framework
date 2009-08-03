@@ -36,6 +36,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Juergen Hoeller
  * @author Scott Andrews
+ * @author Jeremy Grelle
  * @since 2.5.2
  */
 public abstract class AbstractMultiCheckedElementTag extends AbstractCheckedElementTag {
@@ -192,7 +193,7 @@ public abstract class AbstractMultiCheckedElementTag extends AbstractCheckedElem
 		String labelProperty =
 				(itemLabel != null ? ObjectUtils.getDisplayString(evaluate("itemLabel", itemLabel)) : null);
 
-		Class<?> boundType = getBindStatus().getValueType();
+		Class<?> boundType = getBoundValueType();
 		if (itemsObject == null && boundType != null && boundType.isEnum()) {
 			itemsObject = boundType.getEnumConstants();
 		}

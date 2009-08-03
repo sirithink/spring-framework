@@ -18,12 +18,14 @@ package org.springframework.web.servlet.tags.form;
 
 import java.beans.PropertyEditorSupport;
 import java.io.StringReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,11 +34,13 @@ import javax.servlet.jsp.tagext.Tag;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-
 import org.springframework.beans.Colour;
 import org.springframework.beans.Pet;
-import org.springframework.beans.TestBean;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.model.ui.format.Formatter;
+import org.springframework.model.ui.support.DefaultPresentationModel;
+import org.springframework.model.ui.support.FormatterRegistry;
+import org.springframework.model.ui.support.GenericFormatterRegistry;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -46,12 +50,17 @@ import org.springframework.validation.BindingResult;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Benjamin Hoffmann
+ * @author Jeremy Grelle
+ * 
+ * TODO - Collection binding tests fail because binding.getValue() blows up for un-typed collections
  */
 public class CheckboxesTagTests extends AbstractFormTagTests {
 
 	private CheckboxesTag tag;
 
 	private TestBean bean;
+	
+	private FormatterRegistry formatterRegistry;
 
 	protected void onSetUp() {
 		this.tag = new CheckboxesTag() {
@@ -60,6 +69,13 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 			}
 		};
 		this.tag.setPageContext(getPageContext());
+		
+		DefaultPresentationModel presentationModel = new DefaultPresentationModel(this.bean);
+        this.formatterRegistry = new GenericFormatterRegistry();
+        presentationModel.setFormatterRegistry(this.formatterRegistry);
+        
+        this.tag.setPresentationModel(presentationModel);        
+        this.tag.setLegacyBinding(false);
 	}
 
 	public void testWithMultiValueArray() throws Exception {
@@ -98,6 +114,11 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertNull("not checked", checkboxElement3.attribute("checked"));
 		assertEquals("baz", checkboxElement3.attribute("value").getValue());
 		assertEquals("baz", spanElement3.getStringValue());
+	}
+	
+	public void testWithMultiValueArrayLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueArray();
 	}
 
 	public void testWithMultiValueArrayWithDelimiter() throws Exception {
@@ -144,6 +165,11 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertEquals("baz", checkboxElement3.attribute("value").getValue());
 		assertEquals("baz", spanElement3.getStringValue());
 	}
+	
+	public void testWithMultiValueArrayWithDelimiterLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueArrayWithDelimiter();
+	}
 
 	public void testWithMultiValueMap() throws Exception {
 		this.tag.setPath("stringArray");
@@ -187,9 +213,14 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertEquals("baz", checkboxElement3.attribute("value").getValue());
 		assertEquals("BAZ", spanElement3.getStringValue());
 	}
+	
+	public void testWithMultiValueMapLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueMap();
+	}
 
 	public void testWithPetItemsMap() throws Exception {
-		this.tag.setPath("someSet");
+		this.tag.setPath("itemPets");
 		Map m = new LinkedHashMap();
 		m.put(new ItemPet("PET1"), "PET1Label");
 		m.put(new ItemPet("PET2"), "PET2Label");
@@ -210,7 +241,7 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element checkboxElement1 = (Element) spanElement1.elements().get(0);
 		assertEquals("input", checkboxElement1.getName());
 		assertEquals("checkbox", checkboxElement1.attribute("type").getValue());
-		assertEquals("someSet", checkboxElement1.attribute("name").getValue());
+		assertEquals("itemPets", checkboxElement1.attribute("name").getValue());
 		assertEquals("checked", checkboxElement1.attribute("checked").getValue());
 		assertEquals("PET1", checkboxElement1.attribute("value").getValue());
 		assertEquals("PET1Label", spanElement1.getStringValue());
@@ -218,7 +249,7 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element checkboxElement2 = (Element) spanElement2.elements().get(0);
 		assertEquals("input", checkboxElement2.getName());
 		assertEquals("checkbox", checkboxElement2.attribute("type").getValue());
-		assertEquals("someSet", checkboxElement2.attribute("name").getValue());
+		assertEquals("itemPets", checkboxElement2.attribute("name").getValue());
 		assertEquals("checked", checkboxElement2.attribute("checked").getValue());
 		assertEquals("PET2", checkboxElement2.attribute("value").getValue());
 		assertEquals("PET2Label", spanElement2.getStringValue());
@@ -226,10 +257,15 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element checkboxElement3 = (Element) spanElement3.elements().get(0);
 		assertEquals("input", checkboxElement3.getName());
 		assertEquals("checkbox", checkboxElement3.attribute("type").getValue());
-		assertEquals("someSet", checkboxElement3.attribute("name").getValue());
+		assertEquals("itemPets", checkboxElement3.attribute("name").getValue());
 		assertNull("not checked", checkboxElement3.attribute("checked"));
 		assertEquals("PET3", checkboxElement3.attribute("value").getValue());
 		assertEquals("PET3Label", spanElement3.getStringValue());
+	}
+	
+	public void testWithPetItemsMapLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithPetItemsMap();
 	}
 
 	public void testWithMultiValueMapWithDelimiter() throws Exception {
@@ -276,8 +312,54 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertEquals("baz", checkboxElement3.attribute("value").getValue());
 		assertEquals(delimiter + "BAZ", spanElement3.getStringValue());
 	}
+	
+	public void testWithMultiValueMapWithDelimiterLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithMultiValueMapWithDelimiter();
+	}
+	
+	public void testWithMultiValueWithFormatter() throws Exception {
+        this.tag.setPath("stringArray");
+        this.tag.setItems(new Object[] {"   foo", "   bar", "   baz"});
+        
+        MyStringTrimmerFormatter formatter = new MyStringTrimmerFormatter();
+        this.formatterRegistry.add(String.class, formatter);
+
+        int result = this.tag.doStartTag();
+        assertEquals(Tag.SKIP_BODY, result);
+
+        String output = getOutput();
+
+        // wrap the output so it is valid XML
+        output = "<doc>" + output + "</doc>";
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new StringReader(output));
+        Element spanElement1 = (Element) document.getRootElement().elements().get(0);
+        Element checkboxElement1 = (Element) spanElement1.elements().get(0);
+        assertEquals("input", checkboxElement1.getName());
+        assertEquals("checkbox", checkboxElement1.attribute("type").getValue());
+        assertEquals("stringArray", checkboxElement1.attribute("name").getValue());
+        assertEquals("checked", checkboxElement1.attribute("checked").getValue());
+        assertEquals("   foo", checkboxElement1.attribute("value").getValue());
+        Element spanElement2 = (Element) document.getRootElement().elements().get(1);
+        Element checkboxElement2 = (Element) spanElement2.elements().get(0);
+        assertEquals("input", checkboxElement2.getName());
+        assertEquals("checkbox", checkboxElement2.attribute("type").getValue());
+        assertEquals("stringArray", checkboxElement2.attribute("name").getValue());
+        assertEquals("checked", checkboxElement2.attribute("checked").getValue());
+        assertEquals("   bar", checkboxElement2.attribute("value").getValue());
+        Element spanElement3 = (Element) document.getRootElement().elements().get(2);
+        Element checkboxElement3 = (Element) spanElement3.elements().get(0);
+        assertEquals("input", checkboxElement3.getName());
+        assertEquals("checkbox", checkboxElement3.attribute("type").getValue());
+        assertEquals("stringArray", checkboxElement3.attribute("name").getValue());
+        assertNull("not checked", checkboxElement3.attribute("checked"));
+        assertEquals("   baz", checkboxElement3.attribute("value").getValue());
+    }
 
 	public void testWithMultiValueWithEditor() throws Exception {
+	    enableLegacyBinding(this.tag);
 		this.tag.setPath("stringArray");
 		this.tag.setItems(new Object[] {"   foo", "   bar", "   baz"});
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(this.bean, COMMAND_NAME);
@@ -319,8 +401,48 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertEquals("   baz", checkboxElement3.attribute("value").getValue());
 	}
 
+	public void testWithMultiValueWithReverseFormatter() throws Exception {
+        this.tag.setPath("stringArray");
+        this.tag.setItems(new Object[] {"FOO", "BAR", "BAZ"});
+        
+        this.formatterRegistry.add(String.class, new MyLowerCaseFormatter());
+
+        int result = this.tag.doStartTag();
+        assertEquals(Tag.SKIP_BODY, result);
+
+        String output = getOutput();
+
+        // wrap the output so it is valid XML
+        output = "<doc>" + output + "</doc>";
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new StringReader(output));
+        Element spanElement1 = (Element) document.getRootElement().elements().get(0);
+        Element checkboxElement1 = (Element) spanElement1.elements().get(0);
+        assertEquals("input", checkboxElement1.getName());
+        assertEquals("checkbox", checkboxElement1.attribute("type").getValue());
+        assertEquals("stringArray", checkboxElement1.attribute("name").getValue());
+        assertEquals("checked", checkboxElement1.attribute("checked").getValue());
+        assertEquals("FOO", checkboxElement1.attribute("value").getValue());
+        Element spanElement2 = (Element) document.getRootElement().elements().get(1);
+        Element checkboxElement2 = (Element) spanElement2.elements().get(0);
+        assertEquals("input", checkboxElement2.getName());
+        assertEquals("checkbox", checkboxElement2.attribute("type").getValue());
+        assertEquals("stringArray", checkboxElement2.attribute("name").getValue());
+        assertEquals("checked", checkboxElement2.attribute("checked").getValue());
+        assertEquals("BAR", checkboxElement2.attribute("value").getValue());
+        Element spanElement3 = (Element) document.getRootElement().elements().get(2);
+        Element checkboxElement3 = (Element) spanElement3.elements().get(0);
+        assertEquals("input", checkboxElement3.getName());
+        assertEquals("checkbox", checkboxElement3.attribute("type").getValue());
+        assertEquals("stringArray", checkboxElement3.attribute("name").getValue());
+        assertNull("not checked", checkboxElement3.attribute("checked"));
+        assertEquals("BAZ", checkboxElement3.attribute("value").getValue());
+    }
+	
 	public void testWithMultiValueWithReverseEditor() throws Exception {
-		this.tag.setPath("stringArray");
+		enableLegacyBinding(this.tag);
+	    this.tag.setPath("stringArray");
 		this.tag.setItems(new Object[] {"FOO", "BAR", "BAZ"});
 		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(this.bean, COMMAND_NAME);
 		MyLowerCaseEditor editor = new MyLowerCaseEditor();
@@ -423,12 +545,17 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertEquals("Mufty", checkboxElement5.attribute("value").getValue());
 		assertEquals("MUFTY", spanElement5.getStringValue());
 	}
+	
+	public void testCollectionOfPetsLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testCollectionOfPets();
+	}
 
 	/**
 	 * Test case where items toString() doesn't fit the item ID
 	 */
 	public void testCollectionOfItemPets() throws Exception {
-		this.tag.setPath("someSet");
+		this.tag.setPath("itemPets");
 		List allPets = new ArrayList();
 		allPets.add(new ItemPet("PET1"));
 		allPets.add(new ItemPet("PET2"));
@@ -451,7 +578,7 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element checkboxElement1 = (Element) spanElement1.elements().get(0);
 		assertEquals("input", checkboxElement1.getName());
 		assertEquals("checkbox", checkboxElement1.attribute("type").getValue());
-		assertEquals("someSet", checkboxElement1.attribute("name").getValue());
+		assertEquals("itemPets", checkboxElement1.attribute("name").getValue());
 		assertNotNull("should be checked", checkboxElement1.attribute("checked"));
 		assertEquals("checked", checkboxElement1.attribute("checked").getValue());
 		assertEquals("PET1", checkboxElement1.attribute("value").getValue());
@@ -460,7 +587,7 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element checkboxElement2 = (Element) spanElement2.elements().get(0);
 		assertEquals("input", checkboxElement2.getName());
 		assertEquals("checkbox", checkboxElement2.attribute("type").getValue());
-		assertEquals("someSet", checkboxElement2.attribute("name").getValue());
+		assertEquals("itemPets", checkboxElement2.attribute("name").getValue());
 		assertNotNull("should be checked", checkboxElement2.attribute("checked"));
 		assertEquals("checked", checkboxElement2.attribute("checked").getValue());
 		assertEquals("PET2", checkboxElement2.attribute("value").getValue());
@@ -469,14 +596,86 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element checkboxElement3 = (Element) spanElement3.elements().get(0);
 		assertEquals("input", checkboxElement3.getName());
 		assertEquals("checkbox", checkboxElement3.attribute("type").getValue());
-		assertEquals("someSet", checkboxElement3.attribute("name").getValue());
+		assertEquals("itemPets", checkboxElement3.attribute("name").getValue());
 		assertNull("not checked", checkboxElement3.attribute("checked"));
 		assertEquals("PET3", checkboxElement3.attribute("value").getValue());
 		assertEquals("PET3", spanElement3.getStringValue());
 	}
+	
+	public void testCollectionOfItemPetsLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testCollectionOfItemPets();
+	}
 
+	public void testCollectionOfPetsWithFormatter() throws Exception {
+        this.tag.setPath("pets");
+        List<ItemPet> allPets = new ArrayList<ItemPet>();
+        allPets.add(new ItemPet("Rudiger"));
+        allPets.add(new ItemPet("Spot"));
+        allPets.add(new ItemPet("Checkers"));
+        allPets.add(new ItemPet("Fluffy"));
+        allPets.add(new ItemPet("Mufty"));
+        this.tag.setItems(allPets);
+        this.tag.setItemLabel("label");
+        this.tag.setId("myId");
+
+        this.formatterRegistry.add(Pet.class, new MyPetFormatter());
+
+        int result = this.tag.doStartTag();
+        assertEquals(Tag.SKIP_BODY, result);
+
+        String output = getOutput();
+
+        // wrap the output so it is valid XML
+        output = "<doc>" + output + "</doc>";
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new StringReader(output));
+        Element spanElement1 = (Element) document.getRootElement().elements().get(0);
+        Element checkboxElement1 = (Element) spanElement1.elements().get(0);
+        assertEquals("input", checkboxElement1.getName());
+        assertEquals("checkbox", checkboxElement1.attribute("type").getValue());
+        assertEquals("pets", checkboxElement1.attribute("name").getValue());
+        assertEquals("checked", checkboxElement1.attribute("checked").getValue());
+        assertEquals("Rudiger", checkboxElement1.attribute("value").getValue());
+        assertEquals("RUDIGER", spanElement1.getStringValue());
+        Element spanElement2 = (Element) document.getRootElement().elements().get(1);
+        Element checkboxElement2 = (Element) spanElement2.elements().get(0);
+        assertEquals("input", checkboxElement2.getName());
+        assertEquals("checkbox", checkboxElement2.attribute("type").getValue());
+        assertEquals("pets", checkboxElement2.attribute("name").getValue());
+        assertEquals("checked", checkboxElement2.attribute("checked").getValue());
+        assertEquals("Spot", checkboxElement2.attribute("value").getValue());
+        assertEquals("SPOT", spanElement2.getStringValue());
+        Element spanElement3 = (Element) document.getRootElement().elements().get(2);
+        Element checkboxElement3 = (Element) spanElement3.elements().get(0);
+        assertEquals("input", checkboxElement3.getName());
+        assertEquals("checkbox", checkboxElement3.attribute("type").getValue());
+        assertEquals("pets", checkboxElement3.attribute("name").getValue());
+        assertNull("not checked", checkboxElement3.attribute("checked"));
+        assertEquals("Checkers", checkboxElement3.attribute("value").getValue());
+        assertEquals("CHECKERS", spanElement3.getStringValue());
+        Element spanElement4 = (Element) document.getRootElement().elements().get(3);
+        Element checkboxElement4 = (Element) spanElement4.elements().get(0);
+        assertEquals("input", checkboxElement4.getName());
+        assertEquals("checkbox", checkboxElement4.attribute("type").getValue());
+        assertEquals("pets", checkboxElement4.attribute("name").getValue());
+        assertEquals("checked", checkboxElement4.attribute("checked").getValue());
+        assertEquals("Fluffy", checkboxElement4.attribute("value").getValue());
+        assertEquals("FLUFFY", spanElement4.getStringValue());
+        Element spanElement5 = (Element) document.getRootElement().elements().get(4);
+        Element checkboxElement5 = (Element) spanElement5.elements().get(0);
+        assertEquals("input", checkboxElement5.getName());
+        assertEquals("checkbox", checkboxElement5.attribute("type").getValue());
+        assertEquals("pets", checkboxElement5.attribute("name").getValue());
+        assertEquals("checked", checkboxElement5.attribute("checked").getValue());
+        assertEquals("Mufty", checkboxElement5.attribute("value").getValue());
+        assertEquals("MUFTY", spanElement5.getStringValue());
+    }
+	
 	public void testCollectionOfPetsWithEditor() throws Exception {
-		this.tag.setPath("pets");
+		enableLegacyBinding(this.tag);
+	    this.tag.setPath("pets");
 		List allPets = new ArrayList();
 		allPets.add(new ItemPet("Rudiger"));
 		allPets.add(new ItemPet("Spot"));
@@ -554,6 +753,11 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 			// success
 		}
 	}
+	
+	public void testWithNullValueLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testWithNullValue();
+	}
 
 	public void testHiddenElementOmittedOnDisabled() throws Exception {
 		this.tag.setPath("stringArray");
@@ -580,6 +784,11 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		assertEquals("foo", checkboxElement.attribute("value").getValue());
 	}
 	
+	public void testHiddenElementOmittedOnDisabledLegacy() throws Exception {
+	    enableLegacyBinding(this.tag);
+	    testHiddenElementOmittedOnDisabled();
+	}
+	
 	public void testSpanElementCustomizable() throws Exception {
 		this.tag.setPath("stringArray");
 		this.tag.setItems(new Object[] {"foo", "bar", "baz"});
@@ -596,6 +805,11 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		Element spanElement = (Element) document.getRootElement().elements().get(0);
 		assertEquals("element", spanElement.getName());
 	}
+	
+	public void testSpanElementCustomizableLegacy() throws Exception {
+        enableLegacyBinding(this.tag);
+        testSpanElementCustomizable();
+    }
 
 	private Date getDate() {
 		Calendar cal = Calendar.getInstance();
@@ -609,20 +823,20 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 	}
 
 	protected TestBean createTestBean() {
-		List colours = new ArrayList();
+		List<Colour> colours = new ArrayList<Colour>();
 		colours.add(Colour.BLUE);
 		colours.add(Colour.RED);
 		colours.add(Colour.GREEN);
 
-		List pets = new ArrayList();
+		List<Pet> pets = new ArrayList<Pet>();
 		pets.add(new Pet("Rudiger"));
 		pets.add(new Pet("Spot"));
 		pets.add(new Pet("Fluffy"));
 		pets.add(new Pet("Mufty"));
 
-		Set someObjects = new HashSet();
-		someObjects.add(new ItemPet("PET1"));
-		someObjects.add(new ItemPet("PET2"));
+		Set<ItemPet> itemPets = new HashSet<ItemPet>();
+		itemPets.add(new ItemPet("PET1"));
+		itemPets.add(new ItemPet("PET2"));
 		
 		this.bean = new TestBean();
 		this.bean.setDate(getDate());
@@ -633,14 +847,29 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 		this.bean.setSomeIntegerArray(new Integer[] {new Integer(2), new Integer(1)});
 		this.bean.setOtherColours(colours);
 		this.bean.setPets(pets);
-		this.bean.setSomeSet(someObjects);
-		List list = new ArrayList();
+		this.bean.setItemPets(itemPets);
+		List<String> list = new ArrayList<String>();
 		list.add("foo");
 		list.add("bar");
-		this.bean.setSomeList(list);
+		this.bean.setStringList(list);
 		return this.bean;
 	}
+	
+	private class MyStringTrimmerFormatter implements Formatter<String> {
 
+	    public final Set<String> allProcessedValues = new HashSet<String>();
+        
+        @Override
+        public String format(String object, Locale locale) {
+            this.allProcessedValues.add(object);
+            return object.trim();
+        }
+
+        @Override
+        public String parse(String formatted, Locale locale) throws ParseException {
+            return formatted.trim();
+        }
+    }
 
 	private static class MyStringTrimmerEditor extends StringTrimmerEditor {
 
@@ -655,6 +884,32 @@ public class CheckboxesTagTests extends AbstractFormTagTests {
 			this.allProcessedValues.add(getValue());
 		}
 	}
+	
+	private static class MyLowerCaseFormatter implements Formatter<String> {
+
+        @Override
+        public String format(String object, Locale locale) {
+            return object.toUpperCase();
+        }
+
+        @Override
+        public String parse(String formatted, Locale locale) throws ParseException {
+            return formatted.toLowerCase();
+        }
+	}
+	
+	public static class MyPetFormatter implements Formatter<Pet> {
+
+        @Override
+        public String format(Pet object, Locale locale) {
+            return object.getName();
+        }
+
+        @Override
+        public Pet parse(String formatted, Locale locale) throws ParseException {
+            return new Pet(formatted);
+        } 
+    }
 
 
 	private static class MyLowerCaseEditor extends PropertyEditorSupport {

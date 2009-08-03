@@ -18,6 +18,7 @@ package org.springframework.web.servlet.tags.form;
 
 import java.beans.PropertyEditor;
 
+import org.springframework.model.ui.FieldModel;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.HtmlUtils;
 
@@ -70,5 +71,20 @@ abstract class ValueFormatter {
 			return getDisplayString(value, htmlEscape);
 		}
 	}
+	
+	public static String getDisplayString(Object value, FieldModel fieldModel, boolean htmlEscape) {
+        if (fieldModel != null && !(value instanceof String)) {
+            try {
+                return getDisplayString(fieldModel.formatValue(value), htmlEscape);
+            }
+            catch (Throwable ex) {
+                // The Binding might not support this value... pass through.
+                return getDisplayString(value, htmlEscape);
+            }
+        }
+        else {
+            return getDisplayString(value, htmlEscape);
+        }
+    }
 
 }

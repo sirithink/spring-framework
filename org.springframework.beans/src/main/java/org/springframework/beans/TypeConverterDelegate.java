@@ -19,6 +19,7 @@ package org.springframework.beans;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
@@ -203,8 +204,23 @@ class TypeConverterDelegate {
 					convertedValue = convertToTypedMap((Map) convertedValue, propertyName, methodParam);
 				}
 				else if (convertedValue instanceof String && !requiredType.isInstance(convertedValue)) {
-					String strValue = ((String) convertedValue).trim();
-					if (requiredType.isEnum() && "".equals(strValue)) {
+					try {
+						Constructor strCtor = requiredType.getConstructor(String.class);
+						return (T) BeanUtils.instantiateClass(strCtor, convertedValue);
+					}
+					catch (NoSuchMethodException ex) {
+						// proceed with field lookup
+						if (logger.isTraceEnabled()) {
+							logger.trace("No String constructor found on type [" + requiredType.getName() + "]", ex);
+						}
+					}
+					catch (Exception ex) {
+						if (logger.isTraceEnabled()) {
+							logger.trace("Construction via String failed for type [" + requiredType.getName() + "]", ex);
+						}
+					}
+					String trimmedValue = ((String) convertedValue).trim();
+					if (requiredType.isEnum() && "".equals(trimmedValue)) {
 						// It's an empty enum identifier: reset the enum value to null.
 						return null;
 					}
@@ -212,7 +228,7 @@ class TypeConverterDelegate {
 					// with values defined as static fields. Resulting value still needs
 					// to be checked, hence we don't return it right away.
 					try {
-						Field enumField = requiredType.getField(strValue);
+						Field enumField = requiredType.getField(trimmedValue);
 						convertedValue = enumField.get(null);
 					}
 					catch (Throwable ex) {

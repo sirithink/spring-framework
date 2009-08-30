@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.springframework.context.alert.Alert;
 import org.springframework.context.alert.Severity;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.message.DefaultMessageFactory;
 import org.springframework.context.message.MessageBuilder;
 import org.springframework.context.message.ResolvableArgument;
@@ -104,9 +103,11 @@ public class DefaultFieldModel implements FieldModel {
 		assertEnabled();
 		if (submittedValue instanceof String) {
 			try {
-				Object parsed = context.getFormatter().parse((String) submittedValue, getLocale());
-				buffer.setValue(coerseToValueType(parsed));
-				submittedValue = null;
+				Formatter formatter = context.getFormatter();
+				Object parsedValue = formatter != null ? formatter.parse((String) submittedValue, getLocale())
+						: submittedValue;
+				buffer.setValue(coerseToValueType(parsedValue));
+				this.submittedValue = null;
 				bindingStatus = BindingStatus.DIRTY;
 			} catch (ParseException e) {
 				this.submittedValue = submittedValue;
@@ -118,19 +119,19 @@ public class DefaultFieldModel implements FieldModel {
 				bindingStatus = BindingStatus.INVALID_SUBMITTED_VALUE;
 			}
 		} else if (submittedValue instanceof String[]) {
-			Object parsed;
+			Object parsedValue;
+			String[] submittedValues = (String[]) submittedValue;
 			if (isMap()) {
-				String[] sourceValues = (String[]) submittedValue;
 				Formatter keyFormatter = context.getKeyFormatter();
-				Formatter valueFormatter = context.getElementFormatter();
-				Map map = new LinkedHashMap(sourceValues.length);
-				for (int i = 0; i < sourceValues.length; i++) {
-					String entryString = sourceValues[i];
+				Formatter valFormatter = context.getElementFormatter();
+				Map map = new LinkedHashMap(submittedValues.length);
+				for (int i = 0; i < submittedValues.length; i++) {
+					String entryString = submittedValues[i];
 					try {
-						String[] keyValue = entryString.split("=");
-						Object parsedMapKey = keyFormatter.parse(keyValue[0], getLocale());
-						Object parsedMapValue = valueFormatter.parse(keyValue[1], getLocale());
-						map.put(parsedMapKey, parsedMapValue);
+						String[] entry = entryString.split("=");
+						Object parsedKey = keyFormatter != null ? keyFormatter.parse(entry[0], getLocale()) : entry[0];
+						Object parsedVal = valFormatter != null ? valFormatter.parse(entry[1], getLocale()) : entry[1];
+						map.put(parsedKey, parsedVal);
 					} catch (ParseException e) {
 						this.submittedValue = submittedValue;
 						invalidSubmittedValueCause = e;
@@ -138,15 +139,15 @@ public class DefaultFieldModel implements FieldModel {
 						break;
 					}
 				}
-				parsed = map;
+				parsedValue = map;
 			} else {
-				String[] sourceValues = (String[]) submittedValue;
-				List list = new ArrayList(sourceValues.length);
-				for (int i = 0; i < sourceValues.length; i++) {
-					Object parsedValue;
+				List list = new ArrayList(submittedValues.length);
+				Formatter elementFormatter = context.getElementFormatter();
+				for (int i = 0; i < submittedValues.length; i++) {
 					try {
-						parsedValue = context.getElementFormatter().parse(sourceValues[i], getLocale());
-						list.add(parsedValue);
+						Object parsedElement = elementFormatter != null ? elementFormatter.parse(submittedValues[i],
+								getLocale()) : submittedValues[i];
+						list.add(parsedElement);
 					} catch (ParseException e) {
 						this.submittedValue = submittedValue;
 						invalidSubmittedValueCause = e;
@@ -154,12 +155,12 @@ public class DefaultFieldModel implements FieldModel {
 						break;
 					}
 				}
-				parsed = list;
+				parsedValue = list;
 			}
 			if (bindingStatus != BindingStatus.INVALID_SUBMITTED_VALUE) {
 				try {
-					buffer.setValue(coerseToValueType(parsed));
-					submittedValue = null;
+					buffer.setValue(coerseToValueType(parsedValue));
+					this.submittedValue = null;
 					bindingStatus = BindingStatus.DIRTY;
 				} catch (ConversionFailedException e) {
 					this.submittedValue = submittedValue;
@@ -329,14 +330,7 @@ public class DefaultFieldModel implements FieldModel {
 	}
 
 	public FieldModel getMapValue(Object key) {
-		if (key instanceof String) {
-			try {
-				key = context.getKeyFormatter().parse((String) key, getLocale());
-			} catch (ParseException e) {
-				throw new IllegalArgumentException("Unable to parse map key '" + key + "'", e);
-			}
-		}
-		return context.getMapValue(key);
+		return context.getMapValue((key));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -354,13 +348,24 @@ public class DefaultFieldModel implements FieldModel {
 
 	@SuppressWarnings("unchecked")
 	private String format(Object value, Formatter formatter) {
-		Class<?> formattedType = getFormattedObjectType(formatter.getClass());
-		value = context.getConversionService().convert(value, formattedType);
-		return formatter.format(value, getLocale());
+		if (formatter != null) {
+			Class<?> formattedType = getFormattedObjectType(formatter.getClass());
+			value = context.getConversionService().convert(value, formattedType);
+			return formatter.format(value, getLocale());
+		} else {
+			if (value == null) {
+				return "";
+			}
+			if (context.getConversionService().canConvert(value.getClass(), String.class)) {
+				return context.getConversionService().convert(value, String.class);
+			} else {
+				return value.toString();
+			}
+		}
 	}
 
 	private Locale getLocale() {
-		return LocaleContextHolder.getLocale();
+		return context.getLocale();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -392,13 +397,13 @@ public class DefaultFieldModel implements FieldModel {
 		return null;
 	}
 
-	private Object coerseToValueType(Object parsed) {
+	private Object coerseToValueType(Object value) {
 		TypeDescriptor targetType = valueModel.getValueTypeDescriptor();
 		ConversionService conversionService = context.getConversionService();
-		if (parsed != null && conversionService.canConvert(parsed.getClass(), targetType)) {
-			return conversionService.convert(parsed, targetType);
+		if (value != null && conversionService.canConvert(value.getClass(), targetType)) {
+			return conversionService.convert(value, targetType);
 		} else {
-			return parsed;
+			return value;
 		}
 	}
 

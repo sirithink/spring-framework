@@ -15,6 +15,7 @@
  */
 package org.springframework.ui.model.support;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 import org.springframework.core.convert.TypeDescriptor;
@@ -26,22 +27,27 @@ import org.springframework.core.convert.TypeDescriptor;
  */
 public class ListElementValueModel implements ValueModel {
 
-	@SuppressWarnings("unchecked")
-	private List list;
+	private Object list;
 
 	private int index;
 
 	private Class<?> elementType;
 
-	@SuppressWarnings("unchecked")
-	public ListElementValueModel(int index, Class<?> elementType, List list) {
+	public ListElementValueModel(int index, Class<?> elementType, Object list) {
 		this.index = index;
 		this.elementType = elementType;
-		this.list = list;			
+		this.list = list;
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	public Object getValue() {
-		return list.get(index);
+		if (list instanceof List) {
+			return ((List)list).get(index);
+		} else if (list.getClass().isArray()) {
+			return Array.get(list, index);
+		} else {
+			return null;
+		}
 	}
 
 	public Class<?> getValueType() {
@@ -62,6 +68,10 @@ public class ListElementValueModel implements ValueModel {
 
 	@SuppressWarnings("unchecked")
 	public void setValue(Object value) {
-		list.set(index, value);
+		if (list instanceof List) {
+			((List) list).set(index, value);
+		} else if (list.getClass().isArray()) {
+			Array.set(list, index, value);
+		}
 	}
 }

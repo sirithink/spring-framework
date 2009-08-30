@@ -15,6 +15,8 @@
  */
 package org.springframework.ui.model.support;
 
+import java.util.Locale;
+
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.ui.format.Formatter;
@@ -29,7 +31,7 @@ public interface FieldModelContext {
 
 	MessageSource getMessageSource();
 
-	ConversionService getConversionService();
+	Locale getLocale();
 
 	Condition getEditableCondition();
 
@@ -46,12 +48,14 @@ public interface FieldModelContext {
 	@SuppressWarnings("unchecked")
 	Formatter getKeyFormatter();
 
-	String getLabel();
+	ConversionService getConversionService();
 
 	FieldModel getNested(String fieldName);
 
 	FieldModel getListElement(int index);
 
 	FieldModel getMapValue(Object key);
+
+	String getLabel();
 
 }

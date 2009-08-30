@@ -37,6 +37,13 @@ class FieldPath implements Iterable<FieldPathElement> {
 				String index = prop.substring(start + 1, end);
 				elements.add(new FieldPathElement(prop.substring(0, start), false));
 				elements.add(new FieldPathElement(index, true));
+				// TODO limited to just 2 dimensions currently
+				start = prop.indexOf('[', end);
+				if (start != -1) {
+					end = prop.indexOf(']', start);
+					index = prop.substring(start + 1, end);
+					elements.add(new FieldPathElement(index, true));
+				}
 			} else {
 				elements.add(new FieldPathElement(prop, false));
 			}

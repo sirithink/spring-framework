@@ -19,6 +19,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.GenericCollectionTypeResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
@@ -175,7 +177,7 @@ public class DefaultPresentationModel implements PresentationModel {
 
 	@SuppressWarnings("unchecked")
 	class PropertyFieldModelRule implements FieldModelConfiguration, FieldModelContext {
-		
+
 		private Class<?> domainModelClass;
 
 		private PropertyDescriptor property;
@@ -186,23 +188,6 @@ public class DefaultPresentationModel implements PresentationModel {
 
 		private Formatter elementFormatter;
 
-		private final Formatter DEFAULT_FORMATTER = new Formatter() {
-			public String format(Object object, Locale locale) {
-				if (object == null) {
-					return "";
-				} else {
-					return object.toString();
-				}
-			}
-			public Object parse(String formatted, Locale locale) throws ParseException {
-				if (formatted == null || formatted.length() == 0) {
-					return null;
-				} else {
-					return formatted;
-				}
-			}
-		};
-		
 		private Condition editableCondition = Condition.ALWAYS_TRUE;
 
 		private Condition enabledCondition = Condition.ALWAYS_TRUE;
@@ -228,8 +213,20 @@ public class DefaultPresentationModel implements PresentationModel {
 			return messageSource;
 		}
 
-		public ConversionService getConversionService() {
-			return conversionService;
+		public Locale getLocale() {
+			return LocaleContextHolder.getLocale();
+		}
+
+		public Condition getEnabledCondition() {
+			return enabledCondition;
+		}
+
+		public Condition getEditableCondition() {
+			return editableCondition;
+		}
+
+		public Condition getVisibleCondition() {
+			return visibleCondition;
 		}
 
 		public Formatter<?> getFormatter() {
@@ -257,20 +254,8 @@ public class DefaultPresentationModel implements PresentationModel {
 			}
 		}
 
-		public Condition getEnabledCondition() {
-			return enabledCondition;
-		}
-
-		public Condition getEditableCondition() {
-			return editableCondition;
-		}
-
-		public Condition getVisibleCondition() {
-			return visibleCondition;
-		}
-
-		public String getLabel() {
-			return property.getName();
+		public ConversionService getConversionService() {
+			return conversionService;
 		}
 
 		public FieldModel getNested(String fieldName) {
@@ -279,7 +264,6 @@ public class DefaultPresentationModel implements PresentationModel {
 		}
 
 		public FieldModel getListElement(int index) {
-			// TODO array support
 			if (listElements == null) {
 				listElements = new HashMap<Integer, FieldModel>();
 			}
@@ -287,7 +271,7 @@ public class DefaultPresentationModel implements PresentationModel {
 			FieldModel field = listElements.get(index);
 			if (field == null) {
 				FieldModelContext context = new ListElementContext(index, this);
-				ValueModel valueModel = new ListElementValueModel(index, getElementType(), (List) fieldModel.getValue());
+				ValueModel valueModel = new ListElementValueModel(index, getElementType(), fieldModel.getValue());
 				field = new DefaultFieldModel(valueModel, context);
 				listElements.put(index, field);
 			}
@@ -295,6 +279,14 @@ public class DefaultPresentationModel implements PresentationModel {
 		}
 
 		public FieldModel getMapValue(Object key) {
+			if (key instanceof String) {
+				try {
+					key = keyFormatter != null ? keyFormatter.parse((String) key, getLocale()) : key;
+				} catch (ParseException e) {
+					throw new IllegalArgumentException("Unable to parse map key '" + key + "'", e);
+				}
+			}
+			key = conversionService.convert(key, getKeyType());
 			if (mapValues == null) {
 				mapValues = new HashMap<Object, FieldModel>();
 			}
@@ -308,6 +300,10 @@ public class DefaultPresentationModel implements PresentationModel {
 				mapValues.put(key, field);
 			}
 			return field;
+		}
+
+		public String getLabel() {
+			return property.getName();
 		}
 
 		// implementing FieldModelConfiguration
@@ -354,10 +350,9 @@ public class DefaultPresentationModel implements PresentationModel {
 		// internal helpers
 
 		private Formatter<?> getFormatter(TypeDescriptor type) {
-			Formatter formatter = formatterRegistry.getFormatter(type);
-			return formatter != null ? formatter : DEFAULT_FORMATTER;
+			return formatterRegistry.getFormatter(type);
 		}
-		
+
 		private Class<?> getElementType() {
 			Class<?> propertyType = property.getPropertyType();
 			if (Map.class.isAssignableFrom(propertyType)) {
@@ -418,16 +413,30 @@ public class DefaultPresentationModel implements PresentationModel {
 		}
 
 		private void growListIfNecessary(int index) {
-			List list = (List) fieldModel.getValue();
+			Object list = fieldModel.getValue();
 			if (list == null) {
 				list = newListValue(fieldModel.getValueType());
 				fieldModel.applySubmittedValue(list);
 				fieldModel.commit();
-				list = (List) fieldModel.getValue();
+				list = fieldModel.getValue();
 			}
-			if (index >= list.size()) {
-				for (int i = list.size(); i <= index; i++) {
-					list.add(newValue(getElementType()));
+			if (list instanceof List) {
+				List jdkList = (List) list;
+				if (index >= jdkList.size()) {
+					Class<?> elementType = getElementType();
+					for (int i = jdkList.size(); i <= index; i++) {
+						jdkList.add(newValue(elementType));
+					}
+				}
+			} else if (list.getClass().isArray()) {
+				int length = Array.getLength(list);
+				if (index >= length) {
+					Class<?> elementType = getElementType();	
+					Object array = Array.newInstance(elementType, index);
+					System.arraycopy(list, 0, array, 0, length);
+					for (int i = length; i <= index; i++) {
+						Array.set(array, i, newValue(elementType));
+					}
 				}
 			}
 		}
@@ -440,17 +449,28 @@ public class DefaultPresentationModel implements PresentationModel {
 			}
 		}
 
-		private List newListValue(Class<?> type) {
-			if (type.isInterface()) {
-				return (List) newValue(ArrayList.class);
+		private Object newListValue(Class<?> type) {
+			if (List.class.isAssignableFrom(type) && type.isInterface()) {
+				return newValue(ArrayList.class);
 			} else {
-				return (List) newValue(type);
+				return newValue(type);
 			}
 		}
 
 		private Object newValue(Class<?> type) {
 			try {
-				return type.newInstance();
+				if (type.isArray()) {
+					Class<?> elementType = getElementType();
+					if (elementType.isArray()) {
+						Object array = Array.newInstance(getElementType(), 1);
+						Array.set(array, 0, Array.newInstance(elementType.getComponentType(), 1));
+						return array;
+					} else {
+						return Array.newInstance(elementType, 1);
+					}
+				} else {
+					return type.newInstance();
+				}
 			} catch (InstantiationException e) {
 				throw new IllegalStateException("Could not instantiate element of type [" + type.getName() + "]", e);
 			} catch (IllegalAccessException e) {
@@ -464,26 +484,32 @@ public class DefaultPresentationModel implements PresentationModel {
 
 		private int index;
 
-		private PropertyFieldModelRule listBindingContext;
+		private PropertyFieldModelRule listContext;
 
 		final Map<String, FieldModel> nestedBindings = new HashMap<String, FieldModel>();
 
+		private Map<Integer, FieldModel> listElements;
+
 		public ListElementContext(int index, PropertyFieldModelRule listBindingContext) {
 			this.index = index;
-			this.listBindingContext = listBindingContext;
+			this.listContext = listBindingContext;
 		}
 
 		public MessageSource getMessageSource() {
-			return listBindingContext.getMessageSource();
+			return listContext.getMessageSource();
+		}
+
+		public Locale getLocale() {
+			return listContext.getLocale();
 		}
 
 		public ConversionService getConversionService() {
-			return listBindingContext.getConversionService();
+			return listContext.getConversionService();
 		}
 
 		@SuppressWarnings("unchecked")
 		public Formatter getFormatter() {
-			return listBindingContext.getElementFormatter();
+			return listContext.getElementFormatter();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -499,28 +525,28 @@ public class DefaultPresentationModel implements PresentationModel {
 		}
 
 		public Condition getEditableCondition() {
-			return listBindingContext.getEditableCondition();
+			return listContext.getEditableCondition();
 		}
 
 		public Condition getEnabledCondition() {
-			return listBindingContext.getEnabledCondition();
+			return listContext.getEnabledCondition();
 		}
 
 		public Condition getVisibleCondition() {
-			return listBindingContext.getVisibleCondition();
+			return listContext.getVisibleCondition();
 		}
 
 		public String getLabel() {
-			return listBindingContext.getLabel() + "[" + index + "]";
+			return listContext.getLabel() + "[" + index + "]";
 		}
 
 		public FieldModel getNested(String property) {
-			Object model = ((List<?>) listBindingContext.fieldModel.getValue()).get(index);
-			Class<?> elementType = listBindingContext.getElementType();
+			Object model = ((List<?>) listContext.fieldModel.getValue()).get(index);
+			Class<?> elementType = listContext.getElementType();
 			if (elementType == null) {
 				elementType = model.getClass();
 			}
-			PropertyFieldModelRule rule = listBindingContext.getNestedRule(property, elementType);
+			PropertyFieldModelRule rule = listContext.getNestedRule(property, elementType);
 			FieldModel binding = nestedBindings.get(property);
 			if (binding == null) {
 				PropertyValueModel valueModel = new PropertyValueModel(rule.property, model);
@@ -556,6 +582,10 @@ public class DefaultPresentationModel implements PresentationModel {
 
 		public MessageSource getMessageSource() {
 			return mapContext.getMessageSource();
+		}
+
+		public Locale getLocale() {
+			return mapContext.getLocale();
 		}
 
 		public ConversionService getConversionService() {

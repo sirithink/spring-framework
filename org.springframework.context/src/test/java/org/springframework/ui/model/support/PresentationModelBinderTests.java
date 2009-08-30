@@ -2,6 +2,7 @@ package org.springframework.ui.model.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.annotation.Documented;
@@ -9,6 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -24,7 +26,6 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.message.MockMessageSource;
@@ -266,10 +267,8 @@ public class PresentationModelBinderTests {
 	}
 
 	@Test
-	@Ignore
 	public void bindToListSingleString() {
 		GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
-		//formatterRegistry.add(new CollectionTypeDescriptor(List.class, Address.class), new AddressListFormatter());
 		presentationModel.setFormatterRegistry(formatterRegistry);
 		Map<String, String> values = new LinkedHashMap<String, String>();
 		values
@@ -277,48 +276,15 @@ public class PresentationModelBinderTests {
 						"4655 Macy Lane:Melbourne:FL:35452,1234 Rostock Circle:Palm Bay:FL:32901,1977 Bel Aire Estates:Coker:AL:12345");
 		binder.bind(values, presentationModel);
 		Assert.assertEquals(3, bean.addresses.size());
-		assertEquals("4655 Macy Lane", bean.addresses.get(0).street);
-		assertEquals("Melbourne", bean.addresses.get(0).city);
-		assertEquals("FL", bean.addresses.get(0).state);
-		assertEquals("35452", bean.addresses.get(0).zip);
-		assertEquals("1234 Rostock Circle", bean.addresses.get(1).street);
-		assertEquals("Palm Bay", bean.addresses.get(1).city);
-		assertEquals("FL", bean.addresses.get(1).state);
-		assertEquals("32901", bean.addresses.get(1).zip);
-		assertEquals("1977 Bel Aire Estates", bean.addresses.get(2).street);
-		assertEquals("Coker", bean.addresses.get(2).city);
-		assertEquals("AL", bean.addresses.get(2).state);
-		assertEquals("12345", bean.addresses.get(2).zip);
+		assertEquals("4655 Macy Lane:Melbourne:FL:35452", bean.addresses.get(0));
+		assertEquals("1234 Rostock Circle:Palm Bay:FL:32901", bean.addresses.get(1));
+		assertEquals("1977 Bel Aire Estates:Coker:AL:12345", bean.addresses.get(2));
 	}
 
-	@Test
-	@Ignore	
-	public void bindToListSingleStringNoListFormatter() {
-		Map<String, String> values = new LinkedHashMap<String, String>();
-		values
-				.put("addresses",
-						"4655 Macy Lane:Melbourne:FL:35452,1234 Rostock Circle:Palm Bay:FL:32901,1977 Bel Aire Estates:Coker:AL:12345");
-		binder.bind(values, presentationModel);
-		Assert.assertEquals(3, bean.addresses.size());
-		assertEquals("4655 Macy Lane", bean.addresses.get(0).street);
-		assertEquals("Melbourne", bean.addresses.get(0).city);
-		assertEquals("FL", bean.addresses.get(0).state);
-		assertEquals("35452", bean.addresses.get(0).zip);
-		assertEquals("1234 Rostock Circle", bean.addresses.get(1).street);
-		assertEquals("Palm Bay", bean.addresses.get(1).city);
-		assertEquals("FL", bean.addresses.get(1).state);
-		assertEquals("32901", bean.addresses.get(1).zip);
-		assertEquals("1977 Bel Aire Estates", bean.addresses.get(2).street);
-		assertEquals("Coker", bean.addresses.get(2).city);
-		assertEquals("AL", bean.addresses.get(2).state);
-		assertEquals("12345", bean.addresses.get(2).zip);
-	}
 
 	@Test
-	@Ignore	
 	public void getListAsSingleString() {
 		GenericFormatterRegistry formatterRegistry = new GenericFormatterRegistry();
-		//formatterRegistry.add(new CollectionTypeDescriptor(List.class, Address.class), new AddressListFormatter());
 		presentationModel.setFormatterRegistry(formatterRegistry);
 		Address address1 = new Address();
 		address1.setStreet("s1");
@@ -334,29 +300,7 @@ public class PresentationModelBinderTests {
 		addresses.add(address1);
 		addresses.add(address2);
 		bean.addresses = addresses;
-		String value = presentationModel.getFieldModel("addresses").getRenderValue();
-		assertEquals("s1:c1:st1:z1,s2:c2:st2:z2", value);
-	}
-
-	@Test
-	@Ignore	
-	public void getListAsSingleStringNoFormatter() {
-		Address address1 = new Address();
-		address1.setStreet("s1");
-		address1.setCity("c1");
-		address1.setState("st1");
-		address1.setZip("z1");
-		Address address2 = new Address();
-		address2.setStreet("s2");
-		address2.setCity("c2");
-		address2.setState("st2");
-		address2.setZip("z2");
-		List<Address> addresses = new ArrayList<Address>(2);
-		addresses.add(address1);
-		addresses.add(address2);
-		bean.addresses = addresses;
-		String value = presentationModel.getFieldModel("addresses").getRenderValue();
-		assertEquals("s1:c1:st1:z1,s2:c2:st2:z2", value);
+		presentationModel.getFieldModel("addresses").getRenderValue();
 	}
 
 	@Test
@@ -383,12 +327,24 @@ public class PresentationModelBinderTests {
 		values.put("addresses[5].zip", "32901");
 
 		BindingResults results = binder.bind(values, presentationModel);
-		Assert.assertEquals(6, bean.addresses.size());
-		Assert.assertEquals("Palm Bay", bean.addresses.get(1).city);
-		Assert.assertNotNull(bean.addresses.get(2));
+		assertEquals(6, bean.addresses.size());
+		assertEquals("Palm Bay", bean.addresses.get(1).city);
+		assertNotNull(bean.addresses.get(2));
 		assertEquals(12, results.size());
 	}
 
+	@Test
+	public void bindToArray() {
+		Map<String, String> values = new LinkedHashMap<String, String>();
+		values.put("recordSet[0][0]", "Row 1 Column 1");
+		values.put("recordSet[0][1]", "Row 1 Column 2");
+		BindingResults results = binder.bind(values, presentationModel);
+		assertEquals(2, results.size());
+		assertEquals(2, results.successes().size());
+		assertEquals("Row 1 Column 1", bean.recordSet[0][0]);
+		assertEquals("Row 1 Column 2", bean.recordSet[0][1]);
+	}
+	
 	@Test
 	public void bindToMap() {
 		Map<String, String[]> values = new LinkedHashMap<String, String[]>();
@@ -401,7 +357,6 @@ public class PresentationModelBinderTests {
 	}
 
 	@Test
-	@Ignore	
 	public void bindToMapElements() {
 		Map<String, String> values = new LinkedHashMap<String, String>();
 		values.put("favoriteFoodsByGroup[DAIRY]", "Milk");
@@ -477,6 +432,7 @@ public class PresentationModelBinderTests {
 		private List<Address> addresses;
 		private Map<FoodGroup, String> favoriteFoodsByGroup;
 		private Address primaryAddress;
+		private String[][] recordSet;
 
 		public TestBean() {
 		}
@@ -552,6 +508,14 @@ public class PresentationModelBinderTests {
 
 		public void setPrimaryAddress(Address primaryAddress) {
 			this.primaryAddress = primaryAddress;
+		}
+
+		public String[][] getRecordSet() {
+			return recordSet;
+		}
+
+		public void setRecordSet(String[][] recordSet) {
+			this.recordSet = recordSet;
 		}
 
 		public String toString() {

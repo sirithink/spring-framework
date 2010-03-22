@@ -16,12 +16,18 @@
 
 package org.springframework.core.io.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.beans.PropertyEditor;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
-
 import org.springframework.core.io.Resource;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.StringValueResolver;
+import org.springframework.util.SystemPropertyStringValueResolver;
 
 /**
  * @author Dave Syer
@@ -67,7 +73,9 @@ public class ResourceArrayPropertyEditorTests {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testStrictSystemPropertyReplacement() {
-		PropertyEditor editor = new ResourceArrayPropertyEditor(new PathMatchingResourcePatternResolver(), false);
+		PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper(false);
+		StringValueResolver resolver = new SystemPropertyStringValueResolver();
+		PropertyEditor editor = new ResourceArrayPropertyEditor(new PathMatchingResourcePatternResolver(), new PlaceholderResolvingStringValueResolver(helper, resolver));
 		System.setProperty("test.prop", "foo");
 		try {
 			editor.setAsText("${test.prop}-${bar}");

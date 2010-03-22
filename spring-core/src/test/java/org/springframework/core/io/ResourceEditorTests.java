@@ -20,6 +20,9 @@ import java.beans.PropertyEditor;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.SystemPropertyStringValueResolver;
 
 /**
  * Unit tests for the {@link ResourceEditor} class.
@@ -66,22 +69,22 @@ public final class ResourceEditorTests {
 			editor.setAsText("${test.prop}-${bar}");
 			Resource resolved = (Resource) editor.getValue();
 			assertEquals("foo-${bar}", resolved.getFilename());
-		}
-		finally {
+		} finally {
 			System.getProperties().remove("test.prop");
 		}
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testStrictSystemPropertyReplacement() {
-		PropertyEditor editor = new ResourceEditor(new DefaultResourceLoader(), false);
+		PropertyEditor editor = new ResourceEditor(new DefaultResourceLoader(),
+				new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(false),
+						new SystemPropertyStringValueResolver()));
 		System.setProperty("test.prop", "foo");
 		try {
 			editor.setAsText("${test.prop}-${bar}");
 			Resource resolved = (Resource) editor.getValue();
 			assertEquals("foo-${bar}", resolved.getFilename());
-		}
-		finally {
+		} finally {
 			System.getProperties().remove("test.prop");
 		}
 	}

@@ -12,6 +12,7 @@
 		<module>spring-core</module>
 		<module>spring-beans</module>
 		<module>spring-context</module>
+		<module>env-test</module>
 	</modules>
 
 </project>

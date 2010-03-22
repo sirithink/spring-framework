@@ -31,6 +31,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
+import org.springframework.util.StringValueResolver;
 
 /**
  * Generic ApplicationContext implementation that holds a single internal
@@ -83,7 +84,7 @@ import org.springframework.util.Assert;
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
  */
-public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
+public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry, StringValueResolver {
 
 	private final DefaultListableBeanFactory beanFactory;
 
@@ -309,6 +310,10 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 	public boolean isAlias(String beanName) {
 		return this.beanFactory.isAlias(beanName);
+	}
+	
+	public String resolveStringValue(String strVal) {
+		return beanFactory.resolveEmbeddedValue(strVal);
 	}
 
 }

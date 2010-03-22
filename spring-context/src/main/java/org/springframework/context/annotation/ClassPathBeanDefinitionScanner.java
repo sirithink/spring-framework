@@ -22,6 +22,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.BeanFactoryStringValueResolver;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionDefaults;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
@@ -69,7 +71,6 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 	private boolean includeAnnotationConfig = true;
 
-
 	/**
 	 * Create a new ClassPathBeanDefinitionScanner for the given bean factory.
 	 * @param registry the BeanFactory to load bean definitions into,
@@ -107,8 +108,12 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		if (this.registry instanceof ResourceLoader) {
 			setResourceLoader((ResourceLoader) this.registry);
 		}
-	}
 
+		// Determine StringValueRrsolver to use.
+		if (this.registry instanceof ConfigurableBeanFactory) {
+			setPlaceholderResolver(new BeanFactoryStringValueResolver((ConfigurableBeanFactory) this.registry));
+		}
+	}
 
 	/**
 	 * Return the BeanDefinitionRegistry that this scanner operates on.
@@ -122,8 +127,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @see BeanDefinitionDefaults
 	 */
 	public void setBeanDefinitionDefaults(BeanDefinitionDefaults beanDefinitionDefaults) {
-		this.beanDefinitionDefaults =
-				(beanDefinitionDefaults != null ? beanDefinitionDefaults : new BeanDefinitionDefaults());
+		this.beanDefinitionDefaults = (beanDefinitionDefaults != null ? beanDefinitionDefaults
+				: new BeanDefinitionDefaults());
 	}
 
 	/**
@@ -149,7 +154,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @see #setScopedProxyMode
 	 */
 	public void setScopeMetadataResolver(ScopeMetadataResolver scopeMetadataResolver) {
-		this.scopeMetadataResolver = (scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
+		this.scopeMetadataResolver = (scopeMetadataResolver != null ? scopeMetadataResolver
+				: new AnnotationScopeMetadataResolver());
 	}
 
 	/**
@@ -170,7 +176,6 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	public void setIncludeAnnotationConfig(boolean includeAnnotationConfig) {
 		this.includeAnnotationConfig = includeAnnotationConfig;
 	}
-
 
 	/**
 	 * Perform a scan within the specified base packages.
@@ -214,11 +219,12 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				}
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
-					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder,
+							this.registry);
 					beanDefinitions.add(definitionHolder);
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
-			}						
+			}
 		}
 		return beanDefinitions;
 	}
@@ -232,7 +238,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
 		if (this.autowireCandidatePatterns != null) {
-			beanDefinition.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
+			beanDefinition
+					.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
 		}
 	}
 
@@ -246,7 +253,6 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected void registerBeanDefinition(BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry) {
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);
 	}
-
 
 	/**
 	 * Check the given candidate's bean name, determining whether the corresponding
@@ -271,9 +277,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		if (isCompatible(beanDefinition, existingDef)) {
 			return false;
 		}
-		throw new IllegalStateException("Annotation-specified bean name '" + beanName +
-				"' for bean class [" + beanDefinition.getBeanClassName() + "] conflicts with existing, " +
-				"non-compatible bean definition of same name and class [" + existingDef.getBeanClassName() + "]");
+		throw new IllegalStateException("Annotation-specified bean name '" + beanName + "' for bean class ["
+				+ beanDefinition.getBeanClassName() + "] conflicts with existing, "
+				+ "non-compatible bean definition of same name and class [" + existingDef.getBeanClassName() + "]");
 	}
 
 	/**
@@ -288,9 +294,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * new definition to be skipped in favor of the existing definition
 	 */
 	protected boolean isCompatible(BeanDefinition newDefinition, BeanDefinition existingDefinition) {
-		return (!(existingDefinition instanceof AnnotatedBeanDefinition) ||  // explicitly registered overriding bean
-				newDefinition.getSource().equals(existingDefinition.getSource()) ||  // scanned same file twice
-				newDefinition.equals(existingDefinition));  // scanned equivalent class twice
+		return (!(existingDefinition instanceof AnnotatedBeanDefinition) || // explicitly registered overriding bean
+				newDefinition.getSource().equals(existingDefinition.getSource()) || // scanned same file twice
+		newDefinition.equals(existingDefinition)); // scanned equivalent class twice
 	}
 
 }

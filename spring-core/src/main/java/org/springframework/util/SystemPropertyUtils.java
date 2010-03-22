@@ -16,8 +16,6 @@
 
 package org.springframework.util;
 
-import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
-
 /**
  * Helper class for resolving placeholders in texts. Usually applied to file paths.
  *
@@ -35,22 +33,9 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
  */
 public abstract class SystemPropertyUtils {
 
-	/** Prefix for system property placeholders: "${" */
-	public static final String PLACEHOLDER_PREFIX = "${";
+	private static final PropertyPlaceholderHelper strictHelper = new PropertyPlaceholderHelper(false);
 
-	/** Suffix for system property placeholders: "}" */
-	public static final String PLACEHOLDER_SUFFIX = "}";
-
-	/** Value separator for system property placeholders: ":" */
-	public static final String VALUE_SEPARATOR = ":";
-
-
-	private static final PropertyPlaceholderHelper strictHelper =
-			new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, false);
-
-	private static final PropertyPlaceholderHelper nonStrictHelper =
-			new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, true);
-
+	private static final PropertyPlaceholderHelper nonStrictHelper = new PropertyPlaceholderHelper(true);
 
 	/**
 	 * Resolve ${...} placeholders in the given text, replacing them with corresponding system property values.
@@ -80,8 +65,7 @@ public abstract class SystemPropertyUtils {
 		return helper.replacePlaceholders(text, new SystemPropertyPlaceholderResolver(text));
 	}
 
-
-	private static class SystemPropertyPlaceholderResolver implements PlaceholderResolver {
+	private static class SystemPropertyPlaceholderResolver implements StringValueResolver {
 
 		private final String text;
 
@@ -89,7 +73,7 @@ public abstract class SystemPropertyUtils {
 			this.text = text;
 		}
 
-		public String resolvePlaceholder(String placeholderName) {
+		public String resolveStringValue(String placeholderName) {
 			try {
 				String propVal = System.getProperty(placeholderName);
 				if (propVal == null) {
@@ -97,10 +81,9 @@ public abstract class SystemPropertyUtils {
 					propVal = System.getenv(placeholderName);
 				}
 				return propVal;
-			}
-			catch (Throwable ex) {
-				System.err.println("Could not resolve placeholder '" + placeholderName + "' in [" +
-						this.text + "] as system property: " + ex);
+			} catch (Throwable ex) {
+				System.err.println("Could not resolve placeholder '" + placeholderName + "' in [" + this.text
+						+ "] as system property: " + ex);
 				return null;
 			}
 		}

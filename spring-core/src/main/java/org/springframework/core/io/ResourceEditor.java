@@ -20,8 +20,11 @@ import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 
 import org.springframework.util.Assert;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringUtils;
-import org.springframework.util.SystemPropertyUtils;
+import org.springframework.util.StringValueResolver;
+import org.springframework.util.SystemPropertyStringValueResolver;
 
 /**
  * {@link java.beans.PropertyEditor Editor} for {@link Resource}
@@ -50,7 +53,7 @@ public class ResourceEditor extends PropertyEditorSupport {
 
 	private final ResourceLoader resourceLoader;
 
-	private final boolean ignoreUnresolvablePlaceholders;
+	private final StringValueResolver placeholderResolver;
 
 
 	/**
@@ -67,23 +70,24 @@ public class ResourceEditor extends PropertyEditorSupport {
 	 * @param resourceLoader the <code>ResourceLoader</code> to use
 	 */
 	public ResourceEditor(ResourceLoader resourceLoader) {
-		this(resourceLoader, true);
+		this(resourceLoader, new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
+				new SystemPropertyStringValueResolver()));
 	}
 
 	/**
 	 * Create a new instance of the {@link ResourceEditor} class
 	 * using the given {@link ResourceLoader}.
 	 * @param resourceLoader the <code>ResourceLoader</code> to use
-	 * @param ignoreUnresolvablePlaceholders whether to ignore unresolvable placeholders
-	 * if no corresponding system property could be found
+	 * @param placeholderResolver a StringValueResolver used to resolve 
+	 * placeholders in resource paths
 	 */
-	public ResourceEditor(ResourceLoader resourceLoader, boolean ignoreUnresolvablePlaceholders) {
+	public ResourceEditor(ResourceLoader resourceLoader, StringValueResolver placeholderResolver) {
 		Assert.notNull(resourceLoader, "ResourceLoader must not be null");
 		this.resourceLoader = resourceLoader;
-		this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
+		this.placeholderResolver = placeholderResolver;
 	}
 
-
+	
 	@Override
 	public void setAsText(String text) {
 		if (StringUtils.hasText(text)) {
@@ -103,7 +107,7 @@ public class ResourceEditor extends PropertyEditorSupport {
 	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders
 	 */
 	protected String resolvePath(String path) {
-		return SystemPropertyUtils.resolvePlaceholders(path, this.ignoreUnresolvablePlaceholders);
+		return placeholderResolver.resolveStringValue(path);
 	}
 
 

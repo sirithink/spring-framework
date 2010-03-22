@@ -33,6 +33,8 @@ import org.springframework.core.io.ResourceEditor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.util.StringValueResolver;
+import org.springframework.util.SystemPropertyStringValueResolver;
 
 /**
  * PropertyEditorRegistrar implementation that populates a given
@@ -48,6 +50,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 
 	private final ResourceLoader resourceLoader;
+	private final StringValueResolver placeholderResolver;
 
 
 	/**
@@ -58,7 +61,21 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see org.springframework.context.ApplicationContext
 	 */
 	public ResourceEditorRegistrar(ResourceLoader resourceLoader) {
+		this(resourceLoader, new SystemPropertyStringValueResolver());
+	}
+
+	/**
+	 * Create a new ResourceEditorRegistrar for the given ResourceLoader
+	 * @param resourceLoader the ResourceLoader (or ResourcePatternResolver)
+	 * to create editors for (usually an ApplicationContext)
+	 * @param placeholderResolver a StringValueResolver used to resolve 
+	 * placeholders in resource paths
+	 * @see org.springframework.core.io.support.ResourcePatternResolver
+	 * @see org.springframework.context.ApplicationContext
+	 */
+	public ResourceEditorRegistrar(ResourceLoader resourceLoader, StringValueResolver placeholderResolver) {
 		this.resourceLoader = resourceLoader;
+		this.placeholderResolver = placeholderResolver;
 	}
 
 
@@ -76,7 +93,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see org.springframework.core.io.support.ResourceArrayPropertyEditor
 	 */
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
-		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader);
+		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader, this.placeholderResolver);
 		registry.registerCustomEditor(Resource.class, baseEditor);
 		registry.registerCustomEditor(InputStream.class, new InputStreamEditor(baseEditor));
 		registry.registerCustomEditor(File.class, new FileEditor(baseEditor));
@@ -88,7 +105,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 
 		if (this.resourceLoader instanceof ResourcePatternResolver) {
 			registry.registerCustomEditor(Resource[].class,
-					new ResourceArrayPropertyEditor((ResourcePatternResolver) this.resourceLoader));
+					new ResourceArrayPropertyEditor((ResourcePatternResolver) this.resourceLoader, this.placeholderResolver));
 		}
 	}
 

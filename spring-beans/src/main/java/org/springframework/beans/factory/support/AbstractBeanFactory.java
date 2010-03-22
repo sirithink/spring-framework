@@ -64,12 +64,15 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.factory.config.StringValueResolverLocator;
 import org.springframework.core.DecoratingClassLoader;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
@@ -169,6 +172,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Create a new AbstractBeanFactory.
 	 */
 	public AbstractBeanFactory() {
+		this(null);
 	}
 
 	/**
@@ -178,6 +182,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	public AbstractBeanFactory(BeanFactory parentBeanFactory) {
 		this.parentBeanFactory = parentBeanFactory;
+		this.embeddedValueResolvers.add(new PlaceholderResolvingStringValueResolver(
+				new PropertyPlaceholderHelper(), createDefaultStringValueResolver()));
 	}
 
 
@@ -688,6 +694,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 	}
 
+	/**
+	 * Create the default implementation of {@link StringValueResolver} used if
+	 * none is specified. Default implementation returns an instance obtained  from
+	 * {@link StringValueResolverLocator}.
+	 */
+	protected StringValueResolver createDefaultStringValueResolver() {
+		return new StringValueResolverLocator(getBeanClassLoader()).getStringValueResolver();
+	}
+
 	public void addEmbeddedValueResolver(StringValueResolver valueResolver) {
 		Assert.notNull(valueResolver, "StringValueResolver must not be null");
 		this.embeddedValueResolvers.add(valueResolver);
@@ -700,7 +715,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		return result;
 	}
-
+	
 	public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
 		Assert.notNull(beanPostProcessor, "BeanPostProcessor must not be null");
 		this.beanPostProcessors.remove(beanPostProcessor);

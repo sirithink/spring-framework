@@ -35,6 +35,15 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PropertyPlaceholderHelper {
 
+	/** Default placeholder prefix: "${" */
+	public static final String DEFAULT_PLACEHOLDER_PREFIX = "${";
+
+	/** Default placeholder suffix: "}" */
+	public static final String DEFAULT_PLACEHOLDER_SUFFIX = "}";
+
+	/** Default value separator: ":" */
+	public static final String DEFAULT_VALUE_SEPARATOR = ":";
+
 	private static final Log logger = LogFactory.getLog(PropertyPlaceholderHelper.class);
 
 	private final String placeholderPrefix;
@@ -45,6 +54,23 @@ public class PropertyPlaceholderHelper {
 
 	private final boolean ignoreUnresolvablePlaceholders;
 
+	private final String nullValue;
+
+	/**
+	 * Creates a new <code>PropertyPlaceholderHelper</code> that uses the supplied prefix and suffix.
+	 * Unresolvable placeholders are ignored.
+	 */
+	public PropertyPlaceholderHelper() {
+		this(DEFAULT_PLACEHOLDER_PREFIX, DEFAULT_PLACEHOLDER_SUFFIX, DEFAULT_VALUE_SEPARATOR, true);
+	}
+
+	/**
+	 * Creates a new <code>PropertyPlaceholderHelper</code> that uses the supplied prefix and suffix.
+	 * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should be ignored
+	 */
+	public PropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
+		this(DEFAULT_PLACEHOLDER_PREFIX, DEFAULT_PLACEHOLDER_SUFFIX, DEFAULT_VALUE_SEPARATOR, ignoreUnresolvablePlaceholders);
+	}
 
 	/**
 	 * Creates a new <code>PropertyPlaceholderHelper</code> that uses the supplied prefix and suffix.
@@ -53,7 +79,7 @@ public class PropertyPlaceholderHelper {
 	 * @param placeholderSuffix the suffix that denotes the end of a placeholder.
 	 */
 	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix) {
-		this(placeholderPrefix, placeholderSuffix, null, true);
+		this(placeholderPrefix, placeholderSuffix, DEFAULT_VALUE_SEPARATOR, true);
 	}
 
 	/**
@@ -63,8 +89,21 @@ public class PropertyPlaceholderHelper {
 	 * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should be ignored
 	 * (<code>true</code>) or cause an exception (<code>false</code>).
 	 */
-	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix,
-			String valueSeparator, boolean ignoreUnresolvablePlaceholders) {
+	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix, String valueSeparator,
+			boolean ignoreUnresolvablePlaceholders) {
+		this(placeholderPrefix, placeholderSuffix, valueSeparator, ignoreUnresolvablePlaceholders, null);
+	}
+
+	/**
+	 * Creates a new <code>PropertyPlaceholderHelper</code> that uses the supplied prefix and suffix.
+	 * @param placeholderPrefix the prefix that denotes the start of a placeholder.
+	 * @param placeholderSuffix the suffix that denotes the end of a placeholder.
+	 * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should be ignored
+	 * (<code>true</code>) or cause an exception (<code>false</code>).
+	 * @param nullValue a special string value that signifies the result of a replacement should be null
+	 */
+	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix, String valueSeparator,
+			boolean ignoreUnresolvablePlaceholders, String nullValue) {
 
 		Assert.notNull(placeholderPrefix, "placeholderPrefix must not be null");
 		Assert.notNull(placeholderSuffix, "placeholderSuffix must not be null");
@@ -72,8 +111,8 @@ public class PropertyPlaceholderHelper {
 		this.placeholderSuffix = placeholderSuffix;
 		this.valueSeparator = valueSeparator;
 		this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
+		this.nullValue = nullValue;
 	}
-
 
 	/**
 	 * Replaces all placeholders of format <code>${name}</code> with the corresponding property
@@ -84,27 +123,28 @@ public class PropertyPlaceholderHelper {
 	 */
 	public String replacePlaceholders(String value, final Properties properties) {
 		Assert.notNull(properties, "Argument 'properties' must not be null.");
-		return replacePlaceholders(value, new PlaceholderResolver() {
-			public String resolvePlaceholder(String placeholderName) {
-				return properties.getProperty(placeholderName);
-			}
-		});
+		return replacePlaceholders(value, new PropertiesStringValueResolver(properties));
 	}
 
 	/**
-	 * Replaces all placeholders of format <code>${name}</code> with the value returned from the supplied
-	 * {@link PlaceholderResolver}.
+	 * Replaces all placeholders of format <code>${name}</code> with the corresponding property
+	 * from the supplied {@link Properties}.
 	 * @param value the value containing the placeholders to be replaced.
-	 * @param placeholderResolver the <code>PlaceholderResolver</code> to use for replacement.
+	 * @param placeholderResolver the <code>StringValueResolver</code> to use for replacement.
 	 * @return the supplied value with placeholders replaced inline.
 	 */
-	public String replacePlaceholders(String value, PlaceholderResolver placeholderResolver) {
+	public String replacePlaceholders(String value, StringValueResolver placeholderResolver) {
+		Assert.notNull(placeholderResolver, "Argument 'placeholderResolver' must not be null.");
 		Assert.notNull(value, "Argument 'value' must not be null.");
-		return parseStringValue(value, placeholderResolver, new HashSet<String>());
+		String result = parseStringValue(value, placeholderResolver, new HashSet<String>());
+		if (nullValue != null && nullValue.equals(result)) {
+			return null;
+		}
+		return result;
 	}
 
-	protected String parseStringValue(
-			String strVal, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
+	protected String parseStringValue(String strVal, StringValueResolver placeholderResolver,
+			Set<String> visitedPlaceholders) {
 
 		StringBuilder buf = new StringBuilder(strVal);
 
@@ -114,20 +154,20 @@ public class PropertyPlaceholderHelper {
 			if (endIndex != -1) {
 				String placeholder = buf.substring(startIndex + this.placeholderPrefix.length(), endIndex);
 				if (!visitedPlaceholders.add(placeholder)) {
-					throw new IllegalArgumentException(
-							"Circular placeholder reference '" + placeholder + "' in property definitions");
+					throw new IllegalArgumentException("Circular placeholder reference '" + placeholder
+							+ "' in property definitions");
 				}
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
 
 				// Now obtain the value for the fully resolved key...
-				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
+				String propVal = placeholderResolver.resolveStringValue(placeholder);
 				if (propVal == null && this.valueSeparator != null) {
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
 					if (separatorIndex != -1) {
 						String actualPlaceholder = placeholder.substring(0, separatorIndex);
 						String defaultValue = placeholder.substring(separatorIndex + this.valueSeparator.length());
-						propVal = placeholderResolver.resolvePlaceholder(actualPlaceholder);
+						propVal = placeholderResolver.resolveStringValue(actualPlaceholder);
 						if (propVal == null) {
 							propVal = defaultValue;
 						}
@@ -144,18 +184,15 @@ public class PropertyPlaceholderHelper {
 					}
 
 					startIndex = buf.indexOf(this.placeholderPrefix, startIndex + propVal.length());
-				}
-				else if (this.ignoreUnresolvablePlaceholders) {
+				} else if (this.ignoreUnresolvablePlaceholders) {
 					// Proceed with unprocessed value.
 					startIndex = buf.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
-				}
-				else {
+				} else {
 					throw new IllegalArgumentException("Could not resolve placeholder '" + placeholder + "'");
 				}
 
 				visitedPlaceholders.remove(placeholder);
-			}
-			else {
+			} else {
 				startIndex = -1;
 			}
 		}
@@ -171,35 +208,17 @@ public class PropertyPlaceholderHelper {
 				if (withinNestedPlaceholder > 0) {
 					withinNestedPlaceholder--;
 					index = index + this.placeholderPrefix.length() - 1;
-				}
-				else {
+				} else {
 					return index;
 				}
-			}
-			else if (StringUtils.substringMatch(buf, index, this.placeholderPrefix)) {
+			} else if (StringUtils.substringMatch(buf, index, this.placeholderPrefix)) {
 				withinNestedPlaceholder++;
 				index = index + this.placeholderPrefix.length();
-			}
-			else {
+			} else {
 				index++;
 			}
 		}
 		return -1;
-	}
-
-
-	/**
-	 * Strategy interface used to resolve replacement values for placeholders contained in Strings.
-	 * @see PropertyPlaceholderHelper
-	 */
-	public static interface PlaceholderResolver {
-
-		/**
-		 * Resolves the supplied placeholder name into the replacement value.
-		 * @param placeholderName the name of the placeholder to resolve.
-		 * @return the replacement value or <code>null</code> if no replacement is to be made.
-		 */
-		String resolvePlaceholder(String placeholderName);
 	}
 
 }

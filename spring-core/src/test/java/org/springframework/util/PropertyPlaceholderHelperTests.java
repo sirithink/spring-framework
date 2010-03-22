@@ -16,9 +16,10 @@
 
 package org.springframework.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
@@ -72,9 +73,9 @@ public class PropertyPlaceholderHelperTests {
 		String text = "foo=${foo}";
 
 		assertEquals("foo=bar",
-				this.helper.replacePlaceholders(text, new PropertyPlaceholderHelper.PlaceholderResolver() {
-
-					public String resolvePlaceholder(String placeholderName) {
+				this.helper.replacePlaceholders(text, new StringValueResolver() {
+					
+					public String resolveStringValue(String placeholderName) {
 						if ("foo".equals(placeholderName)) {
 							return "bar";
 						}

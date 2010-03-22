@@ -25,9 +25,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.io.Resource;
-import org.springframework.util.SystemPropertyUtils;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.StringValueResolver;
+import org.springframework.util.SystemPropertyStringValueResolver;
 
 /**
  * Editor for {@link org.springframework.core.io.Resource} arrays, to
@@ -57,8 +59,7 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 
 	private final ResourcePatternResolver resourcePatternResolver;
 
-	private final boolean ignoreUnresolvablePlaceholders;
-
+	private final StringValueResolver placeholderResolver;
 
 	/**
 	 * Create a new ResourceArrayPropertyEditor with a default
@@ -74,7 +75,8 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 	 * @param resourcePatternResolver the ResourcePatternResolver to use
 	 */
 	public ResourceArrayPropertyEditor(ResourcePatternResolver resourcePatternResolver) {
-		this(resourcePatternResolver, true);
+		this(resourcePatternResolver, new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
+				new SystemPropertyStringValueResolver()));
 	}
 
 	/**
@@ -83,11 +85,11 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 	 * @param ignoreUnresolvablePlaceholders whether to ignore unresolvable placeholders
 	 * if no corresponding system property could be found
 	 */
-	public ResourceArrayPropertyEditor(ResourcePatternResolver resourcePatternResolver, boolean ignoreUnresolvablePlaceholders) {
+	public ResourceArrayPropertyEditor(ResourcePatternResolver resourcePatternResolver,
+			StringValueResolver placeholderResolver) {
 		this.resourcePatternResolver = resourcePatternResolver;
-		this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
+		this.placeholderResolver = placeholderResolver;
 	}
-
 
 	/**
 	 * Treat the given text as location pattern and convert it to a Resource array.
@@ -97,10 +99,9 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 		String pattern = resolvePath(text).trim();
 		try {
 			setValue(this.resourcePatternResolver.getResources(pattern));
-		}
-		catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Could not resolve resource location pattern [" + pattern + "]: " + ex.getMessage());
+		} catch (IOException ex) {
+			throw new IllegalArgumentException("Could not resolve resource location pattern [" + pattern + "]: "
+					+ ex.getMessage());
 		}
 	}
 
@@ -125,24 +126,21 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 								merged.add(resource);
 							}
 						}
-					}
-					catch (IOException ex) {
+					} catch (IOException ex) {
 						// ignore - might be an unresolved placeholder or non-existing base directory
 						if (logger.isDebugEnabled()) {
 							logger.debug("Could not retrieve resources for pattern '" + pattern + "': " + ex);
 						}
 					}
-				}
-				else if (element instanceof Resource) {
+				} else if (element instanceof Resource) {
 					// A Resource object: add it to the result.
 					Resource resource = (Resource) element;
 					if (!merged.contains(resource)) {
 						merged.add(resource);
 					}
-				}
-				else {
-					throw new IllegalArgumentException("Cannot convert element [" + element + "] to [" +
-							Resource.class.getName() + "]: only location String and Resource object supported");
+				} else {
+					throw new IllegalArgumentException("Cannot convert element [" + element + "] to ["
+							+ Resource.class.getName() + "]: only location String and Resource object supported");
 				}
 			}
 			super.setValue(merged.toArray(new Resource[merged.size()]));
@@ -163,7 +161,7 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders
 	 */
 	protected String resolvePath(String path) {
-		return SystemPropertyUtils.resolvePlaceholders(path, this.ignoreUnresolvablePlaceholders);
+		return placeholderResolver.resolveStringValue(path);
 	}
 
 }

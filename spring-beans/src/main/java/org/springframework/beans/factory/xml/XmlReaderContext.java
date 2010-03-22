@@ -24,6 +24,7 @@ import org.springframework.beans.factory.parsing.SourceExtractor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringValueResolver;
 
 /**
  * Extension of {@link org.springframework.beans.factory.parsing.ReaderContext},
@@ -40,15 +41,18 @@ public class XmlReaderContext extends ReaderContext {
 
 	private final NamespaceHandlerResolver namespaceHandlerResolver;
 
+	private final StringValueResolver placeholderResolver;
+
 
 	public XmlReaderContext(
 			Resource resource, ProblemReporter problemReporter,
 			ReaderEventListener eventListener, SourceExtractor sourceExtractor,
-			XmlBeanDefinitionReader reader, NamespaceHandlerResolver namespaceHandlerResolver) {
+			XmlBeanDefinitionReader reader, NamespaceHandlerResolver namespaceHandlerResolver, StringValueResolver placeholderResolver) {
 
 		super(resource, problemReporter, eventListener, sourceExtractor);
 		this.reader = reader;
 		this.namespaceHandlerResolver = namespaceHandlerResolver;
+		this.placeholderResolver = placeholderResolver;
 	}
 
 
@@ -72,6 +76,9 @@ public class XmlReaderContext extends ReaderContext {
 		return this.namespaceHandlerResolver;
 	}
 
+	public final StringValueResolver getPlaceholderResolver() {
+		return placeholderResolver;
+	}
 
 	public String generateBeanName(BeanDefinition beanDefinition) {
 		return this.reader.getBeanNameGenerator().generateBeanName(beanDefinition, getRegistry());

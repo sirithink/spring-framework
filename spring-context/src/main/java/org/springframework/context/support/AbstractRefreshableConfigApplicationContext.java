@@ -18,9 +18,14 @@ package org.springframework.context.support;
 
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.StringValueResolverLocator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringUtils;
+import org.springframework.util.StringValueResolver;
 import org.springframework.util.SystemPropertyUtils;
 
 /**
@@ -42,13 +47,15 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 
 	private String[] configLocations;
 
-	private boolean setIdCalled = false;
+	private StringValueResolver placeholderResolver;
 
+	private boolean setIdCalled = false;
 
 	/**
 	 * Create a new AbstractRefreshableConfigApplicationContext with no parent.
 	 */
 	public AbstractRefreshableConfigApplicationContext() {
+		this(null);
 	}
 
 	/**
@@ -57,8 +64,9 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 */
 	public AbstractRefreshableConfigApplicationContext(ApplicationContext parent) {
 		super(parent);
+		placeholderResolver = new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
+				new StringValueResolverLocator(ClassUtils.getDefaultClassLoader()).getStringValueResolver());
 	}
-
 
 	/**
 	 * Set the config locations for this application context in init-param style,
@@ -80,8 +88,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			for (int i = 0; i < locations.length; i++) {
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
-		}
-		else {
+		} else {
 			this.configLocations = null;
 		}
 	}
@@ -117,12 +124,10 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * system property values if necessary. Applied to config locations.
 	 * @param path the original file path
 	 * @return the resolved file path
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders
 	 */
 	protected String resolvePath(String path) {
-		return SystemPropertyUtils.resolvePlaceholders(path);
+		return placeholderResolver.resolveStringValue(path);
 	}
-
 
 	@Override
 	public void setId(String id) {

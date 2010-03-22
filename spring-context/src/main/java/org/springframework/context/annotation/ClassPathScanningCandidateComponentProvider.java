@@ -25,10 +25,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.StringValueResolverLocator;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -46,7 +46,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.SystemPropertyUtils;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.StringValueResolver;
 
 /**
  * A component provider that scans the classpath from a base package. It then
@@ -68,7 +70,6 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	private static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
-
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
@@ -81,6 +82,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
 
+	private StringValueResolver placeholderResolver;
 
 	/**
 	 * Create a ClassPathScanningCandidateComponentProvider.
@@ -94,8 +96,9 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 		if (useDefaultFilters) {
 			registerDefaultFilters();
 		}
+		placeholderResolver = new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),new StringValueResolverLocator(ClassUtils.getDefaultClassLoader())
+				.getStringValueResolver());
 	}
-
 
 	/**
 	 * Set the ResourceLoader to use for resource locations.
@@ -115,6 +118,13 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 */
 	public final ResourceLoader getResourceLoader() {
 		return this.resourcePatternResolver;
+	}
+
+	/**
+	 * @param placeholderResolver
+	 */
+	public void setPlaceholderResolver(StringValueResolver placeholderResolver) {
+		this.placeholderResolver = placeholderResolver;
 	}
 
 	/**
@@ -173,23 +183,20 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
-			this.includeFilters.add(new AnnotationTypeFilter(
-					((Class<? extends Annotation>) cl.loadClass("javax.annotation.ManagedBean")), false));
+			this.includeFilters.add(new AnnotationTypeFilter(((Class<? extends Annotation>) cl
+					.loadClass("javax.annotation.ManagedBean")), false));
 			logger.info("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			// JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
 		}
 		try {
-			this.includeFilters.add(new AnnotationTypeFilter(
-					((Class<? extends Annotation>) cl.loadClass("javax.inject.Named")), false));
+			this.includeFilters.add(new AnnotationTypeFilter(((Class<? extends Annotation>) cl
+					.loadClass("javax.inject.Named")), false));
 			logger.info("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			// JSR-330 API not available - simply skip.
 		}
 	}
-
 
 	/**
 	 * Scan the class path for candidate components.
@@ -199,8 +206,8 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
 		try {
-			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-					resolveBasePackage(basePackage) + "/" + this.resourcePattern;
+			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+					+ resolveBasePackage(basePackage) + "/" + this.resourcePattern;
 			Resource[] resources = this.resourcePatternResolver.getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -220,37 +227,31 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 									logger.debug("Identified candidate component class: " + resource);
 								}
 								candidates.add(sbd);
-							}
-							else {
+							} else {
 								if (debugEnabled) {
 									logger.debug("Ignored because not a concrete top-level class: " + resource);
 								}
 							}
-						}
-						else {
+						} else {
 							if (traceEnabled) {
 								logger.trace("Ignored because not matching any filter: " + resource);
 							}
 						}
+					} catch (Throwable ex) {
+						throw new BeanDefinitionStoreException("Failed to read candidate component class: " + resource,
+								ex);
 					}
-					catch (Throwable ex) {
-						throw new BeanDefinitionStoreException(
-								"Failed to read candidate component class: " + resource, ex);
-					}
-				}
-				else {
+				} else {
 					if (traceEnabled) {
 						logger.trace("Ignored because not readable: " + resource);
 					}
 				}
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
 		}
 		return candidates;
 	}
-
 
 	/**
 	 * Resolve the specified base package into a pattern specification for
@@ -261,7 +262,8 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 * @return the pattern specification to be used for package searching
 	 */
 	protected String resolveBasePackage(String basePackage) {
-		return ClassUtils.convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
+		String path = placeholderResolver.resolveStringValue(basePackage);
+		return ClassUtils.convertClassNameToResourcePath(path != null ? path : basePackage);
 	}
 
 	/**

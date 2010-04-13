@@ -16,7 +16,8 @@
 	</description>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.0.2.BUILD-SNAPSHOT</spring.framework.version>
+		<spring.framework.version>3.0.1.RELEASE</spring.framework.version>
+		<spring.prototype.version>3.0.2.BUILD-SNAPSHOT</spring.prototype.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -42,12 +43,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${spring.framework.version}</version>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.prototype.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
 			<version>${spring.framework.version}</version>
 		</dependency>
 		<dependency>

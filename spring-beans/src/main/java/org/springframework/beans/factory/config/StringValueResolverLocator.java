@@ -127,6 +127,7 @@ public class StringValueResolverLocator {
 
 		Collection<Properties> bootstrapMappings = getBootstrapMappings(location);
 		CompositeStringValueResolver result = new CompositeStringValueResolver();
+		boolean resolved = false;
 
 		for (Properties properties : bootstrapMappings) {
 
@@ -134,11 +135,7 @@ public class StringValueResolverLocator {
 					.getProperty(STRING_VALUE_RESOLVER_FACTORY_KEY_NAME);
 			StringValueResolver resolver;
 
-			if (className == null) {
-
-				resolver = new SystemPropertyStringValueResolver();
-
-			} else {
+			if (className != null) {
 
 				try {
 
@@ -155,6 +152,7 @@ public class StringValueResolverLocator {
 					resolver = ((StringValueResolverFactory) BeanUtils
 							.instantiateClass(handlerClass))
 							.getResolver(classLoader, properties);
+					resolved = true;
 
 				} catch (ClassNotFoundException ex) {
 
@@ -168,14 +166,19 @@ public class StringValueResolverLocator {
 									+ className
 									+ "]: problem with resolver class file or dependent class",
 							err);
-
 				}
+
+
+				result.addStringValueResolver(resolver);
+
 			}
 
-			result.addStringValueResolver(resolver);
-
 		}
-
+		
+		if (!resolved) {
+			return new SystemPropertyStringValueResolver();
+		}
+		
 		return result;
 
 	}

@@ -148,6 +148,17 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
+	 * The the placeholder resolver to use in resolving imports. Defaults to a
+	 * value bootstrapped from {@link StringValueResolverLocator}.
+	 * 
+	 * @param placeholderResolver
+	 *            the placeholder resolver to use
+	 */
+	public void setPlaceholderResolver(StringValueResolver placeholderResolver) {
+		this.placeholderResolver = placeholderResolver;
+	}
+
+	/**
 	 * Set whether to use XML validation. Default is <code>true</code>.
 	 * <p>
 	 * This method switches namespace awareness on if validation is turned off,
@@ -614,16 +625,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			return (StringValueResolver) registry;
 		}
 		if (registry instanceof ConfigurableBeanFactory) {
-			return new BeanFactoryStringValueResolver((ConfigurableBeanFactory) registry);
+			return new BeanFactoryStringValueResolver(
+					(ConfigurableBeanFactory) registry);
 		}
 		return new PlaceholderResolvingStringValueResolver(
-				new PropertyPlaceholderHelper(), createDefaultStringValueResolver());
+				new PropertyPlaceholderHelper(),
+				createDefaultStringValueResolver());
 	}
 
 	/**
 	 * Create the default implementation of {@link StringValueResolver} used if
-	 * none is specified. Default implementation returns an instance obtained  from
-	 * {@link StringValueResolverLocator}.
+	 * none is specified. Default implementation returns an instance obtained
+	 * from {@link StringValueResolverLocator}.
 	 */
 	protected StringValueResolver createDefaultStringValueResolver() {
 		return new StringValueResolverLocator(getResourceLoader()

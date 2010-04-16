@@ -16,8 +16,9 @@
 
 package org.springframework.util;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.core.OrderedCompositeHelper;
 
 /**
  * @author Dave Syer
@@ -25,13 +26,13 @@ import java.util.List;
  */
 public class CompositeStringValueResolver implements StringValueResolver {
 
-	private List<StringValueResolver> stringValueResolvers = new ArrayList<StringValueResolver>();
+	private OrderedCompositeHelper<StringValueResolver> stringValueResolvers = new OrderedCompositeHelper<StringValueResolver>();
 
 	/**
 	 * @param stringValueResolvers the string value resolvers to set
 	 */
 	public void setStringValueResolvers(List<? extends StringValueResolver> stringValueResolvers) {
-		this.stringValueResolvers = new ArrayList<StringValueResolver>(stringValueResolvers);
+		this.stringValueResolvers.setItems(stringValueResolvers);
 	}
 	
 	/**
@@ -42,7 +43,7 @@ public class CompositeStringValueResolver implements StringValueResolver {
 	}	
 
 	public String resolveStringValue(String variable) {
-		for (StringValueResolver resolver : stringValueResolvers) {
+		for (StringValueResolver resolver : stringValueResolvers.forward()) {
 			String resolved = resolver.resolveStringValue(variable);
 			if (resolved != null) {
 				return resolved;

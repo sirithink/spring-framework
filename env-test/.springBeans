@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.7.200909012107-CI-R3397-B453]]></pluginVersion>
+	<pluginVersion><![CDATA[2.3.1.201002090815-CI-R3692-B638]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
 	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
+		<config>src/test/resources/org/test/scratch/bootstrap-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

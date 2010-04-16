@@ -30,7 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CompositeStringValueResolver;
 import org.springframework.util.StringValueResolver;
@@ -44,13 +43,12 @@ import org.springframework.util.SystemPropertyStringValueResolver;
  */
 public class StringValueResolverLocator {
 
-	/**
-	 * 
-	 */
 	private static final String STRING_VALUE_RESOLVER_FACTORY_KEY_NAME = StringValueResolverFactory.class
 			.getName();
 
 	private final StringValueResolver stringValueResolver;
+
+	private static ThreadLocal<StringValueResolverLocator> inProgressHolder = new ThreadLocal<StringValueResolverLocator>();
 
 	/**
 	 * The location to look for the mapping files. Can be present in multiple
@@ -67,19 +65,6 @@ public class StringValueResolverLocator {
 	/**
 	 * Create a new <code>DefaultStringValueResolver</code> using the default
 	 * mapping file location.
-	 * <p>
-	 * This constructor will result in the thread context ClassLoader being used
-	 * to load resources.
-	 * 
-	 * @see #DEFAULT_BOOTSTRAP_LOCATION
-	 */
-	public StringValueResolverLocator() {
-		this(null, DEFAULT_BOOTSTRAP_LOCATION);
-	}
-
-	/**
-	 * Create a new <code>DefaultStringValueResolver</code> using the default
-	 * mapping file location.
 	 * 
 	 * @param classLoader
 	 *            the {@link ClassLoader} instance used to load mapping
@@ -92,24 +77,30 @@ public class StringValueResolverLocator {
 	}
 
 	/**
-	 * Create a new <code>DefaultStringValueResolver</code> using the supplied
+	 * Create a new <code>DefaultStringValueResolver</code> using the default
 	 * mapping file location.
 	 * 
 	 * @param classLoader
 	 *            the {@link ClassLoader} instance used to load mapping
-	 *            resources may be <code>null</code>, in which case the thread
+	 *            resources (may be <code>null</code>, in which case the thread
 	 *            context ClassLoader will be used)
 	 * @param bootstrapLocation
-	 *            the mapping file location
+	 *            the location of the bootstrap properties
 	 */
 	public StringValueResolverLocator(ClassLoader classLoader,
 			String bootstrapLocation) {
-		Assert
-				.notNull(bootstrapLocation,
-						"Bootstrap location must not be null");
 		this.classLoader = (classLoader != null ? classLoader : ClassUtils
 				.getDefaultClassLoader());
-		stringValueResolver = createStringValueResolver(bootstrapLocation);
+		if (inProgressHolder.get() != null) {
+			stringValueResolver = inProgressHolder.get().getStringValueResolver();
+		} else {
+			inProgressHolder.set(this);
+			try {
+				stringValueResolver = createStringValueResolver(bootstrapLocation);
+			} finally {
+				inProgressHolder.set(null);
+			}
+		}
 	}
 
 	/**
@@ -125,6 +116,8 @@ public class StringValueResolverLocator {
 	 */
 	private StringValueResolver createStringValueResolver(String location) {
 
+		logger.info("Locating StringValueResolver from location=" + location);
+
 		Collection<Properties> bootstrapMappings = getBootstrapMappings(location);
 		CompositeStringValueResolver result = new CompositeStringValueResolver();
 		boolean resolved = false;
@@ -136,6 +129,12 @@ public class StringValueResolverLocator {
 			StringValueResolver resolver;
 
 			if (className != null) {
+
+				if (logger.isDebugEnabled()) {
+					logger
+							.debug("Found StringValueResolverFactory class name: "
+									+ className);
+				}
 
 				try {
 
@@ -150,8 +149,8 @@ public class StringValueResolverLocator {
 								+ "] interface");
 					}
 					resolver = ((StringValueResolverFactory) BeanUtils
-							.instantiateClass(handlerClass))
-							.getResolver(classLoader, properties);
+							.instantiateClass(handlerClass)).getResolver(
+							classLoader, properties);
 					resolved = true;
 
 				} catch (ClassNotFoundException ex) {
@@ -168,23 +167,22 @@ public class StringValueResolverLocator {
 							err);
 				}
 
-
 				result.addStringValueResolver(resolver);
 
 			}
 
 		}
-		
+
 		if (!resolved) {
 			return new SystemPropertyStringValueResolver();
 		}
-		
+
 		return result;
 
 	}
 
 	/**
-	 * Load the specified NamespaceHandler mappings lazily.
+	 * Load the specified string resolver mappings lazily.
 	 * 
 	 * @param location
 	 */
@@ -206,6 +204,9 @@ public class StringValueResolverLocator {
 			Properties properties = new Properties();
 			try {
 				URLConnection con = url.openConnection();
+				if (logger.isDebugEnabled()) {
+					logger.debug("Loading bootstrap properties from: " + url);
+				}
 				con.setUseCaches(false);
 				is = con.getInputStream();
 				properties.load(is);

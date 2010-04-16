@@ -185,12 +185,14 @@ public class StringValueResolverPlaceholderConfigurer implements
 		PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper(
 				placeholderPrefix, placeholderSuffix, valueSeparator,
 				ignoreUnresolvablePlaceholders, nullValue);
-		
-		if (stringValueResolver==null) {
+
+		if (stringValueResolver == null) {
 			if (beanFactory.containsBean("stringValueResolver")) {
-				stringValueResolver = beanFactory.getBean("stringValueResolver", StringValueResolver.class);				
+				stringValueResolver = beanFactory.getBean(
+						"stringValueResolver", StringValueResolver.class);
 			} else {
-				stringValueResolver = new StringValueResolverLocator(beanFactory.getBeanClassLoader()).getStringValueResolver();				
+				stringValueResolver = StringValueResolverLocator
+						.locate(beanFactory.getBeanClassLoader());
 			}
 		}
 

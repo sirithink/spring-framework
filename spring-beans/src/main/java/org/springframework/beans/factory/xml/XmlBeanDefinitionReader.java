@@ -639,8 +639,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * from {@link StringValueResolverLocator}.
 	 */
 	protected StringValueResolver createDefaultStringValueResolver() {
-		return new StringValueResolverLocator(getResourceLoader()
-				.getClassLoader()).getStringValueResolver();
+		return StringValueResolverLocator.locate(getResourceLoader()
+				.getClassLoader());
 	}
 
 	/**

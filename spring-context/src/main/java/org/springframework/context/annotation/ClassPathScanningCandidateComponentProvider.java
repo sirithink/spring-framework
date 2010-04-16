@@ -1,17 +1,14 @@
 /*
  * Copyright 2002-2009 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package org.springframework.context.annotation;
@@ -51,13 +48,13 @@ import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringValueResolver;
 
 /**
- * A component provider that scans the classpath from a base package. It then
- * applies exclude and include filters to the resulting classes to find candidates.
- *
- * <p>This implementation is based on Spring's
- * {@link org.springframework.core.type.classreading.MetadataReader MetadataReader}
- * facility, backed by an ASM {@link org.springframework.asm.ClassReader ClassReader}.
- *
+ * A component provider that scans the classpath from a base package. It then applies exclude and include filters to the
+ * resulting classes to find candidates.
+ * 
+ * <p>
+ * This implementation is based on Spring's {@link org.springframework.core.type.classreading.MetadataReader
+ * MetadataReader} facility, backed by an ASM {@link org.springframework.asm.ClassReader ClassReader}.
+ * 
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
@@ -86,25 +83,25 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	/**
 	 * Create a ClassPathScanningCandidateComponentProvider.
-	 * @param useDefaultFilters whether to register the default filters for the
-	 * {@link Component @Component}, {@link Repository @Repository},
-	 * {@link Service @Service}, and {@link Controller @Controller}
-	 * stereotype annotations
+	 * @param useDefaultFilters whether to register the default filters for the {@link Component @Component},
+	 * {@link Repository @Repository}, {@link Service @Service}, and {@link Controller @Controller} stereotype
+	 * annotations
 	 * @see #registerDefaultFilters()
 	 */
 	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters) {
 		if (useDefaultFilters) {
 			registerDefaultFilters();
 		}
-		placeholderResolver = new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),new StringValueResolverLocator(ClassUtils.getDefaultClassLoader())
-				.getStringValueResolver());
+		placeholderResolver = new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
+				StringValueResolverLocator.locate(ClassUtils.getDefaultClassLoader()));
 	}
 
 	/**
-	 * Set the ResourceLoader to use for resource locations.
-	 * This will typically be a ResourcePatternResolver implementation.
-	 * <p>Default is PathMatchingResourcePatternResolver, also capable of
-	 * resource pattern resolving through the ResourcePatternResolver interface.
+	 * Set the ResourceLoader to use for resource locations. This will typically be a ResourcePatternResolver
+	 * implementation.
+	 * <p>
+	 * Default is PathMatchingResourcePatternResolver, also capable of resource pattern resolving through the
+	 * ResourcePatternResolver interface.
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
@@ -128,8 +125,8 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	}
 
 	/**
-	 * Set the resource pattern to use when scanning the classpath.
-	 * This value will be appended to each base package name.
+	 * Set the resource pattern to use when scanning the classpath. This value will be appended to each base package
+	 * name.
 	 * @see #findCandidateComponents(String)
 	 * @see #DEFAULT_RESOURCE_PATTERN
 	 */
@@ -154,10 +151,9 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	/**
 	 * Reset the configured type filters.
-	 * @param useDefaultFilters whether to re-register the default filters for
-	 * the {@link Component @Component}, {@link Repository @Repository},
-	 * {@link Service @Service}, and {@link Controller @Controller}
-	 * stereotype annotations
+	 * @param useDefaultFilters whether to re-register the default filters for the {@link Component @Component},
+	 * {@link Repository @Repository}, {@link Service @Service}, and {@link Controller @Controller} stereotype
+	 * annotations
 	 * @see #registerDefaultFilters()
 	 */
 	public void resetFilters(boolean useDefaultFilters) {
@@ -170,13 +166,14 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	/**
 	 * Register the default filter for {@link Component @Component}.
-	 * <p>This will implicitly register all annotations that have the
-	 * {@link Component @Component} meta-annotation including the
-	 * {@link Repository @Repository}, {@link Service @Service}, and
-	 * {@link Controller @Controller} stereotype annotations.
-	 * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
-	 * JSR-330's {@link javax.inject.Named} annotations, if available.
-	 *
+	 * <p>
+	 * This will implicitly register all annotations that have the {@link Component @Component} meta-annotation
+	 * including the {@link Repository @Repository}, {@link Service @Service}, and {@link Controller @Controller}
+	 * stereotype annotations.
+	 * <p>
+	 * Also supports Java EE 6's {@link javax.annotation.ManagedBean} and JSR-330's {@link javax.inject.Named}
+	 * annotations, if available.
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
@@ -186,14 +183,16 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 			this.includeFilters.add(new AnnotationTypeFilter(((Class<? extends Annotation>) cl
 					.loadClass("javax.annotation.ManagedBean")), false));
 			logger.info("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
-		} catch (ClassNotFoundException ex) {
+		}
+		catch (ClassNotFoundException ex) {
 			// JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
 		}
 		try {
 			this.includeFilters.add(new AnnotationTypeFilter(((Class<? extends Annotation>) cl
 					.loadClass("javax.inject.Named")), false));
 			logger.info("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
-		} catch (ClassNotFoundException ex) {
+		}
+		catch (ClassNotFoundException ex) {
 			// JSR-330 API not available - simply skip.
 		}
 	}
@@ -227,37 +226,42 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 									logger.debug("Identified candidate component class: " + resource);
 								}
 								candidates.add(sbd);
-							} else {
+							}
+							else {
 								if (debugEnabled) {
 									logger.debug("Ignored because not a concrete top-level class: " + resource);
 								}
 							}
-						} else {
+						}
+						else {
 							if (traceEnabled) {
 								logger.trace("Ignored because not matching any filter: " + resource);
 							}
 						}
-					} catch (Throwable ex) {
+					}
+					catch (Throwable ex) {
 						throw new BeanDefinitionStoreException("Failed to read candidate component class: " + resource,
 								ex);
 					}
-				} else {
+				}
+				else {
 					if (traceEnabled) {
 						logger.trace("Ignored because not readable: " + resource);
 					}
 				}
 			}
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
 		}
 		return candidates;
 	}
 
 	/**
-	 * Resolve the specified base package into a pattern specification for
-	 * the package search path.
-	 * <p>The default implementation resolves placeholders against system properties,
-	 * and converts a "."-based package path to a "/"-based resource path.
+	 * Resolve the specified base package into a pattern specification for the package search path.
+	 * <p>
+	 * The default implementation resolves placeholders against system properties, and converts a "."-based package path
+	 * to a "/"-based resource path.
 	 * @param basePackage the base package as specified by the user
 	 * @return the pattern specification to be used for package searching
 	 */
@@ -267,8 +271,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	}
 
 	/**
-	 * Determine whether the given class does not match any exclude filter
-	 * and does match at least one include filter.
+	 * Determine whether the given class does not match any exclude filter and does match at least one include filter.
 	 * @param metadataReader the ASM ClassReader for the class
 	 * @return whether the class qualifies as a candidate component
 	 */
@@ -288,8 +291,9 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	/**
 	 * Determine whether the given bean definition qualifies as candidate.
-	 * <p>The default implementation checks whether the class is concrete
-	 * (i.e. not abstract and not an interface). Can be overridden in subclasses.
+	 * <p>
+	 * The default implementation checks whether the class is concrete (i.e. not abstract and not an interface). Can be
+	 * overridden in subclasses.
 	 * @param beanDefinition the bean definition to check
 	 * @return whether the bean definition qualifies as a candidate component
 	 */

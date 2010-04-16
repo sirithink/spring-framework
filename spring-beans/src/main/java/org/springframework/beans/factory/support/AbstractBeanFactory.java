@@ -700,7 +700,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * {@link StringValueResolverLocator}.
 	 */
 	protected StringValueResolver createDefaultStringValueResolver() {
-		return new StringValueResolverLocator(getBeanClassLoader()).getStringValueResolver();
+		return StringValueResolverLocator.locate(getBeanClassLoader());
 	}
 
 	public void addEmbeddedValueResolver(StringValueResolver valueResolver) {

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.core.Constants;
 import org.springframework.util.PlaceholderResolvingStringValueResolver;
 import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.PropertyResolver;
 import org.springframework.util.StringValueResolver;
 
 /**
@@ -360,12 +361,13 @@ public class PropertyPlaceholderConfigurer extends PropertyResourceConfigurer
 	protected String parseStringValue(String strVal, Properties props, Set visitedPlaceholders) {
 		PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper(
 				placeholderPrefix, placeholderSuffix, valueSeparator, ignoreUnresolvablePlaceholders);
-		StringValueResolver resolver = new PropertyPlaceholderConfigurerResolver(props);
+		PropertyResolver resolver = new PropertyPlaceholderConfigurerResolver(props);
 		return helper.replacePlaceholders(strVal, resolver);
 	}
 
 
-	private class PropertyPlaceholderConfigurerResolver implements StringValueResolver {
+	// TODO: use a regular PlaceholderResolvingStringValueResolver
+	private class PropertyPlaceholderConfigurerResolver implements PropertyResolver {
 
 		private final Properties props;
 

@@ -1,2 +1,2 @@
-org.springframework.util.StringValueResolverFactory=org.springframework.beans.factory.support.SimpleStringValueResolverFactory
-org.springframework.beans.factory.support.SimpleStringValueResolverFactory.classes=org.test.scratch.TestStringValueResolver,org.springframework.util.SystemPropertyStringValueResolver
+org.springframework.util.PropertyResolverFactory=org.springframework.beans.factory.support.SimplePropertyResolverFactory
+org.springframework.beans.factory.support.SimplePropertyResolverFactory.classes=org.test.scratch.TestPropertyResolver,org.springframework.util.SystemPropertiesPropertyResolver

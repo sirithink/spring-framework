@@ -8,7 +8,7 @@
 
 	<import resource="classpath:/META-INF/spring/${app}-context.xml" />
 
-	<bean class="org.springframework.beans.factory.config.StringValueResolverPlaceholderConfigurer">
+	<bean class="org.springframework.beans.factory.config.PropertyResolverPlaceholderConfigurer">
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 	</bean>
 

@@ -24,31 +24,35 @@ import org.springframework.core.OrderedCompositeHelper;
  * @author Dave Syer
  *
  */
-public class CompositeStringValueResolver implements StringValueResolver {
+public class CompositePropertyResolver implements PropertyResolver {
 
-	private OrderedCompositeHelper<StringValueResolver> stringValueResolvers = new OrderedCompositeHelper<StringValueResolver>();
+	private OrderedCompositeHelper<PropertyResolver> propertyResolvers = new OrderedCompositeHelper<PropertyResolver>();
 
 	/**
-	 * @param stringValueResolvers the string value resolvers to set
+	 * @param propertyResolvers the string value resolvers to set
 	 */
-	public void setStringValueResolvers(List<? extends StringValueResolver> stringValueResolvers) {
-		this.stringValueResolvers.setItems(stringValueResolvers);
+	public void setStringValueResolvers(List<? extends PropertyResolver> propertyResolvers) {
+		this.propertyResolvers.setItems(propertyResolvers);
 	}
 	
 	/**
-	 * @param stringValueResolver the string value resolver to add
+	 * @param propertyResolver the string value resolver to add
 	 */
-	public void addStringValueResolver(StringValueResolver stringValueResolver) {
-		this.stringValueResolvers.add(stringValueResolver);
+	public void addPropertyResolver(PropertyResolver propertyResolver) {
+		this.propertyResolvers.add(propertyResolver);
 	}	
 
 	public String resolveStringValue(String variable) {
-		for (StringValueResolver resolver : stringValueResolvers.forward()) {
+		for (PropertyResolver resolver : propertyResolvers.forward()) {
 			String resolved = resolver.resolveStringValue(variable);
 			if (resolved != null) {
 				return resolved;
 			}
 		}
 		return null;
+	}
+
+	public int size() {
+		return propertyResolvers.size();
 	}
 }

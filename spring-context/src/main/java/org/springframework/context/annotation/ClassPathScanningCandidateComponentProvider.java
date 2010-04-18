@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.StringValueResolverLocator;
+import org.springframework.beans.factory.config.PropertyResolverLocator;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -93,7 +93,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 			registerDefaultFilters();
 		}
 		placeholderResolver = new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
-				StringValueResolverLocator.locate(ClassUtils.getDefaultClassLoader()));
+				PropertyResolverLocator.locate(ClassUtils.getDefaultClassLoader()));
 	}
 
 	/**

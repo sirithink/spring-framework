@@ -21,17 +21,17 @@ import java.util.Properties;
  * @author Dave Syer
  * 
  */
-public class PropertiesStringValueResolver implements StringValueResolver {
+public class PropertiesPropertyResolver implements PropertyResolver {
 
 	private Properties properties;
 	
-	public PropertiesStringValueResolver() {
+	public PropertiesPropertyResolver() {
 	}
 
 	/**
 	 * @param properties
 	 */
-	public PropertiesStringValueResolver(Properties properties) {
+	public PropertiesPropertyResolver(Properties properties) {
 		super();
 		this.properties = properties;
 	}

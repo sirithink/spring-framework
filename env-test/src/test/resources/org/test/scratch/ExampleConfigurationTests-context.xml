@@ -7,7 +7,7 @@
 
 	<import resource="classpath:/META-INF/spring/${app}-context.xml" />
 
-	<bean class="org.springframework.beans.factory.config.StringValueResolverPlaceholderConfigurer">
+	<bean class="org.springframework.beans.factory.config.PropertyResolverPlaceholderConfigurer">
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 	</bean>
 
@@ -15,11 +15,11 @@
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 	</bean-->
 
-	<bean id="stringValueResolver" class="org.springframework.util.CompositeStringValueResolver">
+	<bean id="stringValueResolver" class="org.springframework.util.CompositePropertyResolver">
 		<property name="stringValueResolvers">
 			<list>
-				<bean class="org.test.scratch.ExampleConfigurationTests$AnotherStringValueResolver" />
-				<bean class="org.springframework.util.SystemPropertyStringValueResolver" />
+				<bean class="org.test.scratch.ExampleConfigurationTests$AnotherPropertyResolver" />
+				<bean class="org.springframework.util.SystemPropertiesPropertyResolver" />
 			</list>
 		</property>
 	</bean>

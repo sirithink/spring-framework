@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.springframework.util.PlaceholderResolvingStringValueResolver;
 import org.springframework.util.PropertyPlaceholderHelper;
-import org.springframework.util.SystemPropertyStringValueResolver;
+import org.springframework.util.SystemPropertiesPropertyResolver;
 
 /**
  * Unit tests for the {@link ResourceEditor} class.
@@ -78,7 +78,7 @@ public final class ResourceEditorTests {
 	public void testStrictSystemPropertyReplacement() {
 		PropertyEditor editor = new ResourceEditor(new DefaultResourceLoader(),
 				new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(false),
-						new SystemPropertyStringValueResolver()));
+						new SystemPropertiesPropertyResolver()));
 		System.setProperty("test.prop", "foo");
 		try {
 			editor.setAsText("${test.prop}-${bar}");

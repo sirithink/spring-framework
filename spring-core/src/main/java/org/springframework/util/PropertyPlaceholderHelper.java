@@ -123,7 +123,7 @@ public class PropertyPlaceholderHelper {
 	 */
 	public String replacePlaceholders(String value, final Properties properties) {
 		Assert.notNull(properties, "Argument 'properties' must not be null.");
-		return replacePlaceholders(value, new PropertiesStringValueResolver(properties));
+		return replacePlaceholders(value, new PropertiesPropertyResolver(properties));
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class PropertyPlaceholderHelper {
 	 * @param placeholderResolver the <code>StringValueResolver</code> to use for replacement.
 	 * @return the supplied value with placeholders replaced inline.
 	 */
-	public String replacePlaceholders(String value, StringValueResolver placeholderResolver) {
+	public String replacePlaceholders(String value, PropertyResolver placeholderResolver) {
 		Assert.notNull(placeholderResolver, "Argument 'placeholderResolver' must not be null.");
 		Assert.notNull(value, "Argument 'value' must not be null.");
 		String result = parseStringValue(value, placeholderResolver, new HashSet<String>());
@@ -143,7 +143,7 @@ public class PropertyPlaceholderHelper {
 		return result;
 	}
 
-	protected String parseStringValue(String strVal, StringValueResolver placeholderResolver,
+	protected String parseStringValue(String strVal, PropertyResolver placeholderResolver,
 			Set<String> visitedPlaceholders) {
 
 		StringBuilder buf = new StringBuilder(strVal);

@@ -114,4 +114,8 @@ public class OrderedCompositeHelper<S> {
 		return result;
 	}
 
+	public int size() {
+		return list.size();
+	}
+
 }

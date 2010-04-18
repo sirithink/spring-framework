@@ -18,9 +18,9 @@ package org.test.scratch;
 
 import java.util.Properties;
 
-import org.springframework.util.StringValueResolver;
+import org.springframework.util.PropertyResolver;
 
-public class TestStringValueResolver implements StringValueResolver {
+public class TestPropertyResolver implements PropertyResolver {
 	
 	private static Properties properties = new Properties();
 	

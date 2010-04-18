@@ -24,7 +24,7 @@ import org.springframework.util.PlaceholderResolvingStringValueResolver;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
-import org.springframework.util.SystemPropertyStringValueResolver;
+import org.springframework.util.SystemPropertiesPropertyResolver;
 
 /**
  * {@link java.beans.PropertyEditor Editor} for {@link Resource}
@@ -71,7 +71,7 @@ public class ResourceEditor extends PropertyEditorSupport {
 	 */
 	public ResourceEditor(ResourceLoader resourceLoader) {
 		this(resourceLoader, new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
-				new SystemPropertyStringValueResolver()));
+				new SystemPropertiesPropertyResolver()));
 	}
 
 	/**

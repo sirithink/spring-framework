@@ -73,7 +73,7 @@ public class PropertyPlaceholderHelperTests {
 		String text = "foo=${foo}";
 
 		assertEquals("foo=bar",
-				this.helper.replacePlaceholders(text, new StringValueResolver() {
+				this.helper.replacePlaceholders(text, new PropertyResolver() {
 					
 					public String resolveStringValue(String placeholderName) {
 						if ("foo".equals(placeholderName)) {

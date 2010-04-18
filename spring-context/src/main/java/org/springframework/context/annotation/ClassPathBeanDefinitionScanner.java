@@ -109,7 +109,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 			setResourceLoader((ResourceLoader) this.registry);
 		}
 
-		// Determine StringValueRrsolver to use.
+		// Determine StringValueResolver to use.
 		if (this.registry instanceof ConfigurableBeanFactory) {
 			setPlaceholderResolver(new BeanFactoryStringValueResolver((ConfigurableBeanFactory) this.registry));
 		}

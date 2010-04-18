@@ -8,7 +8,7 @@
 
 	<context:component-scan base-package="org.test.${scratch}"/>
 
-	<bean class="org.springframework.beans.factory.config.StringValueResolverPlaceholderConfigurer">
+	<bean class="org.springframework.beans.factory.config.PropertyResolverPlaceholderConfigurer">
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 	</bean>
 

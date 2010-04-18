@@ -33,8 +33,10 @@ import org.springframework.core.io.ResourceEditor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.util.PlaceholderResolvingStringValueResolver;
+import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringValueResolver;
-import org.springframework.util.SystemPropertyStringValueResolver;
+import org.springframework.util.SystemPropertiesPropertyResolver;
 
 /**
  * PropertyEditorRegistrar implementation that populates a given
@@ -61,7 +63,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see org.springframework.context.ApplicationContext
 	 */
 	public ResourceEditorRegistrar(ResourceLoader resourceLoader) {
-		this(resourceLoader, new SystemPropertyStringValueResolver());
+		this(resourceLoader, new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(true), new SystemPropertiesPropertyResolver()));
 	}
 
 	/**

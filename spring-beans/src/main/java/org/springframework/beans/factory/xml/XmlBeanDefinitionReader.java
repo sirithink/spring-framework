@@ -27,7 +27,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanFactoryStringValueResolver;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.config.StringValueResolverLocator;
+import org.springframework.beans.factory.config.PropertyResolverLocator;
 import org.springframework.beans.factory.parsing.EmptyReaderEventListener;
 import org.springframework.beans.factory.parsing.FailFastProblemReporter;
 import org.springframework.beans.factory.parsing.NullSourceExtractor;
@@ -45,8 +45,8 @@ import org.springframework.core.io.support.EncodedResource;
 import org.springframework.util.Assert;
 import org.springframework.util.PlaceholderResolvingStringValueResolver;
 import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.PropertyResolver;
 import org.springframework.util.StringValueResolver;
-import org.springframework.util.SystemPropertyStringValueResolver;
 import org.springframework.util.xml.SimpleSaxErrorHandler;
 import org.springframework.util.xml.XmlValidationModeDetector;
 import org.w3c.dom.Document;
@@ -149,7 +149,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/**
 	 * The the placeholder resolver to use in resolving imports. Defaults to a
-	 * value bootstrapped from {@link StringValueResolverLocator}.
+	 * value bootstrapped from {@link PropertyResolverLocator}.
 	 * 
 	 * @param placeholderResolver
 	 *            the placeholder resolver to use
@@ -630,16 +630,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 		return new PlaceholderResolvingStringValueResolver(
 				new PropertyPlaceholderHelper(),
-				createDefaultStringValueResolver());
+				createDefaultPropertyResolver());
 	}
 
 	/**
 	 * Create the default implementation of {@link StringValueResolver} used if
 	 * none is specified. Default implementation returns an instance obtained
-	 * from {@link StringValueResolverLocator}.
+	 * from {@link PropertyResolverLocator}.
 	 */
-	protected StringValueResolver createDefaultStringValueResolver() {
-		return StringValueResolverLocator.locate(getResourceLoader()
+	protected PropertyResolver createDefaultPropertyResolver() {
+		return PropertyResolverLocator.locate(getResourceLoader()
 				.getClassLoader());
 	}
 

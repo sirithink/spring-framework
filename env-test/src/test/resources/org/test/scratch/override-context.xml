@@ -3,6 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean class="org.test.scratch.PropertyResolverLocatorTests$StringValues"/>
+	<bean class="org.springframework.util.PropertiesPropertyResolver">
+		<property name="properties">
+			<props><prop key="foo">${scratch}</prop></props>
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.config.PropertyResolverPlaceholderConfigurer"/>
 
 </beans>

@@ -16,27 +16,15 @@
 
 package org.springframework.util;
 
+import java.util.Properties;
+
 /**
  * @author Dave Syer
- * since 3.1
+ * @since 3.1
  *
  */
-public class NullSafeStringValueResolver implements StringValueResolver {
-
-	private final StringValueResolver stringValueResolver;
-
-	/**
-	 * @param stringValueResolver a delegate resolver
-	 */
-	public NullSafeStringValueResolver(StringValueResolver stringValueResolver) {
-		super();
-		this.stringValueResolver = stringValueResolver;
-	}
-
+public interface PropertyResolverFactory {
 	
-	public String resolveStringValue(String strVal) {
-		String result = stringValueResolver.resolveStringValue(strVal);
-		return result == null ? strVal : result;
-	}
+	PropertyResolver getResolver(ClassLoader classLoader, Properties properties);
 
 }

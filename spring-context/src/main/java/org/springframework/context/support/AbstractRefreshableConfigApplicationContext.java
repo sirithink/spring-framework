@@ -15,7 +15,7 @@ package org.springframework.context.support;
 
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.StringValueResolverLocator;
+import org.springframework.beans.factory.config.PropertyResolverLocator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -61,7 +61,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	public AbstractRefreshableConfigApplicationContext(ApplicationContext parent) {
 		super(parent);
 		placeholderResolver = new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
-				StringValueResolverLocator.locate(ClassUtils.getDefaultClassLoader()));
+				PropertyResolverLocator.locate(ClassUtils.getDefaultClassLoader()));
 	}
 
 	/**

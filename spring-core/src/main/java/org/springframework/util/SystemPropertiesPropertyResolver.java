@@ -23,17 +23,17 @@ import org.apache.commons.logging.LogFactory;
  * @author Dave Syer
  *
  */
-public class SystemPropertyStringValueResolver implements StringValueResolver {
+public class SystemPropertiesPropertyResolver implements PropertyResolver {
 
-	private static final Log logger = LogFactory.getLog(SystemPropertyStringValueResolver.class);
+	private static final Log logger = LogFactory.getLog(SystemPropertiesPropertyResolver.class);
 
 	private final String text;
 
-	public SystemPropertyStringValueResolver(String text) {
+	public SystemPropertiesPropertyResolver(String text) {
 		this.text = text;
 	}
 
-	public SystemPropertyStringValueResolver() {
+	public SystemPropertiesPropertyResolver() {
 		this(null);
 	}
 

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.PropertyResolver;
 import org.springframework.util.StringValueResolver;
 
 public class ExampleConfigurationTests {
@@ -115,7 +116,7 @@ public class ExampleConfigurationTests {
 
 		// Install the test value of app in the string resolver.  If using @ContextConfiguration 
 		// this could be done in @BeforeClass.
-		TestStringValueResolver.setProperty("app", "test");
+		TestPropertyResolver.setProperty("app", "test");
 
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(resource);
 		Map<String, String> map = getMap(context);
@@ -125,7 +126,7 @@ public class ExampleConfigurationTests {
 			assertEquals("file://home/service/test-data.xml", map.get("remote.url"));
 		}
 		finally {
-			TestStringValueResolver.remove("app");
+			TestPropertyResolver.remove("app");
 			context.close();
 		}
 
@@ -136,7 +137,7 @@ public class ExampleConfigurationTests {
 		return map;
 	}
 
-	public static class AnotherStringValueResolver implements StringValueResolver {
+	public static class AnotherPropertyResolver implements PropertyResolver {
 		public String resolveStringValue(String strVal) {
 			if (strVal.equals("jdbc.type")) {
 				return "SYBASE";

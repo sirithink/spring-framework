@@ -29,7 +29,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.PlaceholderResolvingStringValueResolver;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StringValueResolver;
-import org.springframework.util.SystemPropertyStringValueResolver;
+import org.springframework.util.SystemPropertiesPropertyResolver;
 
 /**
  * Editor for {@link org.springframework.core.io.Resource} arrays, to
@@ -76,7 +76,7 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
 	 */
 	public ResourceArrayPropertyEditor(ResourcePatternResolver resourcePatternResolver) {
 		this(resourcePatternResolver, new PlaceholderResolvingStringValueResolver(new PropertyPlaceholderHelper(),
-				new SystemPropertyStringValueResolver()));
+				new SystemPropertiesPropertyResolver()));
 	}
 
 	/**

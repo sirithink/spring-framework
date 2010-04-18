@@ -64,15 +64,17 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.beans.factory.config.StringValueResolverLocator;
+import org.springframework.beans.factory.config.PropertyResolverLocator;
 import org.springframework.core.DecoratingClassLoader;
 import org.springframework.core.NamedThreadLocal;
+import org.springframework.core.OrderedCompositeHelper;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.PlaceholderResolvingStringValueResolver;
 import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.PropertyResolver;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
@@ -140,7 +142,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			new HashMap<Class, Class<? extends PropertyEditor>>(4);
 
 	/** String resolvers to apply e.g. to annotation attribute values */
-	private final List<StringValueResolver> embeddedValueResolvers = new LinkedList<StringValueResolver>();
+	private final OrderedCompositeHelper<StringValueResolver> embeddedValueResolvers = new OrderedCompositeHelper<StringValueResolver>();
 
 	/** BeanPostProcessors to apply in createBean */
 	private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
@@ -183,7 +185,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	public AbstractBeanFactory(BeanFactory parentBeanFactory) {
 		this.parentBeanFactory = parentBeanFactory;
 		this.embeddedValueResolvers.add(new PlaceholderResolvingStringValueResolver(
-				new PropertyPlaceholderHelper(), createDefaultStringValueResolver()));
+				new PropertyPlaceholderHelper(), createDefaultPropertyResolver()));
 	}
 
 
@@ -697,10 +699,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Create the default implementation of {@link StringValueResolver} used if
 	 * none is specified. Default implementation returns an instance obtained  from
-	 * {@link StringValueResolverLocator}.
+	 * {@link PropertyResolverLocator}.
 	 */
-	protected StringValueResolver createDefaultStringValueResolver() {
-		return StringValueResolverLocator.locate(getBeanClassLoader());
+	protected PropertyResolver createDefaultPropertyResolver() {
+		return PropertyResolverLocator.locate(getBeanClassLoader());
 	}
 
 	public void addEmbeddedValueResolver(StringValueResolver valueResolver) {
@@ -710,7 +712,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	public String resolveEmbeddedValue(String value) {
 		String result = value;
-		for (StringValueResolver resolver : this.embeddedValueResolvers) {
+		for (StringValueResolver resolver : this.embeddedValueResolvers.forward()) {
 			result = resolver.resolveStringValue(result);
 		}
 		return result;

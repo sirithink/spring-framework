@@ -97,11 +97,10 @@ public class SQLErrorCodesFactory {
 	 * @see #loadResource(String)
 	 */
 	protected SQLErrorCodesFactory() {
-		Map<String, SQLErrorCodes> errorCodes;
+		Map<String, SQLErrorCodes> errorCodes = null;
 
 		try {
 			DefaultListableBeanFactory lbf = new DefaultListableBeanFactory();
-			lbf.setBeanClassLoader(getClass().getClassLoader());
 			XmlBeanDefinitionReader bdr = new XmlBeanDefinitionReader(lbf);
 
 			// Load default SQL error codes.

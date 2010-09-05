@@ -776,19 +776,19 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 
 		finally {
 			if (dataSource != null) {
-				configTimeDataSourceHolder.remove();
+				configTimeDataSourceHolder.set(null);
 			}
 			if (this.jtaTransactionManager != null) {
-				configTimeTransactionManagerHolder.remove();
+				configTimeTransactionManagerHolder.set(null);
 			}
 			if (this.cacheRegionFactory != null) {
-				configTimeCacheProviderHolder.remove();
+				configTimeCacheProviderHolder.set(null);
 			}
 			if (this.cacheProvider != null) {
-				configTimeCacheProviderHolder.remove();
+				configTimeCacheProviderHolder.set(null);
 			}
 			if (this.lobHandler != null) {
-				configTimeLobHandlerHolder.remove();
+				configTimeLobHandlerHolder.set(null);
 			}
 			if (overrideClassLoader) {
 				// Reset original thread context ClassLoader.
@@ -896,7 +896,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 		finally {
 			if (dataSource != null) {
 				// Reset DataSource holder.
-				configTimeDataSourceHolder.remove();
+				configTimeDataSourceHolder.set(null);
 			}
 		}
 	}
@@ -942,7 +942,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 		}
 		finally {
 			if (dataSource != null) {
-				configTimeDataSourceHolder.remove();
+				configTimeDataSourceHolder.set(null);
 			}
 		}
 	}
@@ -984,7 +984,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 		}
 		finally {
 			if (dataSource != null) {
-				configTimeDataSourceHolder.remove();
+				configTimeDataSourceHolder.set(null);
 			}
 		}
 	}
@@ -1054,7 +1054,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 		}
 		finally {
 			if (dataSource != null) {
-				configTimeDataSourceHolder.remove();
+				configTimeDataSourceHolder.set(null);
 			}
 		}
 	}

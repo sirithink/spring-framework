@@ -351,7 +351,7 @@ public abstract class AbstractPollingMessageListenerContainer extends AbstractMe
 				}
 				noMessageReceived(invoker, sessionToUse);
 				// Nevertheless call commit, in order to reset the transaction timeout (if any).
-				commitIfNecessary(sessionToUse, message);
+				commitIfNecessary(session, message);
 				// Indicate that no message has been received.
 				return false;
 			}

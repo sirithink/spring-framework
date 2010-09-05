@@ -376,6 +376,12 @@ public class JaxWsPortClientInterceptor extends LocalJaxWsServiceFactory
 			if (StringUtils.hasText(pn)) {
 				setPortName(pn);
 			}
+			else {
+				String nm = ann.name();
+				if (StringUtils.hasText(nm)) {
+					setPortName(nm);
+				}
+			}
 		}
 	}
 

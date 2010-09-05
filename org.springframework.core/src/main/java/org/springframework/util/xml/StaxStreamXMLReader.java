@@ -43,7 +43,13 @@ import org.springframework.util.StringUtils;
  */
 class StaxStreamXMLReader extends AbstractStaxXMLReader {
 
+	private static final String DEFAULT_XML_VERSION = "1.0";
+
 	private final XMLStreamReader reader;
+
+	private String xmlVersion = DEFAULT_XML_VERSION;
+
+	private String encoding;
 
 	/**
 	 * Constructs a new instance of the <code>StaxStreamXmlReader</code> that reads from the given
@@ -123,6 +129,14 @@ class StaxStreamXMLReader extends AbstractStaxXMLReader {
 	}
 
 	private void handleStartDocument() throws SAXException {
+		if (XMLStreamConstants.START_DOCUMENT == reader.getEventType()) {
+			String xmlVersion = reader.getVersion();
+			if (StringUtils.hasLength(xmlVersion)) {
+				this.xmlVersion = xmlVersion;
+			}
+			this.encoding = reader.getCharacterEncodingScheme();
+		}
+
 		if (getContentHandler() != null) {
 			final Location location = reader.getLocation();
 
@@ -145,12 +159,11 @@ class StaxStreamXMLReader extends AbstractStaxXMLReader {
 				}
 
 				public String getXMLVersion() {
-					String version = reader.getVersion();
-					return StringUtils.hasLength(version) ? version : "1.0";
+					return xmlVersion;
 				}
 
 				public String getEncoding() {
-					return reader.getEncoding();
+					return encoding;
 				}
 			});
 			getContentHandler().startDocument();
@@ -165,11 +178,14 @@ class StaxStreamXMLReader extends AbstractStaxXMLReader {
 			QName qName = reader.getName();
 			if (hasNamespacesFeature()) {
 				for (int i = 0; i < reader.getNamespaceCount(); i++) {
-					String prefix = reader.getNamespacePrefix(i);
-					if (prefix == null) {
-						prefix = "";
+					startPrefixMapping(reader.getNamespacePrefix(i), reader.getNamespaceURI(i));
+				}
+				for (int i = 0; i < reader.getAttributeCount(); i++) {
+					String prefix = reader.getAttributePrefix(i);
+					String namespace = reader.getAttributeNamespace(i);
+					if (StringUtils.hasLength(namespace)) {
+						startPrefixMapping(prefix, namespace);
 					}
-					getContentHandler().startPrefixMapping(prefix, reader.getNamespaceURI(i));
 				}
 				getContentHandler().startElement(qName.getNamespaceURI(), qName.getLocalPart(), toQualifiedName(qName),
 						getAttributes());
@@ -190,7 +206,7 @@ class StaxStreamXMLReader extends AbstractStaxXMLReader {
 					if (prefix == null) {
 						prefix = "";
 					}
-					getContentHandler().endPrefixMapping(prefix);
+					endPrefixMapping(prefix);
 				}
 			}
 			else {

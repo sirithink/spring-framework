@@ -17,6 +17,8 @@
 package org.springframework.util.xml;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLEventReader;
@@ -57,7 +59,15 @@ import org.springframework.util.StringUtils;
  */
 class StaxEventXMLReader extends AbstractStaxXMLReader {
 
+	private static final String DEFAULT_XML_VERSION = "1.0";
+
 	private final XMLEventReader reader;
+
+	private final Map<String, String> namespaces = new LinkedHashMap<String, String>();
+
+	private String xmlVersion = DEFAULT_XML_VERSION;
+
+	private String encoding;
 
 	/**
 	 * Constructs a new instance of the <code>StaxEventXmlReader</code> that reads from the given
@@ -143,6 +153,17 @@ class StaxEventXMLReader extends AbstractStaxXMLReader {
 	}
 
 	private void handleStartDocument(final XMLEvent event) throws SAXException {
+		if (event.isStartDocument()) {
+			StartDocument startDocument = (StartDocument) event;
+			String xmlVersion = startDocument.getVersion();
+			if (StringUtils.hasLength(xmlVersion)) {
+				this.xmlVersion = xmlVersion;
+			}
+			if (startDocument.encodingSet()) {
+				this.encoding = startDocument.getCharacterEncodingScheme();
+			}
+		}
+
 		if (getContentHandler() != null) {
 			final Location location = event.getLocation();
 			getContentHandler().setDocumentLocator(new Locator2() {
@@ -164,22 +185,11 @@ class StaxEventXMLReader extends AbstractStaxXMLReader {
 				}
 
 				public String getXMLVersion() {
-					if (event.isStartDocument()) {
-						StartDocument startDocument = (StartDocument) event;
-						String version = startDocument.getVersion();
-						return StringUtils.hasLength(version) ? version : "1.0";
-					}
-					return null;
+					return xmlVersion;
 				}
 
 				public String getEncoding() {
-					if (event.isStartDocument()) {
-						StartDocument startDocument = (StartDocument) event;
-						if (startDocument.encodingSet()) {
-							return startDocument.getCharacterEncodingScheme();
-						}
-					}
-					return null;
+					return encoding;
 				}
 			});
 
@@ -193,8 +203,14 @@ class StaxEventXMLReader extends AbstractStaxXMLReader {
 			if (hasNamespacesFeature()) {
 				for (Iterator i = startElement.getNamespaces(); i.hasNext();) {
 					Namespace namespace = (Namespace) i.next();
-					getContentHandler().startPrefixMapping(namespace.getPrefix(), namespace.getNamespaceURI());
+					startPrefixMapping(namespace.getPrefix(), namespace.getNamespaceURI());
 				}
+				for (Iterator i = startElement.getAttributes(); i.hasNext();){
+					Attribute attribute = (Attribute) i.next();
+					QName attributeName = attribute.getName();
+					startPrefixMapping(attributeName.getPrefix(), attributeName.getNamespaceURI());
+				}
+
 				getContentHandler().startElement(qName.getNamespaceURI(), qName.getLocalPart(), toQualifiedName(qName),
 						getAttributes(startElement));
 			}
@@ -228,7 +244,7 @@ class StaxEventXMLReader extends AbstractStaxXMLReader {
 				getContentHandler().endElement(qName.getNamespaceURI(), qName.getLocalPart(), toQualifiedName(qName));
 				for (Iterator i = endElement.getNamespaces(); i.hasNext();) {
 					Namespace namespace = (Namespace) i.next();
-					getContentHandler().endPrefixMapping(namespace.getPrefix());
+					endPrefixMapping(namespace.getPrefix());
 				}
 			}
 			else {

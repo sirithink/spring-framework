@@ -26,8 +26,6 @@ import org.junit.runner.RunWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.refresh.RefreshScopeEvent;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,7 +41,7 @@ public class ExampleConfigurationTests {
 	private Map<String, Object> map;
 	
 	@Autowired
-	private ApplicationEventPublisher publisher;
+	private RefreshScope scope;
 
 	@Test
 	public void testSimpleProperties() throws Exception {
@@ -56,7 +54,7 @@ public class ExampleConfigurationTests {
 		assertEquals("Hello scope!", service.getMessage());
 		String id1 = service.toString();
 		map.put("message", "Foo");
-		publisher.publishEvent(new RefreshScopeEvent(this));
+		scope.refreshAll();
 		String id2 = service.toString();
 		assertNotSame(id1, id2);
 		assertEquals("Foo", service.getMessage());

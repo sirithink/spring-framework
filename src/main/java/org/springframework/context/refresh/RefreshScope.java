@@ -17,9 +17,10 @@
 package org.springframework.context.refresh;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.BeansException;
@@ -32,7 +33,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.expression.BeanFactoryAccessor;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -49,13 +49,11 @@ import org.springframework.util.StringValueResolver;
  * @since 3.1
  * 
  */
-public class RefreshScope implements Scope, BeanFactoryPostProcessor, ApplicationListener<RefreshScopeEvent> {
+public class RefreshScope implements Scope, BeanFactoryPostProcessor {
 
-	private Map<String, Object> cache = new ConcurrentHashMap<String, Object>();
+	private ConcurrentMap<String, BeanCallbackWrapper> cache = new ConcurrentHashMap<String, BeanCallbackWrapper>();
 
 	private String name = "refresh";
-
-	private Map<String, Runnable> callbacks = new ConcurrentHashMap<String, Runnable>();
 
 	private boolean proxyTargetClass = false;
 
@@ -64,26 +62,30 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 	private StandardEvaluationContext evaluationContext;
 
 	/**
-	 * @param name the name to set
+	 * The name of this scope.  Default "refresh".
+	 * @param name
+	 *            the name value to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * @param proxyTargetClass the proxyTargetClass to set
+	 * Flag to indicate that proxies should be created for the concrete type,
+	 * not just the interfaces, of the scoped beans.
+	 * 
+	 * @param proxyTargetClass
+	 *            the flag value to set
 	 */
 	public void setProxyTargetClass(boolean proxyTargetClass) {
 		this.proxyTargetClass = proxyTargetClass;
 	}
 
 	public Object get(String name, ObjectFactory<?> objectFactory) {
-		if (cache.containsKey(name)) {
-			return cache.get(name);
-		}
-		Object value = objectFactory.getObject();
-		cache.put(name, value);
-		return value;
+		BeanCallbackWrapper value = new BeanCallbackWrapper(name, objectFactory);
+		BeanCallbackWrapper result = cache.putIfAbsent(name, value);
+		value = result == null ? value : result;
+		return value.getBean();
 	}
 
 	public String getConversationId() {
@@ -91,11 +93,19 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 	}
 
 	public void registerDestructionCallback(String name, Runnable callback) {
-		callbacks.put(name, callback);
+		BeanCallbackWrapper value = cache.get(name);
+		if (value == null) {
+			return;
+		}
+		value.setCallback(callback);
 	}
 
 	public Object remove(String name) {
-		return cache.remove(name);
+		BeanCallbackWrapper value = cache.get(name);
+		if (value == null) {
+			return null;
+		}
+		return cache.remove(name, value);
 	}
 
 	public Object resolveContextualObject(String key) {
@@ -108,25 +118,28 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 			ExpressionParser parser = new SpelExpressionParser();
 			try {
 				return parser.parseExpression(input);
-			}
-			catch (ParseException e) {
-				throw new IllegalArgumentException("Cannot parse expression: " + input, e);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Cannot parse expression: "
+						+ input, e);
 			}
 
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
 
-	public void onApplicationEvent(RefreshScopeEvent event) {
-		cache.clear();
+	public void refreshAll() {
 		List<Throwable> errors = new ArrayList<Throwable>();
-		for (Runnable callback : callbacks.values()) {
+		Collection<BeanCallbackWrapper> wrappers = this.cache.values();
+		cache.clear();
+		for (BeanCallbackWrapper wrapper : wrappers) {
+			Runnable callback = wrapper.getCallback();
+			if (callback == null) {
+				continue;
+			}
 			try {
 				callback.run();
-			}
-			catch (Throwable e) {
+			} catch (Throwable e) {
 				errors.add(e);
 			}
 		}
@@ -135,7 +148,8 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 		}
 	}
 
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(
+			ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
 		beanFactory.registerScope(name, this);
 
@@ -152,10 +166,12 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 			// Replace this or any of its inner beans with scoped proxy if it
 			// has this scope
 			boolean scoped = name.equals(definition.getScope());
-			Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass, scoped);
+			Scopifier scopifier = new Scopifier(registry, name,
+					proxyTargetClass, scoped);
 			scopifier.visitBeanDefinition(definition);
 			if (scoped) {
-				createScopedProxy(beanName, definition, registry, proxyTargetClass);
+				createScopedProxy(beanName, definition, registry,
+						proxyTargetClass);
 			}
 		}
 
@@ -171,17 +187,20 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 		return new IllegalStateException(throwable);
 	}
 
-	private static BeanDefinitionHolder createScopedProxy(String beanName, BeanDefinition definition,
-			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
-		BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(new BeanDefinitionHolder(definition,
-				beanName), registry, proxyTargetClass);
-		registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
+	private static BeanDefinitionHolder createScopedProxy(String beanName,
+			BeanDefinition definition, BeanDefinitionRegistry registry,
+			boolean proxyTargetClass) {
+		BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(
+				new BeanDefinitionHolder(definition, beanName), registry,
+				proxyTargetClass);
+		registry.registerBeanDefinition(beanName,
+				proxyHolder.getBeanDefinition());
 		return proxyHolder;
 	}
 
 	/**
 	 * Helper class to scan a bean definition hierarchy and force the use of
-	 * auto-proxy for step scoped beans.
+	 * auto-proxy for scoped beans.
 	 * 
 	 * @author Dave Syer
 	 * 
@@ -196,7 +215,8 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 
 		private final boolean scoped;
 
-		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass, boolean scoped) {
+		public Scopifier(BeanDefinitionRegistry registry, String scope,
+				boolean proxyTargetClass, boolean scoped) {
 			super(new StringValueResolver() {
 				public String resolveStringValue(String value) {
 					return value;
@@ -215,9 +235,9 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 			String beanName = null;
 			if (value instanceof BeanDefinition) {
 				definition = (BeanDefinition) value;
-				beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
-			}
-			else if (value instanceof BeanDefinitionHolder) {
+				beanName = BeanDefinitionReaderUtils.generateBeanName(
+						definition, registry);
+			} else if (value instanceof BeanDefinitionHolder) {
 				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
 				definition = holder.getBeanDefinition();
 				beanName = holder.getBeanName();
@@ -229,7 +249,8 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 				if (scopeChangeRequiresProxy) {
 					// Exit here so that nested inner bean definitions are not
 					// analysed
-					return createScopedProxy(beanName, definition, registry, proxyTargetClass);
+					return createScopedProxy(beanName, definition, registry,
+							proxyTargetClass);
 				}
 			}
 
@@ -237,6 +258,60 @@ public class RefreshScope implements Scope, BeanFactoryPostProcessor, Applicatio
 			value = super.resolveValue(value);
 			return value;
 
+		}
+
+	}
+
+	private static class BeanCallbackWrapper {
+
+		private Object bean;
+
+		private Runnable callback;
+
+		private final String name;
+
+		private final ObjectFactory<?> objectFactory;
+
+		public BeanCallbackWrapper(String name, ObjectFactory<?> objectFactory) {
+			this.name = name;
+			this.objectFactory = objectFactory;
+		}
+
+		public Runnable getCallback() {
+			return callback;
+		}
+
+		public void setCallback(Runnable callback) {
+			this.callback = callback;
+		}
+
+		public Object getBean() {
+			return bean == null ? objectFactory.getObject() : bean;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			BeanCallbackWrapper other = (BeanCallbackWrapper) obj;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
 		}
 
 	}

@@ -16,7 +16,6 @@
 
 package org.springframework.core.env;
 
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,18 +43,6 @@ public interface ConfigurableEnvironment extends Environment {
 
 	void addPropertySource(String name, Map<String, String> propertiesMap);
 
-	/**
-	 * TODO: SPR-7508 document
-	 *
-	 * Care should be taken to ensure duplicates are not introduced.
-	 *
-	 * Recommend using {@link LinkedList#set(int, Object)} for replacing items,
-	 * and combining {@link LinkedList#remove()} with other methods like
-	 * {@link LinkedList#add(Object)} to prevent duplicates.
-	 *
-	 * Explain how {@link PropertySource#equals(Object)} and hashCode work, and that
-	 * recommend using {@link PropertySource#named(String)} for lookups in the list.
-	 */
-	LinkedList<PropertySource<?>> getPropertySources();
+	PropertySources getPropertySources();
 
 }

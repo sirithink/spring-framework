@@ -16,7 +16,6 @@
 
 package org.springframework.context.support;
 
-import java.util.LinkedList;
 import java.util.Properties;
 
 import org.springframework.beans.BeansException;
@@ -29,6 +28,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
 import org.springframework.util.Assert;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
@@ -68,23 +68,23 @@ public class EnvironmentAwarePropertyPlaceholderConfigurer
 		Assert.notNull(this.wrappedEnvironment, "Environment must not be null. Did you call setEnvironment()?");
 		environment = new AbstractEnvironment() { };
 
-		LinkedList<PropertySource<?>> propertySources = environment.getPropertySources();
+		PropertySources propertySources = environment.getPropertySources();
 		EnvironmentPropertySource environmentPropertySource =
 			new EnvironmentPropertySource("wrappedEnvironment", wrappedEnvironment);
 
 		if (!this.localOverride) {
-			propertySources.add(environmentPropertySource);
+			propertySources.addLast(environmentPropertySource);
 		}
 
 		if (this.localProperties != null) {
 			int cx=0;
 			for (Properties localProps : this.localProperties) {
-				propertySources.add(new PropertiesPropertySource("localProperties"+cx++, localProps));
+				propertySources.addLast(new PropertiesPropertySource("localProperties"+cx++, localProps));
 			}
 		}
 
 		if (this.localOverride) {
-			propertySources.add(environmentPropertySource);
+			propertySources.addLast(environmentPropertySource);
 		}
 
 		super.postProcessBeanFactory(beanFactory);

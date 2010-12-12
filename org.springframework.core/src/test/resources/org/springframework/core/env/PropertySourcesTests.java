@@ -18,6 +18,8 @@ package org.springframework.core.env;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -28,9 +30,9 @@ public class PropertySourcesTests {
 	@Test
 	public void test() {
 		PropertySources sources = new PropertySources();
-		sources.addLast(new MockPropertySource("b"));
-		sources.addLast(new MockPropertySource("d"));
-		sources.addLast(new MockPropertySource("f"));
+		sources.addLast(new MockPropertySource("b").withProperty("p1", "bValue"));
+		sources.addLast(new MockPropertySource("d").withProperty("p1", "dValue"));
+		sources.addLast(new MockPropertySource("f").withProperty("p1", "fValue"));
 
 		assertThat(sources.size(), equalTo(3));
 		assertThat(sources.contains("a"), is(false));
@@ -40,6 +42,11 @@ public class PropertySourcesTests {
 		assertThat(sources.contains("e"), is(false));
 		assertThat(sources.contains("f"), is(true));
 		assertThat(sources.contains("g"), is(false));
+
+		assertThat(sources.get("b"), not(nullValue()));
+		assertThat(sources.get("b").getProperty("p1"), equalTo("bValue"));
+		assertThat(sources.get("d"), not(nullValue()));
+		assertThat(sources.get("d").getProperty("p1"), equalTo("dValue"));
 
 		sources.addBefore("b", new MockPropertySource("a"));
 		sources.addAfter("b", new MockPropertySource("c"));

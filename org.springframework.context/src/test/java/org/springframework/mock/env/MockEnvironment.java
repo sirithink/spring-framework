@@ -33,7 +33,7 @@ public class MockEnvironment extends AbstractEnvironment {
 	private MockPropertySource propertySource = new MockPropertySource();
 
 	public MockEnvironment() {
-		getPropertySources().add(propertySource);
+		getPropertySources().addLast(propertySource);
 	}
 
 	public void setProperty(String key, String value) {

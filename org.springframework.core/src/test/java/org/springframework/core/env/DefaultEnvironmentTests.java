@@ -20,7 +20,6 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertSame;
@@ -39,7 +38,6 @@ import java.security.Permission;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -87,9 +85,9 @@ public class DefaultEnvironmentTests {
 		// 'local' was added (pushed) last so has precedence
 		assertThat(env.getProperty("foo"), equalTo("localValue"));
 
-		// put 'system' at the front of the list
-		LinkedList<PropertySource<?>> propertySources = env.getPropertySources();
-		propertySources.push(propertySources.remove(propertySources.indexOf(PropertySource.named("system"))));
+		// move 'system' to the front of the list
+		PropertySources propertySources = env.getPropertySources();
+		propertySources.addFirst(propertySources.remove("system"));
 
 		// 'system' now has precedence
 		assertThat(env.getProperty("foo"), equalTo("systemValue"));
@@ -107,10 +105,9 @@ public class DefaultEnvironmentTests {
 		assertThat(env.getProperty("foo"), equalTo("localValue"));
 
 		// replace 'local' with new property source
-		LinkedList<PropertySource<?>> propertySources = env.getPropertySources();
-		int localIndex = propertySources.indexOf(PropertySource.named("local"));
+		PropertySources propertySources = env.getPropertySources();
 		MapPropertySource newSource = new MapPropertySource("new", new HashMap() {{ put("foo", "newValue"); }});
-		propertySources.set(localIndex, newSource);
+		propertySources.replace("local", newSource);
 
 		// 'system' now has precedence
 		assertThat(env.getProperty("foo"), equalTo("newValue"));

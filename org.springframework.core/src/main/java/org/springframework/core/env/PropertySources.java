@@ -75,8 +75,8 @@ public class PropertySources {
 		return propertySourceList.contains(PropertySource.named(propertySourceName));
 	}
 
-	public boolean remove(String propertySourceName) {
-		return propertySourceList.remove(PropertySource.named(propertySourceName));
+	public PropertySource<?> remove(String propertySourceName) {
+		return propertySourceList.remove(propertySourceList.indexOf(PropertySource.named(propertySourceName)));
 	}
 
 	public void replace(String propertySourceName, PropertySource<?> propertySource) {
@@ -96,6 +96,10 @@ public class PropertySources {
 
 	public List<PropertySource<?>> asList() {
 		return Collections.unmodifiableList(this.propertySourceList);
+	}
+
+	public PropertySource<?> get(String propertySourceName) {
+		return propertySourceList.get(propertySourceList.indexOf(PropertySource.named(propertySourceName)));
 	}
 
 }

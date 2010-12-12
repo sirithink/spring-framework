@@ -100,7 +100,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 		// TODO: SPR-7508 extract createEnvironment() method; do also in GWAC
-		this.getEnvironment().getPropertySources().push(new ServletContextPropertySource(this.servletContext));
+		this.getEnvironment().getPropertySources().addFirst(new ServletContextPropertySource(this.servletContext));
 	}
 
 	public ServletContext getServletContext() {
@@ -113,7 +113,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 			this.setServletContext(servletConfig.getServletContext());
 		}
 		// TODO: SPR-7508 extract createEnvironment() method; do also in GWAC
-		this.getEnvironment().getPropertySources().push(new ServletConfigPropertySource(servletConfig));
+		this.getEnvironment().getPropertySources().addFirst(new ServletConfigPropertySource(servletConfig));
 	}
 
 	public ServletConfig getServletConfig() {

@@ -160,7 +160,7 @@ public class GenericWebApplicationContext extends GenericApplicationContext
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
-		this.getEnvironment().getPropertySources().push(new ServletContextPropertySource(servletContext));
+		this.getEnvironment().getPropertySources().addFirst(new ServletContextPropertySource(servletContext));
 	}
 
 	public Theme getTheme(String themeName) {

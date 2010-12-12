@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.env.DefaultWebEnvironment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
@@ -169,9 +170,9 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
-		LinkedList<PropertySource<?>> propertySources = this.getEnvironment().getPropertySources();
-		propertySources.push(new ServletContextPropertySource(servletContext));
-		propertySources.push(new ServletConfigPropertySource(servletConfig));
+		PropertySources propertySources = this.getEnvironment().getPropertySources();
+		propertySources.addFirst(new ServletContextPropertySource(servletContext));
+		propertySources.addFirst(new ServletConfigPropertySource(servletConfig));
 	}
 
 	public Theme getTheme(String themeName) {

@@ -24,11 +24,12 @@ import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_SUFFIX;
 import static org.springframework.util.SystemPropertyUtils.VALUE_SEPARATOR;
 
 import java.security.AccessControlException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -59,7 +60,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	private Set<String> activeProfiles = new LinkedHashSet<String>();
 	private Set<String> defaultProfiles = new LinkedHashSet<String>();
 
-	private LinkedList<PropertySource<?>> propertySources = new LinkedList<PropertySource<?>>();
+	private PropertySources propertySources = new PropertySources();
 	private ConversionService conversionService = ConversionServiceFactory.createDefaultConversionService();
 
 	private final PropertyPlaceholderHelper nonStrictHelper =
@@ -78,7 +79,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	}
 
 	public void addPropertySource(PropertySource<?> propertySource) {
-		propertySources.push(propertySource);
+		this.propertySources.addFirst(propertySource);
 	}
 
 	public void addPropertySource(String name, Properties properties) {
@@ -89,12 +90,12 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		addPropertySource(new MapPropertySource(name, propertiesMap));
 	}
 
-	public LinkedList<PropertySource<?>> getPropertySources() {
-		return propertySources;
+	public PropertySources getPropertySources() {
+		return this.propertySources;
 	}
 
 	public boolean containsProperty(String key) {
-		for (PropertySource<?> propertySource : propertySources) {
+		for (PropertySource<?> propertySource : propertySources.asList()) {
 			if (propertySource.containsProperty(key)) {
 				return true;
 			}
@@ -123,7 +124,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 			logger.trace(format("getProperty(\"%s\", %s)", key, targetValueType.getSimpleName()));
 		}
 
-		for (PropertySource<?> propertySource : propertySources) {
+		for (PropertySource<?> propertySource : propertySources.asList()) {
 			if (debugEnabled) {
 				logger.debug(format("Searching for key '%s' in [%s]", key, propertySource.getName()));
 			}
@@ -169,7 +170,9 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public Properties asProperties() {
 		// TODO SPR-7508: refactor, simplify. only handles map-based propertysources right now.
 		Properties mergedProps = new Properties();
-		Iterator<PropertySource<?>> descendingIterator = getPropertySources().descendingIterator();
+		List<PropertySource<?>> propertySourcesList = new ArrayList<PropertySource<?>>(propertySources.asList());
+		Collections.reverse(propertySourcesList);
+		Iterator<PropertySource<?>> descendingIterator = propertySourcesList.iterator();
 		while (descendingIterator.hasNext()) {
 			PropertySource<?> propertySource =  descendingIterator.next();
 			Object object = propertySource.getSource();

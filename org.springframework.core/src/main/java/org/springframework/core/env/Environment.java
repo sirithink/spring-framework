@@ -46,7 +46,7 @@ public interface Environment {
 	 * 	a) one or more of specifiedProfiles are active in the given environment - see {@link #getActiveProfiles()}
 	 *  b) specifiedProfiles contains default profile - see {@link #getDefaultProfile()}
 	 */
-	boolean acceptsProfiles(String[] specifiedProfiles);
+	boolean acceptsProfiles(String... specifiedProfiles);
 
 	/**
 	 * TODO SPR-7508: document

@@ -39,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.ConversionServiceFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.util.StringUtils;
@@ -287,7 +288,8 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return doResolvePlaceholders(text, strictHelper);
 	}
 
-	public boolean acceptsProfiles(String[] specifiedProfiles) {
+	public boolean acceptsProfiles(String... specifiedProfiles) {
+		Assert.notEmpty(specifiedProfiles, "Must specify at least one profile");
 		boolean activeProfileFound = false;
 		Set<String> activeProfiles = this.getActiveProfiles();
 		Set<String> defaultProfiles = this.getDefaultProfiles();

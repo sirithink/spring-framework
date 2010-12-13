@@ -282,6 +282,7 @@ public abstract class GenericFilterBean implements
 	/**
 	 * PropertyValues implementation created from FilterConfig init parameters.
 	 */
+	@SuppressWarnings("serial")
 	private static class FilterConfigPropertyValues extends MutablePropertyValues {
 
 		/**
@@ -292,12 +293,12 @@ public abstract class GenericFilterBean implements
 		 * @throws ServletException if any required properties are missing
 		 */
 		public FilterConfigPropertyValues(FilterConfig config, Set<String> requiredProperties)
-		    throws ServletException {
+			throws ServletException {
 
 			Set<String> missingProps = (requiredProperties != null && !requiredProperties.isEmpty()) ?
 					new HashSet<String>(requiredProperties) : null;
 
-			Enumeration en = config.getInitParameterNames();
+			Enumeration<?> en = config.getInitParameterNames();
 			while (en.hasMoreElements()) {
 				String property = (String) en.nextElement();
 				Object value = config.getInitParameter(property);

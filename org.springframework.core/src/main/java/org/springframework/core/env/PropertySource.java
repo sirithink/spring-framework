@@ -18,14 +18,19 @@ package org.springframework.core.env;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.Assert;
 
 
 public abstract class PropertySource<T> {
 
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
-	protected final String name;
-	protected final T source;
+	private final String name;
+	private T source;
+
+	public PropertySource(String name) {
+		this.name = name;
+	}
 
 	public PropertySource(String name, T source) {
 		this.name = name;
@@ -37,7 +42,13 @@ public abstract class PropertySource<T> {
 	}
 
 	public T getSource() {
-		return source;
+		Assert.state(this.source != null,
+				"'source' object is null. Call setSource() before calling getSource()");
+		return this.source;
+	}
+
+	protected void setSource(T source) {
+		this.source = source;
 	}
 
 	public abstract boolean containsProperty(String key);

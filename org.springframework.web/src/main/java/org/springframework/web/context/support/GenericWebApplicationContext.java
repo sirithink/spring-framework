@@ -21,6 +21,8 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
@@ -159,7 +161,12 @@ public class GenericWebApplicationContext extends GenericApplicationContext
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
-		this.getEnvironment().getPropertySources().addFirst(new ServletContextPropertySource(servletContext));
+		MutablePropertySources propertySources = this.getEnvironment().getPropertySources();
+		for (PropertySource<?> propertySource : propertySources.asList()) {
+			if (propertySource instanceof ServletContextAware) {
+				((ServletContextAware)propertySource).setServletContext(this.servletContext);
+			}
+		}
 	}
 
 	public Theme getTheme(String themeName) {

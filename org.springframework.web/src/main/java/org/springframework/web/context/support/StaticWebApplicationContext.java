@@ -22,6 +22,7 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
@@ -167,8 +168,13 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
 		MutablePropertySources propertySources = this.getEnvironment().getPropertySources();
-		propertySources.addFirst(new ServletContextPropertySource(servletContext));
-		propertySources.addFirst(new ServletConfigPropertySource(servletConfig));
+		for (PropertySource<?> propertySource : propertySources.asList()) {
+			if (propertySource instanceof ServletContextAware) {
+				((ServletContextAware)propertySource).setServletContext(this.servletContext);
+			} else if (propertySource instanceof ServletConfigAware) {
+				((ServletConfigAware)propertySource).setServletConfig(this.servletConfig);
+			}
+		}
 	}
 
 	public Theme getTheme(String themeName) {

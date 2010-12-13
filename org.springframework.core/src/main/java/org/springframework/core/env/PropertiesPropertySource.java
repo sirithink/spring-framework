@@ -39,16 +39,16 @@ public class PropertiesPropertySource extends PropertySource<Properties> {
 	}
 
 	public boolean containsProperty(String key) {
-		return source.containsKey(key);
+		return this.getSource().containsKey(key);
 	}
 
 	public String getProperty(String key) {
-		return source.getProperty(key);
+		return this.getSource().getProperty(key);
 	}
 
 	@Override
 	public int size() {
-		return source.size();
+		return this.getSource().size();
 	}
 
 }

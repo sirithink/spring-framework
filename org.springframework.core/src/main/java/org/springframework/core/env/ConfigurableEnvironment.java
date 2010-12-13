@@ -29,7 +29,7 @@ public interface ConfigurableEnvironment extends Environment {
 
 	void setDefaultProfiles(String... profiles);
 
-	PropertySources getPropertySources();
+	MutablePropertySources getPropertySources();
 
 	ConfigurablePropertyResolver getPropertyResolver();
 

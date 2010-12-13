@@ -25,9 +25,9 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ChainedPropertyResolver;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertyResolver;
-import org.springframework.core.env.PropertySources;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
@@ -67,7 +67,7 @@ public class EnvironmentAwarePropertyPlaceholderConfigurer
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		Assert.notNull(this.environment, "Environment must not be null. Did you call setEnvironment()?");
 
-		PropertySources localPropertySources = new PropertySources();
+		MutablePropertySources localPropertySources = new MutablePropertySources();
 		if (this.localProperties != null) {
 			int cx=0;
 			for (Properties localProps : this.localProperties) {

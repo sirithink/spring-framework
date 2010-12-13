@@ -53,6 +53,11 @@ public interface Environment {
 	PropertyResolver getPropertyResolver();
 
 	/**
+	 * TODO SPR-7508: document
+	 */
+	PropertySources getPropertySources();
+
+	/**
 	 * TODO SPR-7508: document that this returns {@link System#getenv()} if allowed, or
 	 * {@link ReadOnlySystemAttributesMap} if not.
 	 */

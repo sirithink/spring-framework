@@ -16,94 +16,17 @@
 
 package org.springframework.core.env;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.util.Assert;
 
-public class PropertySources {
+public interface PropertySources {
 
-	private final LinkedList<PropertySource<?>> propertySourceList = new LinkedList<PropertySource<?>>();
+	PropertySource<?> get(String propertySourceName);
 
-	static final String NON_EXISTENT_PROPERTY_SOURCE_MESSAGE = "PropertySource named [%s] does not exist";
-	static final String ILLEGAL_RELATIVE_ADDITION_MESSAGE = "PropertySource named [%s] cannot be added relative to itself";
+	List<PropertySource<?>> asList();
 
+	int size();
 
-	public void addFirst(PropertySource<?> propertySource) {
-		removeIfPresent(propertySource);
-		this.propertySourceList.addFirst(propertySource);
-	}
-
-	public void addLast(PropertySource<?> propertySource) {
-		removeIfPresent(propertySource);
-		this.propertySourceList.addLast(propertySource);
-	}
-
-	public void addBefore(String relativePropertySourceName, PropertySource<?> propertySource) {
-		assertLegalRelativeAddition(relativePropertySourceName, propertySource);
-		removeIfPresent(propertySource);
-		int index = assertPresentAndGetIndex(relativePropertySourceName);
-		addAtIndex(index, propertySource);
-	}
-
-	public void addAfter(String relativePropertySourceName, PropertySource<?> propertySource) {
-		assertLegalRelativeAddition(relativePropertySourceName, propertySource);
-		removeIfPresent(propertySource);
-		int index = assertPresentAndGetIndex(relativePropertySourceName);
-		addAtIndex(index+1, propertySource);
-	}
-
-	protected void assertLegalRelativeAddition(String relativePropertySourceName, PropertySource<?> propertySource) {
-		String newPropertySourceName = propertySource.getName();
-		Assert.isTrue(!relativePropertySourceName.equals(newPropertySourceName),
-				String.format(ILLEGAL_RELATIVE_ADDITION_MESSAGE, newPropertySourceName));
-	}
-
-	protected void addAtIndex(int index, PropertySource<?> propertySource) {
-		removeIfPresent(propertySource);
-		this.propertySourceList.add(index, propertySource);
-	}
-
-	protected void removeIfPresent(PropertySource<?> propertySource) {
-		if (this.propertySourceList.contains(propertySource)) {
-			this.propertySourceList.remove(propertySource);
-		}
-	}
-
-	public boolean contains(String propertySourceName) {
-		return propertySourceList.contains(PropertySource.named(propertySourceName));
-	}
-
-	public PropertySource<?> remove(String propertySourceName) {
-		int index = propertySourceList.indexOf(PropertySource.named(propertySourceName));
-		if (index >= 0) {
-			return propertySourceList.remove(index);
-		}
-		return null;
-	}
-
-	public void replace(String propertySourceName, PropertySource<?> propertySource) {
-		int index = assertPresentAndGetIndex(propertySourceName);
-		this.propertySourceList.set(index, propertySource);
-	}
-
-	protected int assertPresentAndGetIndex(String propertySourceName) {
-		int index = this.propertySourceList.indexOf(PropertySource.named(propertySourceName));
-		Assert.isTrue(index >= 0, String.format(NON_EXISTENT_PROPERTY_SOURCE_MESSAGE, propertySourceName));
-		return index;
-	}
-
-	public int size() {
-		return propertySourceList.size();
-	}
-
-	public List<PropertySource<?>> asList() {
-		return Collections.unmodifiableList(this.propertySourceList);
-	}
-
-	public PropertySource<?> get(String propertySourceName) {
-		return propertySourceList.get(propertySourceList.indexOf(PropertySource.named(propertySourceName)));
-	}
+	boolean contains(String propertySourceName);
 
 }

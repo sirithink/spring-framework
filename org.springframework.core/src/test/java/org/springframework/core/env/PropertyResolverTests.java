@@ -34,12 +34,12 @@ import org.springframework.mock.env.MockPropertySource;
 
 public class PropertyResolverTests {
 	private Properties testProperties;
-	private PropertySources propertySources;
+	private MutablePropertySources propertySources;
 	private ConfigurablePropertyResolver propertyResolver;
 
 	@Before
 	public void setUp() {
-		propertySources = new PropertySources();
+		propertySources = new MutablePropertySources();
 		propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 		testProperties = new Properties();
 		propertySources.addFirst(new PropertiesPropertySource("testProperties", testProperties));
@@ -61,7 +61,7 @@ public class PropertyResolverTests {
 
 	@Test
 	public void getProperty_propertySourceSearchOrderIsFIFO() {
-		PropertySources sources = new PropertySources();
+		MutablePropertySources sources = new MutablePropertySources();
 		PropertyResolver resolver = new PropertySourcesPropertyResolver(sources);
 		sources.addFirst(new MockPropertySource("ps1").withProperty("pName", "ps1Value"));
 		assertThat(resolver.getProperty("pName"), equalTo("ps1Value"));
@@ -109,7 +109,7 @@ public class PropertyResolverTests {
 
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put(key, value1); // before construction
-		PropertySources propertySources = new PropertySources();
+		MutablePropertySources propertySources = new MutablePropertySources();
 		propertySources.addFirst(new MapPropertySource("testProperties", map));
 		PropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 		assertThat(propertyResolver.getProperty(key), equalTo(value1));
@@ -120,7 +120,7 @@ public class PropertyResolverTests {
 	@Test
 	public void getProperty_doesNotCache_addNewKeyPostConstruction() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		PropertySources propertySources = new PropertySources();
+		MutablePropertySources propertySources = new MutablePropertySources();
 		propertySources.addFirst(new MapPropertySource("testProperties", map));
 		PropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 		assertThat(propertyResolver.getProperty("foo"), equalTo(null));
@@ -130,7 +130,7 @@ public class PropertyResolverTests {
 
 	@Test
 	public void getPropertySources_replacePropertySource() {
-		propertySources = new PropertySources();
+		propertySources = new MutablePropertySources();
 		propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 		propertySources.addLast(new MockPropertySource("local").withProperty("foo", "localValue"));
 		propertySources.addLast(new MockPropertySource("system").withProperty("foo", "systemValue"));
@@ -175,7 +175,7 @@ public class PropertyResolverTests {
 
 	@Test
 	public void asProperties() {
-		propertySources = new PropertySources();
+		propertySources = new MutablePropertySources();
 		propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 		assertThat(propertyResolver.asProperties(), notNullValue());
 

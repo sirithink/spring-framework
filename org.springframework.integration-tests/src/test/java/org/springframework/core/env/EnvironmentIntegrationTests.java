@@ -430,7 +430,7 @@ public class EnvironmentIntegrationTests {
 
 		ConfigurableEnvironment environment = ctx.getEnvironment();
 		assertThat(environment, instanceOf(DefaultWebEnvironment.class));
-		PropertySources propertySources = environment.getPropertySources();
+		MutablePropertySources propertySources = environment.getPropertySources();
 		PropertyResolver propertyResolver = environment.getPropertyResolver();
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));
@@ -471,7 +471,7 @@ public class EnvironmentIntegrationTests {
 
 		ConfigurableEnvironment environment = ctx.getEnvironment();
 		assertThat(environment, instanceOf(DefaultWebEnvironment.class));
-		PropertySources propertySources = environment.getPropertySources();
+		MutablePropertySources propertySources = environment.getPropertySources();
 		PropertyResolver propertyResolver = environment.getPropertyResolver();
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 
@@ -509,7 +509,7 @@ public class EnvironmentIntegrationTests {
 		ctx.refresh();
 
 		ConfigurableEnvironment environment = ctx.getEnvironment();
-		PropertySources propertySources = environment.getPropertySources();
+		MutablePropertySources propertySources = environment.getPropertySources();
 		PropertyResolver propertyResolver = environment.getPropertyResolver();
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));

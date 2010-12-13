@@ -30,7 +30,7 @@ import org.springframework.mock.env.MockPropertySource;
 public class PropertySourcesTests {
 	@Test
 	public void test() {
-		PropertySources sources = new PropertySources();
+		MutablePropertySources sources = new MutablePropertySources();
 		sources.addLast(new MockPropertySource("b").withProperty("p1", "bValue"));
 		sources.addLast(new MockPropertySource("d").withProperty("p1", "dValue"));
 		sources.addLast(new MockPropertySource("f").withProperty("p1", "fValue"));
@@ -104,7 +104,7 @@ public class PropertySourcesTests {
 			fail("expected non-existent PropertySource exception");
 		} catch (IllegalArgumentException ex) {
 			assertThat(ex.getMessage(),
-					equalTo(String.format(PropertySources.NON_EXISTENT_PROPERTY_SOURCE_MESSAGE, bogusPS)));
+					equalTo(String.format(MutablePropertySources.NON_EXISTENT_PROPERTY_SOURCE_MESSAGE, bogusPS)));
 		}
 
 		sources.addFirst(new MockPropertySource("a"));
@@ -126,7 +126,7 @@ public class PropertySourcesTests {
 			fail("expected non-existent PropertySource exception");
 		} catch (IllegalArgumentException ex) {
 			assertThat(ex.getMessage(),
-					equalTo(String.format(PropertySources.NON_EXISTENT_PROPERTY_SOURCE_MESSAGE, bogusPS)));
+					equalTo(String.format(MutablePropertySources.NON_EXISTENT_PROPERTY_SOURCE_MESSAGE, bogusPS)));
 		}
 
 		try {
@@ -134,7 +134,7 @@ public class PropertySourcesTests {
 			fail("expected exception");
 		} catch (IllegalArgumentException ex) {
 			assertThat(ex.getMessage(),
-					equalTo(String.format(PropertySources.ILLEGAL_RELATIVE_ADDITION_MESSAGE, "b")));
+					equalTo(String.format(MutablePropertySources.ILLEGAL_RELATIVE_ADDITION_MESSAGE, "b")));
 		}
 
 		try {
@@ -142,7 +142,7 @@ public class PropertySourcesTests {
 			fail("expected exception");
 		} catch (IllegalArgumentException ex) {
 			assertThat(ex.getMessage(),
-					equalTo(String.format(PropertySources.ILLEGAL_RELATIVE_ADDITION_MESSAGE, "b")));
+					equalTo(String.format(MutablePropertySources.ILLEGAL_RELATIVE_ADDITION_MESSAGE, "b")));
 		}
 	}
 

@@ -49,7 +49,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	private Set<String> activeProfiles = new LinkedHashSet<String>();
 	private Set<String> defaultProfiles = new LinkedHashSet<String>();
 
-	private PropertySources propertySources = new PropertySources();
+	private MutablePropertySources propertySources = new MutablePropertySources();
 	private ConfigurablePropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 
 
@@ -98,7 +98,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return activeProfileFound;
 	}
 
-	public PropertySources getPropertySources() {
+	public MutablePropertySources getPropertySources() {
 		return this.propertySources;
 	}
 

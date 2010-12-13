@@ -23,10 +23,10 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
-import org.springframework.core.env.DefaultWebEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.DefaultWebEnvironment;
 import org.springframework.web.context.support.ServletContextAwareProcessor;
 
 /**

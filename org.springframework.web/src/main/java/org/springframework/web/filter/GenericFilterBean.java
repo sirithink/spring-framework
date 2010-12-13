@@ -38,7 +38,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.DefaultWebEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceEditor;
@@ -46,6 +45,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.context.support.DefaultWebEnvironment;
 import org.springframework.web.context.support.ServletContextResourceLoader;
 import org.springframework.web.util.NestedServletException;
 

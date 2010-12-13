@@ -61,12 +61,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jca.context.ResourceAdapterApplicationContext;
 import org.springframework.jca.support.SimpleBootstrapContext;
 import org.springframework.jca.work.SimpleTaskWorkManager;
+import org.springframework.mock.env.MockPropertySource;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.support.DefaultWebEnvironment;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.context.support.StaticWebApplicationContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -533,23 +535,9 @@ public class EnvironmentIntegrationTests {
 		mockSystemProperties.setProperty("pSysProps1", "pSysProps1Value");
 		propertySources.replace(DefaultEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, mockSystemProperties);
 
-		// assert that servletconfig init params resolve with higher precedence than sysprops
-		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
+		// assert that servletcontext params resolve with higher precedence than sysprops
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonContextValue"));
 		assertThat(propertyResolver.getProperty("pSysProps1"), is("pSysProps1Value"));
-	}
-
-	static class MockPropertySource extends PropertiesPropertySource {
-		public MockPropertySource() {
-			this("MockPropertySource");
-		}
-
-		public MockPropertySource(String name) {
-			super(name, new Properties());
-		}
-
-		public void setProperty(String key, String value) {
-			this.source.setProperty(key, value);
-		}
 	}
 
 	@Test

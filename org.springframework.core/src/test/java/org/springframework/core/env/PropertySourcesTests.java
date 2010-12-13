@@ -25,6 +25,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.springframework.mock.env.MockPropertySource;
 
 public class PropertySourcesTests {
 	@Test
@@ -90,11 +91,11 @@ public class PropertySourcesTests {
 		assertThat(sources.asList().indexOf(PropertySource.named("f")), is(5));
 		assertThat(sources.asList().indexOf(PropertySource.named("g")), is(6));
 
-		assertEquals(sources.remove("a"), true);
+		assertEquals(sources.remove("a"), PropertySource.named("a"));
 		assertThat(sources.size(), equalTo(6));
 		assertThat(sources.contains("a"), is(false));
 
-		assertEquals(sources.remove("a"), false);
+		assertEquals(sources.remove("a"), null);
 		assertThat(sources.size(), equalTo(6));
 
 		String bogusPS = "bogus";

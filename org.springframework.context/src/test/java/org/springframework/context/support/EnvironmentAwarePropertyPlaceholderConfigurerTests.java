@@ -60,7 +60,7 @@ public class EnvironmentAwarePropertyPlaceholderConfigurerTests {
 		EnvironmentAwarePropertyPlaceholderConfigurer ppc = new EnvironmentAwarePropertyPlaceholderConfigurer();
 
 		ppc.setLocalOverride(override);
-		ppc.setProperties(MockEnvironment.withProperty("foo", "local").asProperties());
+		ppc.setProperties(MockEnvironment.withProperty("foo", "local").getPropertyResolver().asProperties());
 		ppc.setEnvironment(MockEnvironment.withProperty("foo", "enclosing"));
 		ppc.postProcessBeanFactory(bf);
 		if (override) {

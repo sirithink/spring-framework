@@ -1,4 +1,4 @@
-package org.springframework.core.env;
+package org.springframework.mock.env;
 /*
  * Copyright 2002-2010 the original author or authors.
  *
@@ -15,11 +15,10 @@ package org.springframework.core.env;
  * limitations under the License.
  */
 
-
-
 import java.util.Properties;
 
 import org.springframework.core.env.PropertiesPropertySource;
+
 
 public class MockPropertySource extends PropertiesPropertySource {
 

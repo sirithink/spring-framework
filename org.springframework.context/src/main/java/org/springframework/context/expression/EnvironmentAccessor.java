@@ -48,7 +48,7 @@ public class EnvironmentAccessor implements PropertyAccessor {
 	 * method with the provided {@literal name}.
 	 */
 	public TypedValue read(EvaluationContext context, Object target, String name) throws AccessException {
-		return new TypedValue(((Environment)target).getProperty(name));
+		return new TypedValue(((Environment)target).getPropertyResolver().getProperty(name));
 	}
 
 	/**

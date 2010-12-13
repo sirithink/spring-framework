@@ -17,7 +17,6 @@
 package org.springframework.core.env;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 
@@ -51,37 +50,7 @@ public interface Environment {
 	/**
 	 * TODO SPR-7508: document
 	 */
-	boolean containsProperty(String key);
-
-	/**
-	 * TODO SPR-7508: document
-	 */
-	String getProperty(String key);
-
-	/**
-	 * TODO SPR-7508: document
-	 */
-	<T> T getProperty(String key, Class<T> targetType);
-
-	/**
-	 * TODO SPR-7508: document
-	 */
-	String getRequiredProperty(String key);
-
-	/**
-	 * TODO SPR-7508: document
-	 */
-	<T> T getRequiredProperty(String key, Class<T> targetType);
-
-	/**
-	 * TODO SPR-7508: document
-	 */
-	int getPropertyCount();
-
-	/**
-	 * TODO SPR-7508: document
-	 */
-	Properties asProperties();
+	PropertyResolver getPropertyResolver();
 
 	/**
 	 * TODO SPR-7508: document that this returns {@link System#getenv()} if allowed, or
@@ -96,19 +65,5 @@ public interface Environment {
 	 * see notes within {@link AbstractEnvironment#getSystemProperties()}
 	 */
 	Map<String, String> getSystemProperties();
-
-	/**
-	 * TODO SPR-7508: document
-	 * @see #resolveRequiredPlaceholders(String)
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, int)
-	 */
-	String resolvePlaceholders(String text);
-
-	/**
-	 * TODO SPR-7508: document
-	 * @see #resolvePlaceholders(String)
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, int)
-	 */
-	String resolveRequiredPlaceholders(String path);
 
 }

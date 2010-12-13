@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.springframework.core.env.DefaultEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertyResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -137,9 +138,10 @@ public class ResourceEditor extends PropertyEditorSupport {
 	 * @see Environment#resolveRequiredPlaceholders
 	 */
 	protected String resolvePath(String path) {
+		PropertyResolver resolver = environment.getPropertyResolver();
 		return this.ignoreUnresolvablePlaceholders ?
-				environment.resolvePlaceholders(path) :
-				environment.resolveRequiredPlaceholders(path);
+				resolver.resolvePlaceholders(path) :
+				resolver.resolveRequiredPlaceholders(path);
 	}
 
 

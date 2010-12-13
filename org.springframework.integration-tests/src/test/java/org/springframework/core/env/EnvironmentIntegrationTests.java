@@ -431,17 +431,18 @@ public class EnvironmentIntegrationTests {
 		ConfigurableEnvironment environment = ctx.getEnvironment();
 		assertThat(environment, instanceOf(DefaultWebEnvironment.class));
 		PropertySources propertySources = environment.getPropertySources();
+		PropertyResolver propertyResolver = environment.getPropertyResolver();
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 
 		// ServletConfig gets precedence
-		assertThat(environment.getProperty("pCommon"), is("pCommonConfigValue"));
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
 		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME)),
 				lessThan(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME))));
 
 		// but all params are available
-		assertThat(environment.getProperty("pContext1"), is("pContext1Value"));
-		assertThat(environment.getProperty("pConfig1"), is("pConfig1Value"));
+		assertThat(propertyResolver.getProperty("pContext1"), is("pContext1Value"));
+		assertThat(propertyResolver.getProperty("pConfig1"), is("pConfig1Value"));
 
 		// Servlet* PropertySources have precedence over System* PropertySources
 		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME)),
@@ -454,8 +455,8 @@ public class EnvironmentIntegrationTests {
 		propertySources.replace(DefaultEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, mockSystemProperties);
 
 		// assert that servletconfig init params resolve with higher precedence than sysprops
-		assertThat(environment.getProperty("pCommon"), is("pCommonConfigValue"));
-		assertThat(environment.getProperty("pSysProps1"), is("pSysProps1Value"));
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
+		assertThat(propertyResolver.getProperty("pSysProps1"), is("pSysProps1Value"));
 	}
 
 	@Test
@@ -471,12 +472,12 @@ public class EnvironmentIntegrationTests {
 		ConfigurableEnvironment environment = ctx.getEnvironment();
 		assertThat(environment, instanceOf(DefaultWebEnvironment.class));
 		PropertySources propertySources = environment.getPropertySources();
+		PropertyResolver propertyResolver = environment.getPropertyResolver();
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
-		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 
 		// ServletContext params are available
-		assertThat(environment.getProperty("pCommon"), is("pCommonContextValue"));
-		assertThat(environment.getProperty("pContext1"), is("pContext1Value"));
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonContextValue"));
+		assertThat(propertyResolver.getProperty("pContext1"), is("pContext1Value"));
 
 		// Servlet* PropertySources have precedence over System* PropertySources
 		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME)),
@@ -489,8 +490,8 @@ public class EnvironmentIntegrationTests {
 		propertySources.replace(DefaultEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, mockSystemProperties);
 
 		// assert that servletcontext init params resolve with higher precedence than sysprops
-		assertThat(environment.getProperty("pCommon"), is("pCommonContextValue"));
-		assertThat(environment.getProperty("pSysProps1"), is("pSysProps1Value"));
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonContextValue"));
+		assertThat(propertyResolver.getProperty("pSysProps1"), is("pSysProps1Value"));
 	}
 
 	@Test
@@ -509,17 +510,18 @@ public class EnvironmentIntegrationTests {
 
 		ConfigurableEnvironment environment = ctx.getEnvironment();
 		PropertySources propertySources = environment.getPropertySources();
+		PropertyResolver propertyResolver = environment.getPropertyResolver();
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 
 		// ServletConfig gets precedence
-		assertThat(environment.getProperty("pCommon"), is("pCommonConfigValue"));
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
 		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME)),
 				lessThan(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME))));
 
 		// but all params are available
-		assertThat(environment.getProperty("pContext1"), is("pContext1Value"));
-		assertThat(environment.getProperty("pConfig1"), is("pConfig1Value"));
+		assertThat(propertyResolver.getProperty("pContext1"), is("pContext1Value"));
+		assertThat(propertyResolver.getProperty("pConfig1"), is("pConfig1Value"));
 
 		// Servlet* PropertySources have precedence over System* PropertySources
 		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME)),
@@ -532,8 +534,8 @@ public class EnvironmentIntegrationTests {
 		propertySources.replace(DefaultEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, mockSystemProperties);
 
 		// assert that servletconfig init params resolve with higher precedence than sysprops
-		assertThat(environment.getProperty("pCommon"), is("pCommonConfigValue"));
-		assertThat(environment.getProperty("pSysProps1"), is("pSysProps1Value"));
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
+		assertThat(propertyResolver.getProperty("pSysProps1"), is("pSysProps1Value"));
 	}
 
 	static class MockPropertySource extends PropertiesPropertySource {

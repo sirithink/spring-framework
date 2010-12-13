@@ -23,12 +23,12 @@ import org.springframework.beans.factory.config.AbstractPropertyPlaceholderConfi
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.ChainedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.PropertySources;
+import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
@@ -47,69 +47,49 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 public class EnvironmentAwarePropertyPlaceholderConfigurer
 		extends AbstractPropertyPlaceholderConfigurer implements EnvironmentAware {
 
-	private ConfigurableEnvironment environment;
-	private Environment wrappedEnvironment;
+	private ChainedPropertyResolver propertyResolver;
+	private Environment environment;
 
 	public void setEnvironment(Environment environment) {
-		this.wrappedEnvironment = environment;
+		this.environment = environment;
 	}
 
 	@Override
 	protected PlaceholderResolver getPlaceholderResolver(Properties props) {
 		return new PlaceholderResolver() {
 			public String resolvePlaceholder(String placeholderName) {
-				return environment.getProperty(placeholderName);
+				return propertyResolver.getProperty(placeholderName);
 			}
 		};
 	}
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		Assert.notNull(this.wrappedEnvironment, "Environment must not be null. Did you call setEnvironment()?");
-		environment = new AbstractEnvironment() { };
+		Assert.notNull(this.environment, "Environment must not be null. Did you call setEnvironment()?");
 
-		PropertySources propertySources = environment.getPropertySources();
-		EnvironmentPropertySource environmentPropertySource =
-			new EnvironmentPropertySource("wrappedEnvironment", wrappedEnvironment);
-
-		if (!this.localOverride) {
-			propertySources.addLast(environmentPropertySource);
-		}
-
+		PropertySources localPropertySources = new PropertySources();
 		if (this.localProperties != null) {
 			int cx=0;
 			for (Properties localProps : this.localProperties) {
-				propertySources.addLast(new PropertiesPropertySource("localProperties"+cx++, localProps));
+				localPropertySources.addLast(new PropertiesPropertySource("localProperties"+cx++, localProps));
 			}
 		}
 
+		PropertyResolver localPropertyResolver = new PropertySourcesPropertyResolver(localPropertySources);
+		PropertyResolver environmentPropertyResolver = this.environment.getPropertyResolver();
+		propertyResolver = new ChainedPropertyResolver();
+
 		if (this.localOverride) {
-			propertySources.addLast(environmentPropertySource);
+			propertyResolver.addResolver(localPropertyResolver);
+		} 
+
+		this.propertyResolver.addResolver(environmentPropertyResolver);
+
+		if (!this.localOverride) {
+			propertyResolver.addResolver(localPropertyResolver);
 		}
 
 		super.postProcessBeanFactory(beanFactory);
 	}
 
-	static class EnvironmentPropertySource extends PropertySource<Environment> {
-
-		public EnvironmentPropertySource(String name, Environment source) {
-			super(name, source);
-		}
-
-		@Override
-		public boolean containsProperty(String key) {
-			return source.containsProperty(key);
-		}
-
-		@Override
-		public String getProperty(String key) {
-			return source.getProperty(key);
-		}
-
-		@Override
-		public int size() {
-			// TODO Auto-generated method stub
-			return source.getPropertyCount();
-		}
-	}
 }

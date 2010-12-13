@@ -17,43 +17,43 @@
 package org.springframework.core.env;
 
 import static java.lang.String.format;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
 import static org.springframework.core.env.AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME;
-import static org.springframework.core.env.DefaultEnvironmentTests.CollectionMatchers.isEmpty;
+import static org.springframework.core.env.EnvironmentTests.CollectionMatchers.isEmpty;
 
 import java.lang.reflect.Field;
 import java.security.AccessControlException;
 import java.security.Permission;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.matchers.TypeSafeMatcher;
+import org.springframework.mock.env.MockPropertySource;
+
 
 /**
  * Unit tests for {@link DefaultEnvironment}.
  *
  * @author Chris Beams
  */
-public class DefaultEnvironmentTests {
+public class EnvironmentTests {
 
 	private static final String ALLOWED_PROPERTY_NAME = "theanswer";
 	private static final String ALLOWED_PROPERTY_VALUE = "42";
@@ -66,133 +66,7 @@ public class DefaultEnvironmentTests {
 	private static final Object NON_STRING_PROPERTY_NAME = new Object();
 	private static final Object NON_STRING_PROPERTY_VALUE = new Object();
 
-	private ConfigurableEnvironment environment;
-	private Properties testProperties;
-
-	@Before
-	public void setUp() {
-		environment = new DefaultEnvironment();
-		testProperties = new Properties();
-		environment.addPropertySource("testProperties", testProperties);
-	}
-
-	@Test @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-	public void getPropertySources_manipulatePropertySourceOrder() {
-		AbstractEnvironment env = new AbstractEnvironment() { };
-		env.addPropertySource("system", new HashMap() {{ put("foo", "systemValue"); }});
-		env.addPropertySource("local", new HashMap() {{ put("foo", "localValue"); }});
-
-		// 'local' was added (pushed) last so has precedence
-		assertThat(env.getProperty("foo"), equalTo("localValue"));
-
-		// move 'system' to the front of the list
-		PropertySources propertySources = env.getPropertySources();
-		propertySources.addFirst(propertySources.remove("system"));
-
-		// 'system' now has precedence
-		assertThat(env.getProperty("foo"), equalTo("systemValue"));
-
-		assertThat(propertySources.size(), is(2));
-	}
-
-	@Test @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-	public void getPropertySources_replacePropertySource() {
-		AbstractEnvironment env = new AbstractEnvironment() { };
-		env.addPropertySource("system", new HashMap() {{ put("foo", "systemValue"); }});
-		env.addPropertySource("local", new HashMap() {{ put("foo", "localValue"); }});
-
-		// 'local' was added (pushed) last so has precedence
-		assertThat(env.getProperty("foo"), equalTo("localValue"));
-
-		// replace 'local' with new property source
-		PropertySources propertySources = env.getPropertySources();
-		MapPropertySource newSource = new MapPropertySource("new", new HashMap() {{ put("foo", "newValue"); }});
-		propertySources.replace("local", newSource);
-
-		// 'system' now has precedence
-		assertThat(env.getProperty("foo"), equalTo("newValue"));
-
-		assertThat(propertySources.size(), is(2));
-	}
-
-	@Test
-	public void getProperty() {
-		assertThat(environment.getProperty("foo"), nullValue());
-		testProperties.put("foo", "bar");
-		assertThat(environment.getProperty("foo"), is("bar"));
-	}
-
-	@Test
-	public void getProperty_withExplicitNullValue() {
-		// java.util.Properties does not allow null values (because Hashtable does not)
-		Map<String, String> nullableProperties = new HashMap<String, String>();
-		environment.addPropertySource("nullableProperties", nullableProperties);
-		nullableProperties.put("foo", null);
-		assertThat(environment.getProperty("foo"), nullValue());
-	}
-
-	@Test
-	public void getProperty_withStringArrayConversion() {
-		testProperties.put("foo", "bar,baz");
-		assertThat(environment.getProperty("foo", String[].class), equalTo(new String[] { "bar", "baz" }));
-	}
-
-	@Test
-	public void getProperty_withNonConvertibleTargetType() {
-		testProperties.put("foo", "bar");
-
-		class TestType { }
-
-		try {
-			environment.getProperty("foo", TestType.class);
-			fail("Expected IllegalArgumentException due to non-convertible types");
-		} catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@Test
-	public void getRequiredProperty() {
-		testProperties.put("exists", "xyz");
-		assertThat(environment.getRequiredProperty("exists"), is("xyz"));
-
-		try {
-			environment.getRequiredProperty("bogus");
-			fail("expected IllegalArgumentException");
-		} catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@Test
-	public void getRequiredProperty_withStringArrayConversion() {
-		testProperties.put("exists", "abc,123");
-		assertThat(environment.getRequiredProperty("exists", String[].class), equalTo(new String[] { "abc", "123" }));
-
-		try {
-			environment.getRequiredProperty("bogus", String[].class);
-			fail("expected IllegalArgumentException");
-		} catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@Test @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
-	public void asProperties() {
-		ConfigurableEnvironment env = new AbstractEnvironment() { };
-		assertThat(env.asProperties(), notNullValue());
-
-		env.addPropertySource("lowestPrecedence", new HashMap() {{ put("common", "lowCommon"); put("lowKey", "lowVal"); }});
-		env.addPropertySource("middlePrecedence", new HashMap() {{ put("common", "midCommon"); put("midKey", "midVal"); }});
-		env.addPropertySource("highestPrecedence", new HashMap() {{ put("common", "highCommon"); put("highKey", "highVal"); }});
-
-		Properties props = env.asProperties();
-		assertThat(props.getProperty("common"), is("highCommon"));
-		assertThat(props.getProperty("lowKey"), is("lowVal"));
-		assertThat(props.getProperty("midKey"), is("midVal"));
-		assertThat(props.getProperty("highKey"), is("highVal"));
-		assertThat(props.size(), is(4));
-	}
+	private ConfigurableEnvironment environment = new DefaultEnvironment();
 
 	@Test
 	public void activeProfiles() {
@@ -213,28 +87,23 @@ public class DefaultEnvironmentTests {
 	}
 
 	@Test
-	public void systemPropertiesEmpty() {
+	public void getActiveProfiles_systemPropertiesEmpty() {
 		assertThat(environment.getActiveProfiles(), isEmpty());
-
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, "");
 		assertThat(environment.getActiveProfiles(), isEmpty());
-
 		System.getProperties().remove(ACTIVE_PROFILES_PROPERTY_NAME);
 	}
 
 	@Test
-	public void systemPropertiesResoloutionOfProfiles() {
+	public void getActiveProfiles_fromSystemProperties() {
 		assertThat(environment.getActiveProfiles(), isEmpty());
-
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, "foo");
 		assertThat(environment.getActiveProfiles(), hasItem("foo"));
-
-		// clean up
 		System.getProperties().remove(ACTIVE_PROFILES_PROPERTY_NAME);
 	}
 
 	@Test
-	public void systemPropertiesResoloutionOfMultipleProfiles() {
+	public void getActiveProfiles_fromSystemProperties_withMultipleProfiles() {
 		assertThat(environment.getActiveProfiles(), isEmpty());
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, "foo,bar");
 		assertThat(environment.getActiveProfiles(), hasItems("foo", "bar"));
@@ -242,7 +111,7 @@ public class DefaultEnvironmentTests {
 	}
 
 	@Test
-	public void systemPropertiesResolutionOfMulitpleProfiles_withWhitespace() {
+	public void getActiveProfiles_fromSystemProperties_withMulitpleProfiles_withWhitespace() {
 		assertThat(environment.getActiveProfiles(), isEmpty());
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, " bar , baz "); // notice whitespace
 		assertThat(environment.getActiveProfiles(), hasItems("bar", "baz"));
@@ -250,18 +119,59 @@ public class DefaultEnvironmentTests {
 	}
 
 	@Test
-	public void environmentResolutionOfDefaultSpringProfileProperty_noneSet() {
+	public void getDefaultProfiles() {
 		assertThat(environment.getDefaultProfiles(), isEmpty());
+		environment.getPropertySources().addFirst(new MockPropertySource().withProperty(DEFAULT_PROFILES_PROPERTY_NAME, "pd1"));
+		assertThat(environment.getDefaultProfiles().size(), is(1));
+		assertThat(environment.getDefaultProfiles(), hasItem("pd1"));
 	}
 
 	@Test
-	public void environmentResolutionOfDefaultSpringProfileProperty_isSet() {
-		testProperties.setProperty(DEFAULT_PROFILES_PROPERTY_NAME, "custom-default");
-		assertTrue(environment.getDefaultProfiles().contains("custom-default"));
+	public void setDefaultProfiles() {
+		environment.setDefaultProfiles();
+		assertThat(environment.getDefaultProfiles(), isEmpty());
+		environment.setDefaultProfiles("pd1");
+		assertThat(environment.getDefaultProfiles(), hasItem("pd1"));
+		environment.setDefaultProfiles("pd2", "pd3");
+		assertThat(environment.getDefaultProfiles(), not(hasItem("pd1")));
+		assertThat(environment.getDefaultProfiles(), hasItems("pd2", "pd3"));
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void acceptsProfiles_mustSpecifyAtLeastOne() {
+		environment.acceptsProfiles();
 	}
 
 	@Test
-	public void systemPropertiesAccess() {
+	public void acceptsProfiles_activeProfileSetProgrammatically() {
+		assertThat(environment.acceptsProfiles("p1", "p2"), is(false));
+		environment.setActiveProfiles("p1");
+		assertThat(environment.acceptsProfiles("p1", "p2"), is(true));
+		environment.setActiveProfiles("p2");
+		assertThat(environment.acceptsProfiles("p1", "p2"), is(true));
+		environment.setActiveProfiles("p1", "p2");
+		assertThat(environment.acceptsProfiles("p1", "p2"), is(true));
+	}
+
+	@Test
+	public void acceptsProfiles_activeProfileSetViaProperty() {
+		assertThat(environment.acceptsProfiles("p1"), is(false));
+		environment.getPropertySources().addFirst(new MockPropertySource().withProperty(ACTIVE_PROFILES_PROPERTY_NAME, "p1"));
+		assertThat(environment.acceptsProfiles("p1"), is(true));
+	}
+
+	@Test
+	public void acceptsProfiles_defaultProfile() {
+		assertThat(environment.acceptsProfiles("pd"), is(false));
+		environment.setDefaultProfiles("pd");
+		assertThat(environment.acceptsProfiles("pd"), is(true));
+		environment.setActiveProfiles("p1");
+		assertThat(environment.acceptsProfiles("pd"), is(false));
+		assertThat(environment.acceptsProfiles("p1"), is(true));
+	}
+
+	@Test
+	public void getSystemProperties_withAndWithoutSecurityManager() {
 		System.setProperty(ALLOWED_PROPERTY_NAME, ALLOWED_PROPERTY_VALUE);
 		System.setProperty(DISALLOWED_PROPERTY_NAME, DISALLOWED_PROPERTY_VALUE);
 		System.getProperties().put(STRING_PROPERTY_NAME, NON_STRING_PROPERTY_VALUE);
@@ -335,7 +245,7 @@ public class DefaultEnvironmentTests {
 	}
 
 	@Test
-	public void systemEnvironmentAccess() throws Exception {
+	public void getSystemEnvironment_withAndWithoutSecurityManager() throws Exception {
 		getModifiableSystemEnvironment().put(ALLOWED_PROPERTY_NAME, ALLOWED_PROPERTY_VALUE);
 		getModifiableSystemEnvironment().put(DISALLOWED_PROPERTY_NAME, DISALLOWED_PROPERTY_VALUE);
 
@@ -373,30 +283,6 @@ public class DefaultEnvironmentTests {
 		System.setSecurityManager(oldSecurityManager);
 		getModifiableSystemEnvironment().remove(ALLOWED_PROPERTY_NAME);
 		getModifiableSystemEnvironment().remove(DISALLOWED_PROPERTY_NAME);
-	}
-
-	@Test
-	public void resolvePlaceholders() {
-		AbstractEnvironment env = new AbstractEnvironment() { };
-		Properties testProperties = new Properties();
-		testProperties.setProperty("foo", "bar");
-		env.addPropertySource("testProperties", testProperties);
-		String resolved = env.resolvePlaceholders("pre-${foo}-${unresolvable}-post");
-		assertThat(resolved, is("pre-bar-${unresolvable}-post"));
-	}
-
-	@Test
-	public void resolveRequiredPlaceholders() {
-		AbstractEnvironment env = new AbstractEnvironment() { };
-		Properties testProperties = new Properties();
-		testProperties.setProperty("foo", "bar");
-		env.addPropertySource("testProperties", testProperties);
-		try {
-			env.resolveRequiredPlaceholders("pre-${foo}-${unresolvable}-post");
-			fail("expected exception");
-		} catch (IllegalArgumentException ex) {
-			assertThat(ex.getMessage(), is("Could not resolve placeholder 'unresolvable'"));
-		}
 	}
 
 	public static class CollectionMatchers {

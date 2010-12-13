@@ -16,21 +16,12 @@
 
 package org.springframework.core.env;
 
+import org.springframework.core.convert.ConversionService;
 
-/**
- * TODO SPR-7508: document
- *
- * @author Chris Beams
- * @since 3.1
- */
-public interface ConfigurableEnvironment extends Environment {
+public interface ConfigurablePropertyResolver extends PropertyResolver {
 
-	void setActiveProfiles(String... profiles);
+	ConversionService getConversionService();
 
-	void setDefaultProfiles(String... profiles);
-
-	PropertySources getPropertySources();
-
-	ConfigurablePropertyResolver getPropertyResolver();
+	void setConversionService(ConversionService conversionService);
 
 }

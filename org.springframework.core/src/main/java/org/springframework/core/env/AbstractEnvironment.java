@@ -19,29 +19,17 @@ package org.springframework.core.env;
 import static java.lang.String.format;
 import static org.springframework.util.StringUtils.commaDelimitedListToSet;
 import static org.springframework.util.StringUtils.trimAllWhitespace;
-import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_PREFIX;
-import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_SUFFIX;
-import static org.springframework.util.SystemPropertyUtils.VALUE_SEPARATOR;
 
 import java.security.AccessControlException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.ConversionServiceFactory;
 import org.springframework.util.Assert;
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.util.StringUtils;
 
 
@@ -62,135 +50,12 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	private Set<String> defaultProfiles = new LinkedHashSet<String>();
 
 	private PropertySources propertySources = new PropertySources();
-	private ConversionService conversionService = ConversionServiceFactory.createDefaultConversionService();
+	private ConfigurablePropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
 
-	private final PropertyPlaceholderHelper nonStrictHelper =
-		new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, true);
-
-	private final PropertyPlaceholderHelper strictHelper =
-		new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, false);
-
-
-	public ConversionService getConversionService() {
-		return this.conversionService;
-	}
-
-	public void setConversionService(ConversionService conversionService) {
-		this.conversionService = conversionService;
-	}
-
-	public void addPropertySource(PropertySource<?> propertySource) {
-		this.propertySources.addFirst(propertySource);
-	}
-
-	public void addPropertySource(String name, Properties properties) {
-		addPropertySource(new PropertiesPropertySource(name, properties));
-	}
-
-	public void addPropertySource(String name, Map<String, String> propertiesMap) {
-		addPropertySource(new MapPropertySource(name, propertiesMap));
-	}
-
-	public PropertySources getPropertySources() {
-		return this.propertySources;
-	}
-
-	public boolean containsProperty(String key) {
-		for (PropertySource<?> propertySource : propertySources.asList()) {
-			if (propertySource.containsProperty(key)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public String getProperty(String key) {
-		if (logger.isTraceEnabled()) {
-			logger.trace(format("getProperty(\"%s\") (implicit targetType [String])", key));
-		}
-		return getProperty(key, String.class);
-	}
-
-	public String getRequiredProperty(String key) {
-		String value = getProperty(key);
-		if (value == null) {
-			throw new IllegalArgumentException(format("required key [%s] not found", key));
-		}
-		return value;
-	}
-
-	public <T> T getProperty(String key, Class<T> targetValueType) {
-		boolean debugEnabled = logger.isDebugEnabled();
-		if (logger.isTraceEnabled()) {
-			logger.trace(format("getProperty(\"%s\", %s)", key, targetValueType.getSimpleName()));
-		}
-
-		for (PropertySource<?> propertySource : propertySources.asList()) {
-			if (debugEnabled) {
-				logger.debug(format("Searching for key '%s' in [%s]", key, propertySource.getName()));
-			}
-			if (propertySource.containsProperty(key)) {
-				Object value = propertySource.getProperty(key);
-				Class<?> valueType = value == null ? null : value.getClass();
-				if (debugEnabled) {
-					logger.debug(
-							format("Found key '%s' in [%s] with type [%s] and value '%s'",
-									key, propertySource.getName(),
-									valueType == null ? "" : valueType.getSimpleName(), value));
-				}
-				if (value == null) {
-					return null;
-				}
-				if (!conversionService.canConvert(valueType, targetValueType)) {
-					throw new IllegalArgumentException(
-							format("Cannot convert value [%s] from source type [%s] to target type [%s]",
-									value, valueType.getSimpleName(), targetValueType.getSimpleName()));
-				}
-				return conversionService.convert(value, targetValueType);
-			}
-		}
-
-		if (debugEnabled) {
-			logger.debug(format("Could not find key '%s' in any property source. Returning [null]", key));
-		}
-		return null;
-	}
-
-	public <T> T getRequiredProperty(String key, Class<T> valueType) {
-		T value = getProperty(key, valueType);
-		if (value == null) {
-			throw new IllegalArgumentException(format("required key [%s] not found", key));
-		}
-		return value;
-	}
-
-	public int getPropertyCount() {
-		return asProperties().size();
-	}
-
-	public Properties asProperties() {
-		// TODO SPR-7508: refactor, simplify. only handles map-based propertysources right now.
-		Properties mergedProps = new Properties();
-		List<PropertySource<?>> propertySourcesList = new ArrayList<PropertySource<?>>(propertySources.asList());
-		Collections.reverse(propertySourcesList);
-		Iterator<PropertySource<?>> descendingIterator = propertySourcesList.iterator();
-		while (descendingIterator.hasNext()) {
-			PropertySource<?> propertySource =  descendingIterator.next();
-			Object object = propertySource.getSource();
-			if (object instanceof Map) {
-				for (Entry<?, ?> entry : ((Map<?, ?>)object).entrySet()) {
-					mergedProps.put(entry.getKey(), entry.getValue());
-				}
-			} else {
-				throw new IllegalArgumentException("unknown PropertySource source type: " + object.getClass().getName());
-			}
-		}
-		return mergedProps;
-	}
 
 	public Set<String> getActiveProfiles() {
 		if (this.activeProfiles.isEmpty()) {
-			String profiles = getProperty(ACTIVE_PROFILES_PROPERTY_NAME);
+			String profiles = propertyResolver.getProperty(ACTIVE_PROFILES_PROPERTY_NAME);
 			if (StringUtils.hasText(profiles)) {
 				this.activeProfiles = commaDelimitedListToSet(trimAllWhitespace(profiles));
 			}
@@ -205,7 +70,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	public Set<String> getDefaultProfiles() {
 		if (this.defaultProfiles.isEmpty()) {
-			String profiles = getProperty(DEFAULT_PROFILES_PROPERTY_NAME);
+			String profiles = propertyResolver.getProperty(DEFAULT_PROFILES_PROPERTY_NAME);
 			if (StringUtils.hasText(profiles)) {
 				this.defaultProfiles = commaDelimitedListToSet(profiles);
 			}
@@ -216,6 +81,29 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public void setDefaultProfiles(String... profiles) {
 		this.defaultProfiles.clear();
 		this.defaultProfiles.addAll(Arrays.asList(profiles));
+	}
+
+	public boolean acceptsProfiles(String... specifiedProfiles) {
+		Assert.notEmpty(specifiedProfiles, "Must specify at least one profile");
+		boolean activeProfileFound = false;
+		Set<String> activeProfiles = this.getActiveProfiles();
+		Set<String> defaultProfiles = this.getDefaultProfiles();
+		for (String profile : specifiedProfiles) {
+			if (activeProfiles.contains(profile)
+					|| (activeProfiles.isEmpty() && defaultProfiles.contains(profile))) {
+				activeProfileFound = true;
+				break;
+			}
+		}
+		return activeProfileFound;
+	}
+
+	public PropertySources getPropertySources() {
+		return this.propertySources;
+	}
+
+	public ConfigurablePropertyResolver getPropertyResolver() {
+		return this.propertyResolver;
 	}
 
 	public Map<String, String> getSystemEnvironment() {
@@ -278,37 +166,6 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 			};
 		}
 		return systemProperties;
-	}
-
-	public String resolvePlaceholders(String text) {
-		return doResolvePlaceholders(text, nonStrictHelper);
-	}
-
-	public String resolveRequiredPlaceholders(String text) {
-		return doResolvePlaceholders(text, strictHelper);
-	}
-
-	public boolean acceptsProfiles(String... specifiedProfiles) {
-		Assert.notEmpty(specifiedProfiles, "Must specify at least one profile");
-		boolean activeProfileFound = false;
-		Set<String> activeProfiles = this.getActiveProfiles();
-		Set<String> defaultProfiles = this.getDefaultProfiles();
-		for (String profile : specifiedProfiles) {
-			if (activeProfiles.contains(profile)
-					|| (activeProfiles.isEmpty() && defaultProfiles.contains(profile))) {
-				activeProfileFound = true;
-				break;
-			}
-		}
-		return activeProfileFound;
-	}
-
-	private String doResolvePlaceholders(String text, PropertyPlaceholderHelper helper) {
-		return helper.replacePlaceholders(text, new PlaceholderResolver() {
-			public String resolvePlaceholder(String placeholderName) {
-				return AbstractEnvironment.this.getProperty(placeholderName);
-			}
-		});
 	}
 
 	@Override

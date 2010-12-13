@@ -76,7 +76,11 @@ public class PropertySources {
 	}
 
 	public PropertySource<?> remove(String propertySourceName) {
-		return propertySourceList.remove(propertySourceList.indexOf(PropertySource.named(propertySourceName)));
+		int index = propertySourceList.indexOf(PropertySource.named(propertySourceName));
+		if (index >= 0) {
+			return propertySourceList.remove(index);
+		}
+		return null;
 	}
 
 	public void replace(String propertySourceName, PropertySource<?> propertySource) {

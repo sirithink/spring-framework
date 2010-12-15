@@ -35,7 +35,6 @@ import static org.springframework.core.env.EnvironmentIntegrationTests.Constants
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -437,10 +436,10 @@ public class EnvironmentIntegrationTests {
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 
-		// ServletConfig gets precedence
-		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
-		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME)),
-				lessThan(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME))));
+		// ServletContext gets precedence
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonContextValue"));
+		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME)),
+				lessThan(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME))));
 
 		// but all params are available
 		assertThat(propertyResolver.getProperty("pContext1"), is("pContext1Value"));
@@ -456,8 +455,8 @@ public class EnvironmentIntegrationTests {
 		mockSystemProperties.setProperty("pSysProps1", "pSysProps1Value");
 		propertySources.replace(DefaultEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, mockSystemProperties);
 
-		// assert that servletconfig init params resolve with higher precedence than sysprops
-		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
+		// assert that servletcontext params resolve with higher precedence than sysprops
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonContextValue"));
 		assertThat(propertyResolver.getProperty("pSysProps1"), is("pSysProps1Value"));
 	}
 
@@ -516,10 +515,10 @@ public class EnvironmentIntegrationTests {
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 		assertThat(propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME), is(true));
 
-		// ServletConfig gets precedence
-		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonConfigValue"));
-		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME)),
-				lessThan(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME))));
+		// ServletContext gets precedence
+		assertThat(propertyResolver.getProperty("pCommon"), is("pCommonContextValue"));
+		assertThat(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME)),
+				lessThan(propertySources.asList().indexOf(PropertySource.named(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME))));
 
 		// but all params are available
 		assertThat(propertyResolver.getProperty("pContext1"), is("pContext1Value"));

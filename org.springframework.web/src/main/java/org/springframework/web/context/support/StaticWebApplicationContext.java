@@ -16,15 +16,12 @@
 
 package org.springframework.web.context.support;
 
-import static org.springframework.web.context.support.DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME;
-import static org.springframework.web.context.support.DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.StaticApplicationContext;
-import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
@@ -70,7 +67,6 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 
 	public StaticWebApplicationContext() {
 		setDisplayName("Root WebApplicationContext");
-		setEnvironment(new DefaultWebEnvironment()); // TODO SPR-7508: see GenericWebApplicationContext, AbstractRefreshableWebApplicationContext
 	}
 
 
@@ -163,6 +159,11 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 		return new ServletContextResourcePatternResolver(this);
 	}
 
+	@Override
+	protected ConfigurableEnvironment createEnvironment() {
+		return new DefaultWebEnvironment();
+	}
+
 	/**
 	 * Initialize the theme capability.
 	 */
@@ -174,17 +175,8 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	@Override
 	protected void initPropertySources() {
 		super.initPropertySources();
-		MutablePropertySources propertySources = this.getEnvironment().getPropertySources();
-		if (this.servletConfig != null
-				&& propertySources.contains(SERVLET_CONFIG_PROPERTY_SOURCE_NAME)) {
-			propertySources.replace(SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
-					new ServletConfigPropertySource(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, this.servletConfig));
-		}
-		if (this.servletContext != null
-				&& propertySources.contains(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME)) {
-			propertySources.replace(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
-					new ServletContextPropertySource(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, this.servletContext));
-		}
+		WebApplicationContextUtils.initServletPropertySources(
+				this.getEnvironment().getPropertySources(), this.servletContext, this.servletConfig);
 	}
 
 	public Theme getTheme(String themeName) {

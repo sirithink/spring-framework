@@ -26,6 +26,7 @@ import org.springframework.core.env.PropertySource.StubPropertySource;
  *
  * @author Chris Beams
  * @since 3.1
+ * @see WebApplicationContextUtils#initServletPropertySources
  */
 public class DefaultWebEnvironment extends DefaultEnvironment {
 

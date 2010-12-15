@@ -30,7 +30,7 @@ public abstract class PropertySource<T> {
 
 	public PropertySource(String name, T source) {
 		Assert.hasText(name, "Property source name must contain at least one character");
-		Assert.notNull(source, "Property source must be non-null");
+		Assert.notNull(source, "Property source must not be null");
 		this.name = name;
 		this.source = source;
 	}

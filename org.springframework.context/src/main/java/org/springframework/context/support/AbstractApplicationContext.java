@@ -207,7 +207,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<ApplicationListener<?>>();
 
 	/** TODO SPR-7508: document */
-	private ConfigurableEnvironment environment = new DefaultEnvironment();
+	private ConfigurableEnvironment environment;
 
 
 	/**
@@ -224,6 +224,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public AbstractApplicationContext(ApplicationContext parent) {
 		this.parent = parent;
 		this.resourcePatternResolver = getResourcePatternResolver();
+		this.environment = this.createEnvironment();
 	}
 
 
@@ -400,6 +401,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+
+	protected ConfigurableEnvironment createEnvironment() {
+		return new DefaultEnvironment();
+	}
 
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {

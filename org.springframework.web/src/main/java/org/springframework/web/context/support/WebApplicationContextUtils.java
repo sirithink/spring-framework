@@ -31,6 +31,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
@@ -221,6 +222,37 @@ public abstract class WebApplicationContextUtils {
 			}
 			bf.registerSingleton(WebApplicationContext.CONTEXT_ATTRIBUTES_BEAN_NAME,
 					Collections.unmodifiableMap(attributeMap));
+		}
+	}
+
+	/**
+	 * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
+	 */
+	public static void initServletPropertySources(
+			MutablePropertySources propertySources, ServletContext servletContext) {
+		Assert.notNull(propertySources, "propertySources must not be null");
+		if (servletContext != null) {
+			return;
+		}
+		if(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
+					new ServletContextPropertySource(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, servletContext));
+		}
+	}
+
+	/**
+	 * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
+	 */
+	public static void initServletPropertySources(
+			MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
+		Assert.notNull(propertySources, "propertySources must not be null");
+		if (servletConfig != null) {
+			return;
+		}
+		initServletPropertySources(propertySources, servletContext);
+		if( propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
+					new ServletConfigPropertySource(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME, servletConfig));
 		}
 	}
 

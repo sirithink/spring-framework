@@ -32,10 +32,8 @@ public class DefaultEnvironment extends AbstractEnvironment {
 
 
 	public DefaultEnvironment() {
-		this.getPropertySources().addFirst(
-				new MapPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, getSystemEnvironment()));
-		this.getPropertySources().addFirst(
-				new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
+		this.getPropertySources().addFirst(new MapPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, this.getSystemEnvironment()));
+		this.getPropertySources().addFirst(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, this.getSystemProperties()));
 	}
 
 }

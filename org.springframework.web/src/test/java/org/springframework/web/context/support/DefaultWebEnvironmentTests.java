@@ -35,8 +35,8 @@ public class DefaultWebEnvironmentTests {
 		ConfigurableEnvironment env = new DefaultWebEnvironment();
 		List<PropertySource<?>> sources = env.getPropertySources().asList();
 		assertThat(sources.size(), is(4));
-		assertThat(sources.get(0).getName(), equalTo(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME));
-		assertThat(sources.get(1).getName(), equalTo(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME));
+		assertThat(sources.get(0).getName(), equalTo(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME));
+		assertThat(sources.get(1).getName(), equalTo(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME));
 		assertThat(sources.get(2).getName(), equalTo(DefaultEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME));
 		assertThat(sources.get(3).getName(), equalTo(DefaultEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME));
 	}

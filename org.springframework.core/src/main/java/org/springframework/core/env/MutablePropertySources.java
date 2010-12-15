@@ -16,24 +16,19 @@
 
 package org.springframework.core.env;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 
 public class MutablePropertySources implements PropertySources {
 
-	static final String NON_EXISTENT_PROPERTY_SOURCE_MESSAGE = "PropertySource named [%s] does not exist";
-	static final String ILLEGAL_RELATIVE_ADDITION_MESSAGE = "PropertySource named [%s] cannot be added relative to itself";
-
 	private final LinkedList<PropertySource<?>> propertySourceList = new LinkedList<PropertySource<?>>();
 
-	protected final Log logger = LogFactory.getLog(getClass());
+	static final String NON_EXISTENT_PROPERTY_SOURCE_MESSAGE = "PropertySource named [%s] does not exist";
+	static final String ILLEGAL_RELATIVE_ADDITION_MESSAGE = "PropertySource named [%s] cannot be added relative to itself";
 
 
 	public void addFirst(PropertySource<?> propertySource) {
@@ -105,16 +100,7 @@ public class MutablePropertySources implements PropertySources {
 	}
 
 	public List<PropertySource<?>> asList() {
-		ArrayList<PropertySource<?>> availableSources = new ArrayList<PropertySource<?>>();
-		for (PropertySource<?> source : this.propertySourceList) {
-			if (source.isAvailable()) {
-				availableSources.add(source);
-			} else if (logger.isDebugEnabled()) {
-				logger.debug(String.format("Excluding unavailable property source [%s] from asList() results",
-						source.getName()));
-			}
-		}
-		return Collections.unmodifiableList(availableSources);
+		return Collections.unmodifiableList(this.propertySourceList);
 	}
 
 	public PropertySource<?> get(String propertySourceName) {

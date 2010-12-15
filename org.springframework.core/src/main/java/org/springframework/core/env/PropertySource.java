@@ -36,12 +36,8 @@ public abstract class PropertySource<T> {
 		return this.name;
 	}
 
-	public boolean isAvailable() {
-		return this.source != null;
-	}
-
 	public T getSource() {
-		return this.source;
+		return source;
 	}
 
 	public abstract boolean containsProperty(String key);
@@ -140,5 +136,4 @@ public abstract class PropertySource<T> {
 			return String.format("%s [name='%s']", getClass().getSimpleName(), this.name);
 		}
 	}
-
 }

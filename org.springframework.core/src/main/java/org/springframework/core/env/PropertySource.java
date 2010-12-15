@@ -33,7 +33,7 @@ public abstract class PropertySource<T> {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public T getSource() {
@@ -87,11 +87,11 @@ public abstract class PropertySource<T> {
 	public String toString() {
 		if (logger.isDebugEnabled()) {
 			return String.format("%s@%s [name='%s', properties=%s]",
-					getClass().getSimpleName(), System.identityHashCode(this), name, source);
+					this.getClass().getSimpleName(), System.identityHashCode(this), this.name, this.source);
 		}
 
 		return String.format("%s [name='%s', propertyCount=%d]",
-				getClass().getSimpleName(), name, this.size());
+				this.getClass().getSimpleName(), this.name, this.size());
 	}
 
 
@@ -107,7 +107,7 @@ public abstract class PropertySource<T> {
 	/**
 	 * TODO: SPR-7508: document
 	 */
-	public static class ComparisonPropertySource extends PropertySource<Void>{
+	static class ComparisonPropertySource extends PropertySource<Void> {
 
 		private static final String USAGE_ERROR =
 			"ComparisonPropertySource instances are for collection comparison " +
@@ -133,7 +133,7 @@ public abstract class PropertySource<T> {
 
 		@Override
 		public String toString() {
-			return String.format("%s [name='%s']", getClass().getSimpleName(), name);
+			return String.format("%s [name='%s']", getClass().getSimpleName(), this.name);
 		}
 	}
 }

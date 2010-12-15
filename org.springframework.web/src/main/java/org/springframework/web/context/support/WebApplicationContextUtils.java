@@ -225,19 +225,9 @@ public abstract class WebApplicationContextUtils {
 		}
 	}
 
-	/**
-	 * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
-	 */
 	public static void initServletPropertySources(
 			MutablePropertySources propertySources, ServletContext servletContext) {
-		Assert.notNull(propertySources, "propertySources must not be null");
-		if (servletContext != null) {
-			return;
-		}
-		if(propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME)) {
-			propertySources.replace(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
-					new ServletContextPropertySource(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, servletContext));
-		}
+		initServletPropertySources(propertySources, servletContext, null);
 	}
 
 	/**
@@ -246,11 +236,11 @@ public abstract class WebApplicationContextUtils {
 	public static void initServletPropertySources(
 			MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
 		Assert.notNull(propertySources, "propertySources must not be null");
-		if (servletConfig != null) {
-			return;
+		if(servletContext != null && propertySources.contains(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
+					new ServletContextPropertySource(DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, servletContext));
 		}
-		initServletPropertySources(propertySources, servletContext);
-		if( propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME)) {
+		if(servletConfig != null && propertySources.contains(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME)) {
 			propertySources.replace(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
 					new ServletConfigPropertySource(DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME, servletConfig));
 		}

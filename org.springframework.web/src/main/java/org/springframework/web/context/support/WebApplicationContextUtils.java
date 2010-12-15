@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletConfig;
@@ -192,14 +193,14 @@ public abstract class WebApplicationContextUtils {
 		if (!bf.containsBean(WebApplicationContext.CONTEXT_PARAMETERS_BEAN_NAME)) {
 			Map<String, String> parameterMap = new HashMap<String, String>();
 			if (sc != null) {
-				Enumeration paramNameEnum = sc.getInitParameterNames();
+				Enumeration<?> paramNameEnum = sc.getInitParameterNames();
 				while (paramNameEnum.hasMoreElements()) {
 					String paramName = (String) paramNameEnum.nextElement();
 					parameterMap.put(paramName, sc.getInitParameter(paramName));
 				}
 			}
 			if (config != null) {
-				Enumeration paramNameEnum = config.getInitParameterNames();
+				Enumeration<?> paramNameEnum = config.getInitParameterNames();
 				while (paramNameEnum.hasMoreElements()) {
 					String paramName = (String) paramNameEnum.nextElement();
 					parameterMap.put(paramName, config.getInitParameter(paramName));
@@ -212,7 +213,7 @@ public abstract class WebApplicationContextUtils {
 		if (!bf.containsBean(WebApplicationContext.CONTEXT_ATTRIBUTES_BEAN_NAME)) {
 			Map<String, Object> attributeMap = new HashMap<String, Object>();
 			if (sc != null) {
-				Enumeration attrNameEnum = sc.getAttributeNames();
+				Enumeration<?> attrNameEnum = sc.getAttributeNames();
 				while (attrNameEnum.hasMoreElements()) {
 					String attrName = (String) attrNameEnum.nextElement();
 					attributeMap.put(attrName, sc.getAttribute(attrName));
@@ -239,6 +240,7 @@ public abstract class WebApplicationContextUtils {
 	/**
 	 * Factory that exposes the current request object on demand.
 	 */
+	@SuppressWarnings("serial")
 	private static class RequestObjectFactory implements ObjectFactory<ServletRequest>, Serializable {
 
 		public ServletRequest getObject() {
@@ -255,6 +257,7 @@ public abstract class WebApplicationContextUtils {
 	/**
 	 * Factory that exposes the current session object on demand.
 	 */
+	@SuppressWarnings("serial")
 	private static class SessionObjectFactory implements ObjectFactory<HttpSession>, Serializable {
 
 		public HttpSession getObject() {
@@ -271,6 +274,7 @@ public abstract class WebApplicationContextUtils {
 	/**
 	 * Factory that exposes the current WebRequest object on demand.
 	 */
+	@SuppressWarnings("serial")
 	private static class WebRequestObjectFactory implements ObjectFactory<WebRequest>, Serializable {
 
 		public WebRequest getObject() {

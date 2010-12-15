@@ -18,6 +18,7 @@ package org.springframework.core.env;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.Assert;
 
 
 public abstract class PropertySource<T> {
@@ -28,6 +29,8 @@ public abstract class PropertySource<T> {
 	protected final T source;
 
 	public PropertySource(String name, T source) {
+		Assert.hasText(name, "Property source name must contain at least one character");
+		Assert.notNull(source, "Property source must be non-null");
 		this.name = name;
 		this.source = source;
 	}
@@ -105,20 +108,55 @@ public abstract class PropertySource<T> {
 
 
 	/**
+	 * PropertySource to be used as a placeholder in cases where an actual
+	 * property source cannot be eagerly initialized at application context
+	 * creation time.  For example, a ServletCcontext-based property source
+	 * must wait until the ServletContext object is available to its enclosing
+	 * ApplicationContext.  In such cases, a stub should be used to hold the
+	 * intended default position/order of the property source, then be replaced
+	 * during context refresh.
+	 *
+	 * @see org.springframework.context.support.AbstractApplicationContext#initPropertySources()
+	 * @see org.springframework.web.context.support.DefaultWebEnvironment
+	 * @see org.springframework.web.context.support.ServletContextPropertySource
+	 */
+	public static class StubPropertySource extends PropertySource<Object> {
+
+		public StubPropertySource(String name) {
+			super(name, new Object());
+		}
+
+		@Override
+		public boolean containsProperty(String key) {
+			return false;
+		}
+
+		@Override
+		public String getProperty(String key) {
+			return null;
+		}
+
+		@Override
+		public int size() {
+			return 0;
+		}
+	}
+
+	/**
 	 * TODO: SPR-7508: document
 	 */
-	static class ComparisonPropertySource extends PropertySource<Void> {
+	static class ComparisonPropertySource extends PropertySource<Object> {
 
 		private static final String USAGE_ERROR =
 			"ComparisonPropertySource instances are for collection comparison " +
 			"use only";
 
 		public ComparisonPropertySource(String name) {
-			super(name, null);
+			super(name, new Object());
 		}
 
 		@Override
-		public Void getSource() {
+		public Object getSource() {
 			throw new UnsupportedOperationException(USAGE_ERROR);
 		}
 		public String getProperty(String key) {

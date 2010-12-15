@@ -406,6 +406,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
+			// Initialize any placeholder property sources in the context environment
+			initPropertySources();
+
 			// Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -468,6 +471,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		if (logger.isInfoEnabled()) {
 			logger.info("Refreshing " + this);
 		}
+	}
+
+	/**
+	 * Replace any placeholder property sources with actual instances.
+	 */
+	protected void initPropertySources() {
+		// For subclasses: do nothing by default.
 	}
 
 	/**

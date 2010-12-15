@@ -17,6 +17,7 @@
 package org.springframework.web.context.support;
 
 import org.springframework.core.env.DefaultEnvironment;
+import org.springframework.core.env.PropertySource.StubPropertySource;
 
 
 /**
@@ -31,7 +32,7 @@ public class DefaultWebEnvironment extends DefaultEnvironment {
 	public static final String SERVLET_CONFIG_PROPERTY_SOURCE_NAME = "servletConfigInitParams";
 
 	public DefaultWebEnvironment() {
-		this.getPropertySources().addFirst(new ServletConfigPropertySource(SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME));
-		this.getPropertySources().addFirst(new ServletContextPropertySource(SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME));
+		this.getPropertySources().addFirst(new StubPropertySource(SERVLET_CONFIG_PROPERTY_SOURCE_NAME));
+		this.getPropertySources().addFirst(new StubPropertySource(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME));
 	}
 }

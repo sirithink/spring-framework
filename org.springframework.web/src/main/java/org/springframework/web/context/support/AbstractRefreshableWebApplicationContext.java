@@ -16,11 +16,15 @@
 
 package org.springframework.web.context.support;
 
+import static org.springframework.web.context.support.DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME;
+import static org.springframework.web.context.support.DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
@@ -98,8 +102,6 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
-		// TODO: SPR-7508 extract createEnvironment() method; do also in GWAC
-		this.getEnvironment().getPropertySources().addFirst(new ServletContextPropertySource(this.servletContext));
 	}
 
 	public ServletContext getServletContext() {
@@ -111,8 +113,6 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 		if (servletConfig != null && this.servletContext == null) {
 			this.setServletContext(servletConfig.getServletContext());
 		}
-		// TODO: SPR-7508 extract createEnvironment() method; do also in GWAC
-		this.getEnvironment().getPropertySources().addFirst(new ServletConfigPropertySource(servletConfig));
 	}
 
 	public ServletConfig getServletConfig() {
@@ -173,6 +173,22 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
+	}
+
+	@Override
+	protected void initPropertySources() {
+		super.initPropertySources();
+		MutablePropertySources propertySources = this.getEnvironment().getPropertySources();
+		if (this.servletConfig != null
+				&& propertySources.contains(SERVLET_CONFIG_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
+					new ServletConfigPropertySource(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, this.servletConfig));
+		}
+		if (this.servletContext != null
+				&& propertySources.contains(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
+					new ServletContextPropertySource(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, this.servletContext));
+		}
 	}
 
 	public Theme getTheme(String themeName) {

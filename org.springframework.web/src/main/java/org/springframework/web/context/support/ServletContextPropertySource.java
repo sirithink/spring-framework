@@ -20,7 +20,6 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 
-import org.springframework.core.env.DefaultWebEnvironment;
 import org.springframework.core.env.PropertySource;
 
 
@@ -32,10 +31,6 @@ import org.springframework.core.env.PropertySource;
  * @see ServletConfigPropertySource
  */
 public class ServletContextPropertySource extends PropertySource<ServletContext> {
-
-	public ServletContextPropertySource(ServletContext servletContext) {
-		this(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME, servletContext);
-	}
 
 	public ServletContextPropertySource(String name, ServletContext servletContext) {
 		super(name, servletContext);

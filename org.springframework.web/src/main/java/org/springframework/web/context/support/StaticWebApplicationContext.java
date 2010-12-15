@@ -16,6 +16,9 @@
 
 package org.springframework.web.context.support;
 
+import static org.springframework.web.context.support.DefaultWebEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME;
+import static org.springframework.web.context.support.DefaultWebEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
@@ -166,9 +169,22 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
+	}
+
+	@Override
+	protected void initPropertySources() {
+		super.initPropertySources();
 		MutablePropertySources propertySources = this.getEnvironment().getPropertySources();
-		propertySources.addFirst(new ServletContextPropertySource(servletContext));
-		propertySources.addFirst(new ServletConfigPropertySource(servletConfig));
+		if (this.servletConfig != null
+				&& propertySources.contains(SERVLET_CONFIG_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
+					new ServletConfigPropertySource(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, this.servletConfig));
+		}
+		if (this.servletContext != null
+				&& propertySources.contains(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME)) {
+			propertySources.replace(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
+					new ServletContextPropertySource(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, this.servletContext));
+		}
 	}
 
 	public Theme getTheme(String themeName) {

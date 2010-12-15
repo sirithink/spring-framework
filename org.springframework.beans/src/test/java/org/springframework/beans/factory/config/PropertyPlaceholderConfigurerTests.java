@@ -38,8 +38,9 @@ import test.beans.TestBean;
 
 
 /**
- * Unit tests for {@link EnvironmentAwarePropertyPlaceholderConfigurer}.
+ * Unit tests for {@link PropertyPlaceholderConfigurer}.
  *
+ * @see PropertySourcesPlaceholderConfigurer
  * @see PropertyResourceConfigurerTests
  * @author Chris Beams
  */

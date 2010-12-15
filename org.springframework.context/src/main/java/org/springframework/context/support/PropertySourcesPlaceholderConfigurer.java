@@ -42,9 +42,8 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
  * @author Chris Beams
  * @since 3.1
  * @see PropertyPlaceholderConfigurer
- * @see EnvironmentAwarePropertyOverrideConfigurer
  */
-public class EnvironmentAwarePropertyPlaceholderConfigurer
+public class PropertySourcesPlaceholderConfigurer
 		extends AbstractPropertyPlaceholderConfigurer implements EnvironmentAware {
 
 	private ChainedPropertyResolver propertyResolver;

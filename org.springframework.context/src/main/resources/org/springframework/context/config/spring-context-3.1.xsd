@@ -90,7 +90,7 @@
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
 	Activates replacement of ${...} placeholders, resolved against the specified properties file or
-	Properties object (if any). Defines an EnvironmentAwarePropertyPlaceholderConfigurer within the context.
+	Properties object (if any). Defines an PropertySourcesPlaceholderConfigurer within the context.
 	For backward compatibility with versions earlier than Spring 3.1, a PropertyPlaceholderConfigurer will be
 	registered if the 'system-properties-mode' attribute has been explicitly assigned a value.
 			]]></xsd:documentation>
@@ -109,7 +109,7 @@
 							<xsd:documentation><![CDATA[
 If set to any value other than DELEGATE, register a PropertyPlaceholderConfigurer bean and call
 its setSystemPropertiesModeName() method with the value. If set to DELEGATE (the default), register
-an EnvironmentAwarePropertyPlaceholderConfigurer and ignore the setting altogether, instead delegating
+an PropertySourcesPlaceholderConfigurer and ignore the setting altogether, instead delegating
 to the enclosing application context's Environment object and its collection of PropertySource objects
 which may or may not include system properties and environment variables.
 							]]></xsd:documentation>

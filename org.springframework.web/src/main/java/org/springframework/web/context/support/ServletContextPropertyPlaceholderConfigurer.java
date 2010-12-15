@@ -21,7 +21,6 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.support.EnvironmentAwarePropertyPlaceholderConfigurer;
 import org.springframework.web.context.ServletContextAware;
 
 
@@ -59,7 +58,7 @@ import org.springframework.web.context.ServletContextAware;
  * @see #setSearchContextAttributes
  * @see javax.servlet.ServletContext#getInitParameter(String)
  * @see javax.servlet.ServletContext#getAttribute(String)
- * @deprecated in Spring 3.1 in favor of {@link EnvironmentAwarePropertyPlaceholderConfigurer}
+ * @deprecated in Spring 3.1 in favor of {@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer}
  * in conjunction with {@link org.springframework.web.servlet.support.DefaultWebEnvironment}.
  */
 @Deprecated

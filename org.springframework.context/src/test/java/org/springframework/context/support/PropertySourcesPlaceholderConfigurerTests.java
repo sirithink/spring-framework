@@ -27,17 +27,16 @@ import org.springframework.mock.env.MockEnvironment;
 import test.beans.TestBean;
 
 /**
- * Unit tests for {@link EnvironmentAwarePropertyPlaceholderConfigurer}.
+ * Unit tests for {@link PropertySourcesPlaceholderConfigurer}.
  * 
  * @author Chris Beams
  * @since 3.1
- * @see EnvironmentAwarePropertyPlaceholderConfigurerTests
  */
-public class EnvironmentAwarePropertyPlaceholderConfigurerTests {
+public class PropertySourcesPlaceholderConfigurerTests {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void environmentNotNull() {
-		new EnvironmentAwarePropertyPlaceholderConfigurer().postProcessBeanFactory(new DefaultListableBeanFactory());
+		new PropertySourcesPlaceholderConfigurer().postProcessBeanFactory(new DefaultListableBeanFactory());
 	}
 
 	@Test
@@ -57,7 +56,7 @@ public class EnvironmentAwarePropertyPlaceholderConfigurerTests {
 					.addPropertyValue("name", "${foo}")
 					.getBeanDefinition());
 
-		EnvironmentAwarePropertyPlaceholderConfigurer ppc = new EnvironmentAwarePropertyPlaceholderConfigurer();
+		PropertySourcesPlaceholderConfigurer ppc = new PropertySourcesPlaceholderConfigurer();
 
 		ppc.setLocalOverride(override);
 		ppc.setProperties(MockEnvironment.withProperty("foo", "local").getPropertyResolver().asProperties());
@@ -81,8 +80,8 @@ public class EnvironmentAwarePropertyPlaceholderConfigurerTests {
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("my.name", "myValue");
 
-		EnvironmentAwarePropertyPlaceholderConfigurer ppc =
-			new EnvironmentAwarePropertyPlaceholderConfigurer();
+		PropertySourcesPlaceholderConfigurer ppc =
+			new PropertySourcesPlaceholderConfigurer();
 		ppc.setEnvironment(env);
 		ppc.postProcessBeanFactory(bf);
 		assertThat(bf.getBean(TestBean.class).getName(), equalTo("myValue"));

@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.context.support.EnvironmentAwarePropertyPlaceholderConfigurer;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.util.StringUtils;
 
 /**
@@ -43,7 +43,7 @@ class PropertyPlaceholderBeanDefinitionParser extends AbstractPropertyLoadingBea
 			return PropertyPlaceholderConfigurer.class;
 		}
 
-		return EnvironmentAwarePropertyPlaceholderConfigurer.class;
+		return PropertySourcesPlaceholderConfigurer.class;
 	}
 
 	@Override

@@ -20,8 +20,8 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletConfig;
 
+import org.springframework.core.env.DefaultWebEnvironment;
 import org.springframework.core.env.PropertySource;
-import org.springframework.web.context.ServletConfigAware;
 
 
 /**
@@ -31,15 +31,19 @@ import org.springframework.web.context.ServletConfigAware;
  * @since 3.1
  * @see ServletContextPropertySource
  */
-public class ServletConfigPropertySource extends PropertySource<ServletConfig> implements ServletConfigAware {
+public class ServletConfigPropertySource extends PropertySource<ServletConfig> {
 
-	public ServletConfigPropertySource(String name) {
-		super(name);
+	public ServletConfigPropertySource(ServletConfig servletConfig) {
+		this(DefaultWebEnvironment.SERVLET_CONFIG_PARAMS_PROPERTY_SOURCE_NAME, servletConfig);
+	}
+
+	public ServletConfigPropertySource(String name, ServletConfig servletConfig) {
+		super(name, servletConfig);
 	}
 
 	@Override
 	public boolean containsProperty(String name) {
-		Enumeration<?> initParamNames = this.getSource().getInitParameterNames();
+		Enumeration<?> initParamNames = this.source.getInitParameterNames();
 		while (initParamNames.hasMoreElements()) {
 			if (initParamNames.nextElement().equals(name)) {
 				return true;
@@ -48,24 +52,19 @@ public class ServletConfigPropertySource extends PropertySource<ServletConfig> i
 		return false;
 	}
 
-	public void setServletConfig(ServletConfig servletConfig) {
-		this.setSource(servletConfig);
-	}
-
 	@Override
 	public String getProperty(String name) {
-		return this.getSource().getInitParameter(name);
+		return this.source.getInitParameter(name);
 	}
 
 	@Override
 	public int size() {
 		int size=0;
-		Enumeration<?> initParamNames = this.getSource().getInitParameterNames();
+		Enumeration<?> initParamNames = this.source.getInitParameterNames();
 		while (initParamNames.hasMoreElements()) {
 			initParamNames.nextElement();
 			size++;
 		}
 		return size;
 	}
-
 }

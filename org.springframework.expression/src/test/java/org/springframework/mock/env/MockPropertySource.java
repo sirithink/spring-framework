@@ -39,7 +39,7 @@ public class MockPropertySource extends PropertiesPropertySource {
 	}
 
 	public void setProperty(String key, String value) {
-		this.getSource().setProperty(key, value);
+		this.source.setProperty(key, value);
 	}
 
 	public MockPropertySource withProperty(String key, String value) {

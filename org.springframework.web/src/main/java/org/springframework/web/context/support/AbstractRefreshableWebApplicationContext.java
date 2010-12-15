@@ -21,8 +21,6 @@ import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
@@ -100,6 +98,8 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
+		// TODO: SPR-7508 extract createEnvironment() method; do also in GWAC
+		this.getEnvironment().getPropertySources().addFirst(new ServletContextPropertySource(this.servletContext));
 	}
 
 	public ServletContext getServletContext() {
@@ -111,6 +111,8 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 		if (servletConfig != null && this.servletContext == null) {
 			this.setServletContext(servletConfig.getServletContext());
 		}
+		// TODO: SPR-7508 extract createEnvironment() method; do also in GWAC
+		this.getEnvironment().getPropertySources().addFirst(new ServletConfigPropertySource(servletConfig));
 	}
 
 	public ServletConfig getServletConfig() {
@@ -171,14 +173,6 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
-		MutablePropertySources propertySources = this.getEnvironment().getPropertySources();
-		for (PropertySource<?> propertySource : propertySources.asList()) {
-			if (propertySource instanceof ServletContextAware) {
-				((ServletContextAware)propertySource).setServletContext(this.servletContext);
-			} else if (propertySource instanceof ServletConfigAware) {
-				((ServletConfigAware)propertySource).setServletConfig(this.servletConfig);
-			}
-		}
 	}
 
 	public Theme getTheme(String themeName) {

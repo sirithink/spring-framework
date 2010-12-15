@@ -20,8 +20,8 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 
+import org.springframework.core.env.DefaultWebEnvironment;
 import org.springframework.core.env.PropertySource;
-import org.springframework.web.context.ServletContextAware;
 
 
 /**
@@ -31,19 +31,19 @@ import org.springframework.web.context.ServletContextAware;
  * @since 3.1
  * @see ServletConfigPropertySource
  */
-public class ServletContextPropertySource extends PropertySource<ServletContext> implements ServletContextAware {
+public class ServletContextPropertySource extends PropertySource<ServletContext> {
 
-	public ServletContextPropertySource(String name) {
-		super(name);
+	public ServletContextPropertySource(ServletContext servletContext) {
+		this(DefaultWebEnvironment.SERVLET_CONTEXT_PARAMS_PROPERTY_SOURCE_NAME, servletContext);
 	}
 
-	public void setServletContext(ServletContext servletContext) {
-		this.setSource(servletContext);
+	public ServletContextPropertySource(String name, ServletContext servletContext) {
+		super(name, servletContext);
 	}
 
 	@Override
 	public boolean containsProperty(String name) {
-		Enumeration<?> initParamNames = this.getSource().getInitParameterNames();
+		Enumeration<?> initParamNames = this.source.getInitParameterNames();
 		while (initParamNames.hasMoreElements()) {
 			if (initParamNames.nextElement().equals(name)) {
 				return true;
@@ -54,13 +54,13 @@ public class ServletContextPropertySource extends PropertySource<ServletContext>
 
 	@Override
 	public String getProperty(String name) {
-		return this.getSource().getInitParameter(name);
+		return this.source.getInitParameter(name);
 	}
 
 	@Override
 	public int size() {
 		int size=0;
-		Enumeration<?> initParamNames = this.getSource().getInitParameterNames();
+		Enumeration<?> initParamNames = this.source.getInitParameterNames();
 		while (initParamNames.hasMoreElements()) {
 			initParamNames.nextElement();
 			size++;

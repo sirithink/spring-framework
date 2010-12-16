@@ -16,20 +16,21 @@
 
 package org.springframework.context.support;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.AbstractPropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.ChainedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
-import org.springframework.util.Assert;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
 
@@ -46,7 +47,7 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 public class PropertySourcesPlaceholderConfigurer
 		extends AbstractPropertyPlaceholderConfigurer implements EnvironmentAware {
 
-	private ChainedPropertyResolver propertyResolver;
+	private PropertyResolver propertyResolver;
 	private Environment environment;
 
 	public void setEnvironment(Environment environment) {
@@ -64,31 +65,28 @@ public class PropertySourcesPlaceholderConfigurer
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		Assert.notNull(this.environment, "Environment must not be null. Did you call setEnvironment()?");
+		try {
+			MutablePropertySources propertySources = new MutablePropertySources();
 
-		MutablePropertySources localPropertySources = new MutablePropertySources();
-		if (this.localProperties != null) {
-			int cx=0;
-			for (Properties localProps : this.localProperties) {
-				localPropertySources.addLast(new PropertiesPropertySource("localProperties"+cx++, localProps));
+			if (this.environment != null) {
+				for (PropertySource<?> propertySource : this.environment.getPropertySources().asList()) {
+					propertySources.addFirst(propertySource);
+				}
 			}
+
+			PropertiesPropertySource localPropertySource = new PropertiesPropertySource("localProperties", mergeProperties());
+			if (this.localOverride) {
+				propertySources.addFirst(localPropertySource);
+			} else {
+				propertySources.addLast(localPropertySource);
+			}
+
+			this.propertyResolver = new PropertySourcesPropertyResolver(propertySources);
+			processProperties(beanFactory, this.propertyResolver.asProperties());
 		}
-
-		PropertyResolver localPropertyResolver = new PropertySourcesPropertyResolver(localPropertySources);
-		PropertyResolver environmentPropertyResolver = this.environment.getPropertyResolver();
-		propertyResolver = new ChainedPropertyResolver();
-
-		if (this.localOverride) {
-			propertyResolver.addResolver(localPropertyResolver);
-		} 
-
-		this.propertyResolver.addResolver(environmentPropertyResolver);
-
-		if (!this.localOverride) {
-			propertyResolver.addResolver(localPropertyResolver);
+		catch (IOException ex) {
+			throw new BeanInitializationException("Could not load properties", ex);
 		}
-
-		super.postProcessBeanFactory(beanFactory);
 	}
 
 }

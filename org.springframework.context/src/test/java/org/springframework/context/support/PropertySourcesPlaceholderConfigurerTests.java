@@ -20,8 +20,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mock.env.MockEnvironment;
 
 import test.beans.TestBean;
@@ -34,6 +38,38 @@ import test.beans.TestBean;
  */
 public class PropertySourcesPlaceholderConfigurerTests {
 
+	@Test
+	public void spr7547_ppc() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		PropertyPlaceholderConfigurer pc = new PropertyPlaceholderConfigurer();
+		Resource resource = new ClassPathResource("PropertySourcesPlaceholderConfigurerTests.properties", this.getClass());
+		pc.setLocation(resource);
+		//pc.setProperties(new Properties() {{ setProperty("my.name", "bar"); }});
+		pc.postProcessBeanFactory(bf);
+	}
+
+	@Test
+	public void spr7547_pspc() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
+		pc.setEnvironment(new MockEnvironment());
+		Resource resource = new ClassPathResource("PropertySourcesPlaceholderConfigurerTests.properties", this.getClass());
+		pc.setLocation(resource);
+		//pc.setProperties(new Properties() {{ setProperty("my.name", "bar"); }});
+		pc.postProcessBeanFactory(bf);
+	}
+
+	@Ignore
 	@Test(expected=IllegalArgumentException.class)
 	public void environmentNotNull() {
 		new PropertySourcesPlaceholderConfigurer().postProcessBeanFactory(new DefaultListableBeanFactory());

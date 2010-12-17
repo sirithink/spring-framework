@@ -31,6 +31,19 @@ public class MutablePropertySources implements PropertySources {
 	static final String ILLEGAL_RELATIVE_ADDITION_MESSAGE = "PropertySource named [%s] cannot be added relative to itself";
 
 
+	public MutablePropertySources() {
+	}
+
+	public MutablePropertySources(PropertySources propertySources) {
+		this.addAll(propertySources);
+	}
+
+	public void addAll(PropertySources propertySources) {
+		for (PropertySource<?> propertySource : propertySources.asList()) {
+			this.addLast(propertySource);
+		}
+	}
+
 	public void addFirst(PropertySource<?> propertySource) {
 		removeIfPresent(propertySource);
 		this.propertySourceList.addFirst(propertySource);

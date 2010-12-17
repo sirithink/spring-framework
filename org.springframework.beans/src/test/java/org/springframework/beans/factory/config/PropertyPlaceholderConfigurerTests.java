@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionReaderUtils.registerWithGeneratedName;
 
@@ -33,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import test.beans.TestBean;
 
@@ -79,6 +82,20 @@ public class PropertyPlaceholderConfigurerTests {
 		getModifiableSystemEnvironment().remove(P1);
 	}
 
+
+	@Test
+	public void localPropertiesViaResource() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		PropertyPlaceholderConfigurer pc = new PropertyPlaceholderConfigurer();
+		Resource resource = new ClassPathResource("PropertyPlaceholderConfigurerTests.properties", this.getClass());
+		pc.setLocation(resource);
+		pc.postProcessBeanFactory(bf);
+	}
 
 	@Test
 	public void resolveFromSystemProperties() {

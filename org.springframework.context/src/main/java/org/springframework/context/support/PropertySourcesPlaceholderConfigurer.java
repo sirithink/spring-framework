@@ -29,7 +29,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertyResolver;
-import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
@@ -47,11 +47,16 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 public class PropertySourcesPlaceholderConfigurer
 		extends AbstractPropertyPlaceholderConfigurer implements EnvironmentAware {
 
+	private MutablePropertySources propertySources;
 	private PropertyResolver propertyResolver;
 	private Environment environment;
 
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
+	}
+
+	public void setPropertySources(PropertySources propertySources) {
+		this.propertySources = new MutablePropertySources(propertySources);
 	}
 
 	@Override
@@ -65,28 +70,26 @@ public class PropertySourcesPlaceholderConfigurer
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		try {
-			MutablePropertySources propertySources = new MutablePropertySources();
-
+		if (this.propertySources == null) {
+			this.propertySources = new MutablePropertySources();
 			if (this.environment != null) {
-				for (PropertySource<?> propertySource : this.environment.getPropertySources().asList()) {
-					propertySources.addFirst(propertySource);
+				this.propertySources.addAll(this.environment.getPropertySources());
+			}
+			try {
+				PropertiesPropertySource localPropertySource = new PropertiesPropertySource("localProperties", mergeProperties());
+				if (this.localOverride) {
+					this.propertySources.addFirst(localPropertySource);
+				} else {
+					this.propertySources.addLast(localPropertySource);
 				}
 			}
-
-			PropertiesPropertySource localPropertySource = new PropertiesPropertySource("localProperties", mergeProperties());
-			if (this.localOverride) {
-				propertySources.addFirst(localPropertySource);
-			} else {
-				propertySources.addLast(localPropertySource);
+			catch (IOException ex) {
+				throw new BeanInitializationException("Could not load properties", ex);
 			}
+		}
 
-			this.propertyResolver = new PropertySourcesPropertyResolver(propertySources);
-			processProperties(beanFactory, this.propertyResolver.asProperties());
-		}
-		catch (IOException ex) {
-			throw new BeanInitializationException("Could not load properties", ex);
-		}
+		this.propertyResolver = new PropertySourcesPropertyResolver(this.propertySources);
+		processProperties(beanFactory, this.propertyResolver.asProperties());
 	}
 
 }

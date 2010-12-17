@@ -88,7 +88,7 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	 * @see #processProperties
 	 */
 	protected void convertProperties(Properties props) {
-		Enumeration propertyNames = props.propertyNames();
+		Enumeration<?> propertyNames = props.propertyNames();
 		while (propertyNames.hasMoreElements()) {
 			String propertyName = (String) propertyNames.nextElement();
 			String propertyValue = props.getProperty(propertyName);

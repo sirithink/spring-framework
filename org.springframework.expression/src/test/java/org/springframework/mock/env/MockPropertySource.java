@@ -1,4 +1,3 @@
-package org.springframework.mock.env;
 /*
  * Copyright 2002-2010 the original author or authors.
  *
@@ -14,6 +13,8 @@ package org.springframework.mock.env;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.springframework.mock.env;
 
 import java.util.Properties;
 

@@ -20,13 +20,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
-import org.junit.Ignore;
+import java.util.Properties;
+
 import org.junit.Test;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.env.MockPropertySource;
 
 import test.beans.TestBean;
 
@@ -39,74 +41,7 @@ import test.beans.TestBean;
 public class PropertySourcesPlaceholderConfigurerTests {
 
 	@Test
-	public void spr7547_ppc() {
-		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
-		bf.registerBeanDefinition("testBean",
-				genericBeanDefinition(TestBean.class)
-					.addPropertyValue("name", "${my.name}")
-					.getBeanDefinition());
-
-		PropertyPlaceholderConfigurer pc = new PropertyPlaceholderConfigurer();
-		Resource resource = new ClassPathResource("PropertySourcesPlaceholderConfigurerTests.properties", this.getClass());
-		pc.setLocation(resource);
-		//pc.setProperties(new Properties() {{ setProperty("my.name", "bar"); }});
-		pc.postProcessBeanFactory(bf);
-	}
-
-	@Test
-	public void spr7547_pspc() {
-		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
-		bf.registerBeanDefinition("testBean",
-				genericBeanDefinition(TestBean.class)
-					.addPropertyValue("name", "${my.name}")
-					.getBeanDefinition());
-
-		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
-		pc.setEnvironment(new MockEnvironment());
-		Resource resource = new ClassPathResource("PropertySourcesPlaceholderConfigurerTests.properties", this.getClass());
-		pc.setLocation(resource);
-		//pc.setProperties(new Properties() {{ setProperty("my.name", "bar"); }});
-		pc.postProcessBeanFactory(bf);
-	}
-
-	@Ignore
-	@Test(expected=IllegalArgumentException.class)
-	public void environmentNotNull() {
-		new PropertySourcesPlaceholderConfigurer().postProcessBeanFactory(new DefaultListableBeanFactory());
-	}
-
-	@Test
-	public void localPropertiesOverrideFalse() {
-		localPropertiesOverride(false);
-	}
-
-	@Test
-	public void localPropertiesOverrideTrue() {
-		localPropertiesOverride(true);
-	}
-
-	private void localPropertiesOverride(boolean override) {
-		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
-		bf.registerBeanDefinition("testBean",
-				genericBeanDefinition(TestBean.class)
-					.addPropertyValue("name", "${foo}")
-					.getBeanDefinition());
-
-		PropertySourcesPlaceholderConfigurer ppc = new PropertySourcesPlaceholderConfigurer();
-
-		ppc.setLocalOverride(override);
-		ppc.setProperties(MockEnvironment.withProperty("foo", "local").getPropertyResolver().asProperties());
-		ppc.setEnvironment(MockEnvironment.withProperty("foo", "enclosing"));
-		ppc.postProcessBeanFactory(bf);
-		if (override) {
-			assertThat(bf.getBean(TestBean.class).getName(), equalTo("local"));
-		} else {
-			assertThat(bf.getBean(TestBean.class).getName(), equalTo("enclosing"));
-		}
-	}
-
-	@Test
-	public void simpleReplacement() {
+	public void replacementFromEnvironmentProperties() {
 		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
 		bf.registerBeanDefinition("testBean",
 				genericBeanDefinition(TestBean.class)
@@ -121,6 +56,108 @@ public class PropertySourcesPlaceholderConfigurerTests {
 		ppc.setEnvironment(env);
 		ppc.postProcessBeanFactory(bf);
 		assertThat(bf.getBean(TestBean.class).getName(), equalTo("myValue"));
+	}
+
+	@Test
+	public void localPropertiesViaResource() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
+		Resource resource = new ClassPathResource("PropertySourcesPlaceholderConfigurerTests.properties", this.getClass());
+		pc.setLocation(resource);
+		pc.postProcessBeanFactory(bf);
+		assertThat(bf.getBean(TestBean.class).getName(), equalTo("foo"));
+	}
+
+	@Test
+	public void localPropertiesOverrideFalse() {
+		localPropertiesOverride(false);
+	}
+
+	@Test
+	public void localPropertiesOverrideTrue() {
+		localPropertiesOverride(true);
+	}
+
+	@Test
+	public void explicitPropertySources() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		MutablePropertySources propertySources = new MutablePropertySources();
+		propertySources.addLast(new MockPropertySource().withProperty("my.name", "foo"));
+
+		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
+		pc.setPropertySources(propertySources);
+		pc.postProcessBeanFactory(bf);
+		assertThat(bf.getBean(TestBean.class).getName(), equalTo("foo"));
+	}
+
+	@Test
+	public void explicitPropertySourcesExcludesEnvironment() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		MutablePropertySources propertySources = new MutablePropertySources();
+		propertySources.addLast(new MockPropertySource());
+
+		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
+		pc.setPropertySources(propertySources);
+		pc.setEnvironment(MockEnvironment.withProperty("my.name", "env"));
+		pc.setIgnoreUnresolvablePlaceholders(true);
+		pc.postProcessBeanFactory(bf);
+		assertThat(bf.getBean(TestBean.class).getName(), equalTo("${my.name}"));
+	}
+
+	@Test
+	@SuppressWarnings("serial")
+	public void explicitPropertySourcesExcludesLocalProperties() {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${my.name}")
+					.getBeanDefinition());
+
+		MutablePropertySources propertySources = new MutablePropertySources();
+		propertySources.addLast(new MockPropertySource());
+
+		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
+		pc.setPropertySources(propertySources);
+		pc.setProperties(new Properties() {{ put("my.name", "local"); }});
+		pc.setIgnoreUnresolvablePlaceholders(true);
+		pc.postProcessBeanFactory(bf);
+		assertThat(bf.getBean(TestBean.class).getName(), equalTo("${my.name}"));
+	}
+
+	@SuppressWarnings("serial")
+	private void localPropertiesOverride(boolean override) {
+		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+		bf.registerBeanDefinition("testBean",
+				genericBeanDefinition(TestBean.class)
+					.addPropertyValue("name", "${foo}")
+					.getBeanDefinition());
+
+		PropertySourcesPlaceholderConfigurer ppc = new PropertySourcesPlaceholderConfigurer();
+
+		ppc.setLocalOverride(override);
+		ppc.setProperties(new Properties() {{ setProperty("foo", "local"); }});
+		ppc.setEnvironment(MockEnvironment.withProperty("foo", "enclosing"));
+		ppc.postProcessBeanFactory(bf);
+		if (override) {
+			assertThat(bf.getBean(TestBean.class).getName(), equalTo("local"));
+		} else {
+			assertThat(bf.getBean(TestBean.class).getName(), equalTo("enclosing"));
+		}
 	}
 
 }

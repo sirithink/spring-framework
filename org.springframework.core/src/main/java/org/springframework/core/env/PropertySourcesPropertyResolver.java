@@ -20,7 +20,6 @@ import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -90,15 +89,12 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 		return null;
 	}
 
-
 	public Properties asProperties() {
 		// TODO SPR-7508: refactor, simplify. only handles map-based propertysources right now.
 		Properties mergedProps = new Properties();
-		List<PropertySource<?>> propertySourcesList = new ArrayList<PropertySource<?>>(propertySources.asList());
-		Collections.reverse(propertySourcesList);
-		Iterator<PropertySource<?>> descendingIterator = propertySourcesList.iterator();
-		while (descendingIterator.hasNext()) {
-			PropertySource<?> propertySource =  descendingIterator.next();
+		List<PropertySource<?>> propertySourcesList = this.propertySources.asList();
+		for (int i = propertySourcesList.size() -1; i >= 0; i--) {
+			PropertySource<?> propertySource = propertySourcesList.get(i);
 			Object object = propertySource.getSource();
 			if (object instanceof Map) {
 				for (Entry<?, ?> entry : ((Map<?, ?>)object).entrySet()) {

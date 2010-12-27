@@ -401,7 +401,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
-
+	/**
+	 * SPR-7408: document
+	 */
 	protected ConfigurableEnvironment createEnvironment() {
 		return new DefaultEnvironment();
 	}

@@ -51,10 +51,16 @@ public class PropertySourcesPlaceholderConfigurer
 	private PropertyResolver propertyResolver;
 	private Environment environment;
 
+	/**
+	 * TODO SPR-7508: document
+	 */
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
 
+	/**
+	 * TODO SPR-7508: document
+	 */
 	public void setPropertySources(PropertySources propertySources) {
 		this.propertySources = new MutablePropertySources(propertySources);
 	}
@@ -89,7 +95,7 @@ public class PropertySourcesPlaceholderConfigurer
 		}
 
 		this.propertyResolver = new PropertySourcesPropertyResolver(this.propertySources);
-		processProperties(beanFactory, this.propertyResolver.asProperties());
+		this.processProperties(beanFactory, this.propertyResolver.asProperties());
 	}
 
 }

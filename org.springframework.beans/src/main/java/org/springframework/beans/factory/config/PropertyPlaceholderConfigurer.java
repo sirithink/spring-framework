@@ -88,6 +88,7 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
  * @see System#getProperty(String)
  * @see #convertPropertyValue
  * @see PropertyOverrideConfigurer
+ * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
  */
 public class PropertyPlaceholderConfigurer extends AbstractPropertyPlaceholderConfigurer
 		implements BeanNameAware, BeanFactoryAware {

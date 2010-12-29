@@ -29,19 +29,74 @@ import org.springframework.util.StringValueResolver;
 
 
 /**
- * TODO SPR-7508: document.
+ * Abstract base class for property resource configurers that resolve placeholders
+ * in bean definition property values. It <em>pulls</em> values from a properties
+ * file or other {@link org.springframework.core.env.PropertySource property source}
+ * into bean definitions.
+ *
+ * <p>The default placeholder syntax follows the Ant / Log4J / JSP EL style:
+ *
+ *<pre class="code">${...}</pre>
+ *
+ * Example XML bean definition:
+ *
+ *<pre class="code">{@code
+ *<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"/>
+ *    <property name="driverClassName" value="}${driver}{@code"/>
+ *    <property name="url" value="jdbc:}${dbname}{@code"/>
+ *</bean>
+ *}</pre>
+ *
+ * Example properties file:
+ *
+ * <pre class="code"> driver=com.mysql.jdbc.Driver
+ * dbname=mysql:mydb</pre>
+ *
+ * Annotated bean definitions may take advantage of property replacement using
+ * the {@link org.springframework.beans.factory.annotation.Value @Value} annotation:
+ *
+ *<pre class="code">@Value("${person.age}")</pre>
+ *
+ * Implementations check simple property values, lists, maps, props, and bean names
+ * in bean references. Furthermore, placeholder values can also cross-reference
+ * other placeholders, like:
+ *
+ *<pre class="code">rootPath=myrootdir
+ *subPath=${rootPath}/subdir</pre>
+ *
+ * In contrast to {@link PropertyOverrideConfigurer}, subclasses of this type allow
+ * filling in of explicit placeholders in bean definitions. Therefore, the original
+ * definition cannot specify any default values for such bean properties, and the
+ * property sources searched must contain an entry for each defined placeholder.
+ *
+ * <p>If a configurer cannot resolve a placeholder, a {@link
+ * BeanDefinitionStoreException} will be thrown. If you want to check against multiple
+ * properties files, specify multiple resources via the {@link #setLocations locations}
+ * property. You can also define multiple configurers, each with its <em>own</em>
+ * placeholder syntax. Use {@link #ignoreUnresolvablePlaceholders} to intentionally
+ * suppress throwing an exception if a placeholder cannot be resolved.
+ *
+ * <p>Default property values can be defined via the {@link #setProperties properties}
+ * property to make overriding definitions in properties files optional. Implementations
+ * may check for properties against default locations such as system properties or against
+ * the application context's {@link org.springframework.core.env.Environment Environment}
+ * object and its set of {@link org.springframework.core.env.PropertySources property sources}.
  *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
+ * @see PropertyPlaceholderConfigurer
+ * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
  */
 public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyResourceConfigurer
 		implements BeanNameAware, BeanFactoryAware {
 
 	/** Default placeholder prefix: "${" */
 	public static final String DEFAULT_PLACEHOLDER_PREFIX = "${";
+
 	/** Default placeholder suffix: "}" */
 	public static final String DEFAULT_PLACEHOLDER_SUFFIX = "}";
+
 	/** Default value separator: ":" */
 	public static final String DEFAULT_VALUE_SEPARATOR = ":";
 

@@ -49,11 +49,13 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 	private final ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this);
 
+
 	/**
  	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		this.delegateEnvironment(super.getEnvironment());
 	}
 
 	/**
@@ -63,6 +65,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * e.g. {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
+		this();
 		register(annotatedClasses);
 		refresh();
 	}
@@ -73,22 +76,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @param basePackages the packages to check for annotated classes
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
+		this();
 		scan(basePackages);
 		refresh();
 	}
 
-
-	/**
-	 * {@inheritDoc}
-	 * <p>Delegates newly created environment to underlying {@link AnnotatedBeanDefinitionReader}
-	 * and {@link ClassPathBeanDefinitionScanner} members.
-	 */
-	@Override
-	protected ConfigurableEnvironment createEnvironment() {
-		ConfigurableEnvironment environment = super.createEnvironment();
-		this.delegateEnvironment(environment);
-		return environment;
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -98,7 +90,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	@Override
 	public void setEnvironment(ConfigurableEnvironment environment) {
 		super.setEnvironment(environment);
-		this.delegateEnvironment(environment);
+		delegateEnvironment(environment);
 	}
 
 	private void delegateEnvironment(ConfigurableEnvironment environment) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009 the original author or authors.
+ * Copyright 2002-2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,10 +113,8 @@ public class AnnotatedBeanDefinitionReader {
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(annotatedClass);
 		AnnotationMetadata metadata = abd.getMetadata();
 
-		if (metadata.hasAnnotation(Profile.class.getName())) {
-			String[] specifiedProfiles =
-				(String[])metadata.getAnnotationAttributes(Profile.class.getName()).get(Profile.CANDIDATE_PROFILES_ATTRIB_NAME);
-			if (!this.environment.acceptsProfiles(specifiedProfiles)) {
+		if (Profile.Helper.isProfileAnnotationPresent(metadata)) {
+			if (!this.environment.acceptsProfiles(Profile.Helper.getCandidateProfiles(metadata))) {
 				// TODO SPR-7508: log that this bean is being rejected on profile mismatch
 				return;
 			}

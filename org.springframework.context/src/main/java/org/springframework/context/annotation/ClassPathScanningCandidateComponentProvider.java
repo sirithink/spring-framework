@@ -298,13 +298,11 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, this.metadataReaderFactory)) {
 				AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
-				if (!metadata.hasAnnotation(Profile.class.getName())) {
+				if (!Profile.Helper.isProfileAnnotationPresent(metadata)) {
 					return true;
 				}
-				String[] specifiedProfiles = 
-					(String[])metadata.getAnnotationAttributes(Profile.class.getName()).get(Profile.CANDIDATE_PROFILES_ATTRIB_NAME);
 				// TODO SPR-7508: log that this bean is being rejected on profile mismatch
-				return this.environment.acceptsProfiles(specifiedProfiles);
+				return this.environment.acceptsProfiles(Profile.Helper.getCandidateProfiles(metadata));
 			}
 		}
 		return false;

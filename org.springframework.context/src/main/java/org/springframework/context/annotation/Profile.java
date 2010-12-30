@@ -23,6 +23,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.core.type.AnnotationMetadata;
+
 /**
  * TODO SPR-7508: document
  * 
@@ -46,12 +48,18 @@ import java.lang.annotation.Target;
 public @interface Profile {
 
 	/**
-	 * @see #value()
-	 */
-	static final String CANDIDATE_PROFILES_ATTRIB_NAME = "value";
-
-	/**
-	 * TODO SPR-7508: document
+	 * The set profiles for which, if active, this component should be registered.
 	 */
 	String[] value();
+
+
+	static class Helper {
+		static boolean isProfileAnnotationPresent(AnnotationMetadata metadata) {
+			return metadata.hasAnnotation(Profile.class.getName());
+		}
+
+		static String[] getCandidateProfiles(AnnotationMetadata metadata) {
+			return (String[])metadata.getAnnotationAttributes(Profile.class.getName()).get("value");
+		}
+	}
 }

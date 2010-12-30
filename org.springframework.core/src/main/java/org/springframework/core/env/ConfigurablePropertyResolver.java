@@ -18,10 +18,30 @@ package org.springframework.core.env;
 
 import org.springframework.core.convert.ConversionService;
 
+
+/**
+ * Configuration interface to be implemented by most if not all {@link PropertyResolver
+ * PropertyResolvers}. Provides facilities for accessing and customizing the
+ * {@link ConversionService} used when converting property values from one type to
+ * another.
+ *
+ * @author Chris Beams
+ * @since 3.1
+ */
 public interface ConfigurablePropertyResolver extends PropertyResolver {
 
+	/**
+	 * @return the {@link ConversionService} used when performing type
+	 * conversions on properties.
+	 * @see PropertyResolver#getProperty(String, Class)
+	 */
 	ConversionService getConversionService();
 
+	/**
+	 * Set the {@link ConversionService} to be used when performing type
+	 * conversions on properties.
+	 * @see PropertyResolver#getProperty(String, Class)
+	 */
 	void setConversionService(ConversionService conversionService);
 
 }

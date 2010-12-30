@@ -30,9 +30,9 @@ import org.springframework.util.StringValueResolver;
 
 /**
  * Abstract base class for property resource configurers that resolve placeholders
- * in bean definition property values. It <em>pulls</em> values from a properties
- * file or other {@link org.springframework.core.env.PropertySource property source}
- * into bean definitions.
+ * in bean definition property values. Implementations <em>pull</em> values from a
+ * properties file or other {@link org.springframework.core.env.PropertySource property
+ * source} into bean definitions.
  *
  * <p>The default placeholder syntax follows the Ant / Log4J / JSP EL style:
  *
@@ -65,22 +65,25 @@ import org.springframework.util.StringValueResolver;
  *subPath=${rootPath}/subdir</pre>
  *
  * In contrast to {@link PropertyOverrideConfigurer}, subclasses of this type allow
- * filling in of explicit placeholders in bean definitions. Therefore, the original
- * definition cannot specify any default values for such bean properties, and the
- * property sources searched must contain an entry for each defined placeholder.
+ * filling in of explicit placeholders in bean definitions.
  *
- * <p>If a configurer cannot resolve a placeholder, a {@link
- * BeanDefinitionStoreException} will be thrown. If you want to check against multiple
- * properties files, specify multiple resources via the {@link #setLocations locations}
- * property. You can also define multiple configurers, each with its <em>own</em>
- * placeholder syntax. Use {@link #ignoreUnresolvablePlaceholders} to intentionally
- * suppress throwing an exception if a placeholder cannot be resolved.
+ * <p>If a configurer cannot resolve a placeholder, a {@link BeanDefinitionStoreException}
+ * will be thrown. If you want to check against multiple properties files, specify multiple
+ * resources via the {@link #setLocations locations} property. You can also define multiple
+ * configurers, each with its <em>own</em> placeholder syntax. Use {@link
+ * #ignoreUnresolvablePlaceholders} to intentionally suppress throwing an exception if a
+ * placeholder cannot be resolved.
  *
- * <p>Default property values can be defined via the {@link #setProperties properties}
- * property to make overriding definitions in properties files optional. Implementations
- * may check for properties against default locations such as system properties or against
- * the application context's {@link org.springframework.core.env.Environment Environment}
- * object and its set of {@link org.springframework.core.env.PropertySources property sources}.
+ * <p>Default property values can be defined globally for each configurer instance
+ * via the {@link #setProperties properties} property, or on a property-by-property basis
+ * using the default value separator which is {@literal ":"} by default and
+ * customizable via {@link #setValueSeparator(String)}.
+ *
+ * <p>Example XML property with default value:
+ *
+ *<pre class="code">{@code
+ *  <property name="url" value="jdbc:}${dbname:defaultdb}{@code"/>
+ *}</pre>
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -139,7 +142,7 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 	 * Specify the separating character between the placeholder variable
 	 * and the associated default value, or <code>null</code> if no such
 	 * special character should be processed as a value separator.
-	 * The default is ":".
+	 * The default is {@value #DEFAULT_VALUE_SEPARATOR}.
 	 */
 	public void setValueSeparator(String valueSeparator) {
 		this.valueSeparator = valueSeparator;

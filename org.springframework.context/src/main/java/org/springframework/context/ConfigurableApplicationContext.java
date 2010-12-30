@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009 the original author or authors.
+ * Copyright 2002-2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,12 +96,22 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void setParent(ApplicationContext parent);
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return the application context's environment object in configurable form
 	 */
 	ConfigurableEnvironment getEnvironment();
 
 	/**
-	 * TODO SPR-7508: document
+	 * Set the {@link Environment} for this application context.
+	 * <p>Note that there is always a default environment present. Replacement
+	 * is one option, but configuration through {@link #getEnvironment()} may
+	 * also suffice. In either case, any such modifications should be performed
+	 * <em>before</em> {@link #refresh()}. Custom ApplicationContext subclasses
+	 * may wish to override the {@link
+	 * org.springframework.context.support.AbstractApplicationContext#createEnvironment
+	 * createEnvironment()} lifecycle method.
+	 * @param environment the new environment
+	 * @see #getEnvironment
+	 * @see org.springframework.context.support.AbstractApplicationContext#createEnvironment
 	 */
 	void setEnvironment(ConfigurableEnvironment environment);
 

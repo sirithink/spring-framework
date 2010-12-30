@@ -17,7 +17,6 @@
 package org.springframework.core.env;
 
 import static java.lang.String.format;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,20 +30,15 @@ import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
 import static org.springframework.core.env.AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME;
-import static org.springframework.core.env.EnvironmentTests.CollectionMatchers.isEmpty;
 
 import java.lang.reflect.Field;
 import java.security.AccessControlException;
 import java.security.Permission;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Test;
-import org.junit.internal.matchers.TypeSafeMatcher;
 import org.springframework.mock.env.MockPropertySource;
 
 
@@ -70,71 +64,62 @@ public class EnvironmentTests {
 
 	@Test
 	public void activeProfiles() {
-		assertThat(environment.getActiveProfiles(), isEmpty());
+		assertThat(environment.getActiveProfiles().length, is(0));
 		environment.setActiveProfiles("local", "embedded");
-		Set<String> activeProfiles = environment.getActiveProfiles();
-		assertThat(activeProfiles, hasItems("local", "embedded"));
-		assertThat(activeProfiles.size(), is(2));
-		try {
-			environment.getActiveProfiles().add("bogus");
-			fail("activeProfiles should be unmodifiable");
-		} catch (UnsupportedOperationException ex) {
-			// expected
-		}
-		environment.setActiveProfiles("foo");
-		assertThat(activeProfiles, hasItem("foo"));
-		assertThat(environment.getActiveProfiles().size(), is(1));
+		String[] activeProfiles = environment.getActiveProfiles();
+		assertThat(Arrays.asList(activeProfiles), hasItems("local", "embedded"));
+		assertThat(activeProfiles.length, is(2));
 	}
 
 	@Test
 	public void getActiveProfiles_systemPropertiesEmpty() {
-		assertThat(environment.getActiveProfiles(), isEmpty());
+		assertThat(environment.getActiveProfiles().length, is(0));
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, "");
-		assertThat(environment.getActiveProfiles(), isEmpty());
+		assertThat(environment.getActiveProfiles().length, is(0));
 		System.getProperties().remove(ACTIVE_PROFILES_PROPERTY_NAME);
 	}
 
 	@Test
 	public void getActiveProfiles_fromSystemProperties() {
-		assertThat(environment.getActiveProfiles(), isEmpty());
+		assertThat(environment.getActiveProfiles().length, is(0));
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, "foo");
-		assertThat(environment.getActiveProfiles(), hasItem("foo"));
+		assertThat(Arrays.asList(environment.getActiveProfiles()), hasItem("foo"));
 		System.getProperties().remove(ACTIVE_PROFILES_PROPERTY_NAME);
 	}
 
 	@Test
 	public void getActiveProfiles_fromSystemProperties_withMultipleProfiles() {
-		assertThat(environment.getActiveProfiles(), isEmpty());
+		assertThat(environment.getActiveProfiles().length, is(0));
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, "foo,bar");
-		assertThat(environment.getActiveProfiles(), hasItems("foo", "bar"));
+		assertThat(Arrays.asList(environment.getActiveProfiles()), hasItems("foo", "bar"));
 		System.getProperties().remove(ACTIVE_PROFILES_PROPERTY_NAME);
 	}
 
 	@Test
 	public void getActiveProfiles_fromSystemProperties_withMulitpleProfiles_withWhitespace() {
-		assertThat(environment.getActiveProfiles(), isEmpty());
+		assertThat(environment.getActiveProfiles().length, is(0));
 		System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, " bar , baz "); // notice whitespace
-		assertThat(environment.getActiveProfiles(), hasItems("bar", "baz"));
+		assertThat(Arrays.asList(environment.getActiveProfiles()), hasItems("bar", "baz"));
 		System.getProperties().remove(ACTIVE_PROFILES_PROPERTY_NAME);
 	}
 
 	@Test
 	public void getDefaultProfiles() {
-		assertThat(environment.getDefaultProfiles(), isEmpty());
+		assertThat(environment.getDefaultProfiles().length, is(0));
 		environment.getPropertySources().addFirst(new MockPropertySource().withProperty(DEFAULT_PROFILES_PROPERTY_NAME, "pd1"));
-		assertThat(environment.getDefaultProfiles().size(), is(1));
-		assertThat(environment.getDefaultProfiles(), hasItem("pd1"));
+		assertThat(environment.getDefaultProfiles().length, is(1));
+		assertThat(Arrays.asList(environment.getDefaultProfiles()), hasItem("pd1"));
 	}
 
 	@Test
 	public void setDefaultProfiles() {
 		environment.setDefaultProfiles();
-		assertThat(environment.getDefaultProfiles(), isEmpty());
+		assertThat(environment.getDefaultProfiles().length, is(0));
 		environment.setDefaultProfiles("pd1");
-		assertThat(environment.getDefaultProfiles(), hasItem("pd1"));
+		assertThat(Arrays.asList(environment.getDefaultProfiles()), hasItem("pd1"));
 		environment.setDefaultProfiles("pd2", "pd3");
-		assertThat(environment.getDefaultProfiles(), not(hasItem("pd1")));
-		assertThat(environment.getDefaultProfiles(), hasItems("pd2", "pd3"));
+		assertThat(Arrays.asList(environment.getDefaultProfiles()), not(hasItem("pd1")));
+		assertThat(Arrays.asList(environment.getDefaultProfiles()), hasItems("pd2", "pd3"));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -283,23 +268,6 @@ public class EnvironmentTests {
 		System.setSecurityManager(oldSecurityManager);
 		getModifiableSystemEnvironment().remove(ALLOWED_PROPERTY_NAME);
 		getModifiableSystemEnvironment().remove(DISALLOWED_PROPERTY_NAME);
-	}
-
-	public static class CollectionMatchers {
-		public static Matcher<Collection<?>> isEmpty() {
-
-			return new TypeSafeMatcher<Collection<?>>() {
-
-				@Override
-				public boolean matchesSafely(Collection<?> collection) {
-					return collection.isEmpty();
-				}
-
-				public void describeTo(Description desc) {
-					desc.appendText("an empty collection");
-				}
-			};
-		}
 	}
 
 	// TODO SPR-7508: duplicated from EnvironmentPropertyResolutionSearchTests

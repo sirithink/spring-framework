@@ -24,17 +24,28 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 
+/**
+ * {@link PropertyResolver} implementation that resolves property values against
+ * an underlying set of {@link PropertySources}.
+ *
+ * @author Chris Beams
+ * @since 3.1
+ */
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
-	final PropertySources propertySources;
+	private final PropertySources propertySources;
 
+	/**
+	 * Create a new resolver against the given property sources.
+	 * @param propertySources the set of {@link PropertySource} objects to use
+	 */
 	public PropertySourcesPropertyResolver(PropertySources propertySources) {
 		this.propertySources = propertySources;
 	}
 
 
 	public boolean containsProperty(String key) {
-		for (PropertySource<?> propertySource : propertySources.asList()) {
+		for (PropertySource<?> propertySource : this.propertySources.asList()) {
 			if (propertySource.containsProperty(key)) {
 				return true;
 			}
@@ -46,9 +57,8 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 		if (logger.isTraceEnabled()) {
 			logger.trace(format("getProperty(\"%s\") (implicit targetType [String])", key));
 		}
-		return getProperty(key, String.class);
+		return this.getProperty(key, String.class);
 	}
-
 
 	public <T> T getProperty(String key, Class<T> targetValueType) {
 		boolean debugEnabled = logger.isDebugEnabled();
@@ -56,7 +66,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 			logger.trace(format("getProperty(\"%s\", %s)", key, targetValueType.getSimpleName()));
 		}
 	
-		for (PropertySource<?> propertySource : propertySources.asList()) {
+		for (PropertySource<?> propertySource : this.propertySources.asList()) {
 			if (debugEnabled) {
 				logger.debug(format("Searching for key '%s' in [%s]", key, propertySource.getName()));
 			}
@@ -72,7 +82,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 				if (value == null) {
 					return null;
 				}
-				if (!conversionService.canConvert(valueType, targetValueType)) {
+				if (!this.conversionService.canConvert(valueType, targetValueType)) {
 					throw new IllegalArgumentException(
 							format("Cannot convert value [%s] from source type [%s] to target type [%s]",
 									value, valueType.getSimpleName(), targetValueType.getSimpleName()));

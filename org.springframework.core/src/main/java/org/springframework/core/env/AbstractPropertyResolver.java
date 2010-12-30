@@ -17,6 +17,7 @@
 package org.springframework.core.env;
 
 import static java.lang.String.format;
+
 import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_PREFIX;
 import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_SUFFIX;
 import static org.springframework.util.SystemPropertyUtils.VALUE_SEPARATOR;
@@ -29,12 +30,24 @@ import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
 
+/**
+ * Abstract base class for resolving properties against any underlying source.
+ *
+ * @author Chris Beams
+ * @since 3.1
+ */
 public abstract class AbstractPropertyResolver implements ConfigurablePropertyResolver {
 
 	protected final Log logger = LogFactory.getLog(getClass());
+
 	protected ConversionService conversionService = ConversionServiceFactory.createDefaultConversionService();
-	private final PropertyPlaceholderHelper nonStrictHelper = new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, true);
-	private final PropertyPlaceholderHelper strictHelper = new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, false);
+
+	private final PropertyPlaceholderHelper nonStrictHelper =
+		new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, true);
+
+	private final PropertyPlaceholderHelper strictHelper =
+		new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, false);
+
 
 	public ConversionService getConversionService() {
 		return this.conversionService;
@@ -44,18 +57,18 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 		this.conversionService = conversionService;
 	}
 
-	public String getRequiredProperty(String key) {
+	public String getRequiredProperty(String key) throws IllegalStateException {
 		String value = getProperty(key);
 		if (value == null) {
-			throw new IllegalArgumentException(format("required key [%s] not found", key));
+			throw new IllegalStateException(format("required key [%s] not found", key));
 		}
 		return value;
 	}
 
-	public <T> T getRequiredProperty(String key, Class<T> valueType) {
+	public <T> T getRequiredProperty(String key, Class<T> valueType) throws IllegalStateException {
 		T value = getProperty(key, valueType);
 		if (value == null) {
-			throw new IllegalArgumentException(format("required key [%s] not found", key));
+			throw new IllegalStateException(format("required key [%s] not found", key));
 		}
 		return value;
 	}
@@ -65,11 +78,11 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	}
 
 	public String resolvePlaceholders(String text) {
-		return doResolvePlaceholders(text, nonStrictHelper);
+		return doResolvePlaceholders(text, this.nonStrictHelper);
 	}
 
 	public String resolveRequiredPlaceholders(String text) {
-		return doResolvePlaceholders(text, strictHelper);
+		return doResolvePlaceholders(text, this.strictHelper);
 	}
 
 	private String doResolvePlaceholders(String text, PropertyPlaceholderHelper helper) {

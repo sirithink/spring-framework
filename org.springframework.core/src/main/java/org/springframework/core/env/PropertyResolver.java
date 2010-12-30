@@ -18,55 +18,79 @@ package org.springframework.core.env;
 
 import java.util.Properties;
 
+
+/**
+ * Interface for resolving properties against any underlying source.
+ *
+ * @author Chris Beams
+ * @since 3.1
+ * @see Environment#getPropertyResolver()
+ */
 public interface PropertyResolver {
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return whether the given property key is available for resolution
 	 */
 	boolean containsProperty(String key);
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return the property value associated with the given key
+	 * @see #getProperty(String, Class)
 	 */
 	String getProperty(String key);
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return the property value associated with the given key, or {@code null}
+	 * if the key cannot be resolved
 	 */
 	<T> T getProperty(String key, Class<T> targetType);
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return the property value associated with the given key, converted to the given
+	 * targetType (never {@code null})
+	 * @throws IllegalStateException if the key cannot be resolved
+	 * @see #getRequiredProperty(String, Class)
 	 */
-	String getRequiredProperty(String key);
+	String getRequiredProperty(String key) throws IllegalStateException;
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return the property value associated with the given key, converted to the given
+	 * targetType (never {@code null})
+	 * @throws IllegalStateException if the given key cannot be resolved
 	 */
-	<T> T getRequiredProperty(String key, Class<T> targetType);
+	<T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException;
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return the number of unique properties keys resolvable
 	 */
 	int getPropertyCount();
 
 	/**
-	 * TODO SPR-7508: document
+	 * @return all property key/value pairs as a {@link java.util.Properties} instance
 	 */
 	Properties asProperties();
 
 	/**
-	 * TODO SPR-7508: document
-	 * @see #resolveRequiredPlaceholders(String)
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, int)
+	 * Resolve ${...} placeholders in the given text, replacing them with corresponding
+	 * property values as resolved by {@link #getProperty}. Unresolvable placeholders with
+	 * no default value are ignored and passed through unchanged.
+	 * @param text the String to resolve
+	 * @return the resolved String (never {@code null})
+	 * @throws IllegalArgumentException if given text is {@code null}
+	 * @see #resolveRequiredPlaceholders
+	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String)
 	 */
 	String resolvePlaceholders(String text);
 
 	/**
-	 * TODO SPR-7508: document
-	 * @see #resolvePlaceholders(String)
-	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, int)
+	 * Resolve ${...} placeholders in the given text, replacing them with corresponding
+	 * property values as resolved by {@link #getProperty}. Unresolvable placeholders with
+	 * no default value will cause an IllegalArgumentException to be thrown.
+	 * @return the resolved String (never {@code null})
+	 * @throws IllegalArgumentException if given text is {@code null}
+	 * @throws IllegalArgumentException if any placeholders are unresolvable
+	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, boolean)
 	 */
-	String resolveRequiredPlaceholders(String path);
+	String resolveRequiredPlaceholders(String path) throws IllegalArgumentException;
 
 }

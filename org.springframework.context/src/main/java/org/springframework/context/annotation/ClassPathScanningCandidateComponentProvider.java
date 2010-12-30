@@ -116,15 +116,15 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
-	 * TODO SPR-7508: document
+	 * Set the Environment to use when resolving placeholders and evaluating
+	 * {@link Profile @Profile}-annotated component classes.
+	 * <p>The default is a {@link DefaultEnvironment}
+	 * @param environment the Environment to use
 	 */
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
 
-	/**
-	 * TODO SPR-7508: document
-	 */
 	public Environment getEnvironment() {
 		return this.environment;
 	}

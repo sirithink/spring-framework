@@ -28,9 +28,7 @@ import org.springframework.core.env.Environment;
 public interface EnvironmentAware {
 
 	/**
-	 * Set the {@link Environment} object that this object runs in.
-	 * <p>Invoked
-	 * @param environment the Environment object to be used by this object
+	 * Set the Environment that this object runs in.
 	 */
 	void setEnvironment(Environment environment);
 

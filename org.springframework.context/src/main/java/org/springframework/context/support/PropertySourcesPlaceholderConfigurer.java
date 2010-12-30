@@ -51,9 +51,7 @@ public class PropertySourcesPlaceholderConfigurer
 	private PropertyResolver propertyResolver;
 	private Environment environment;
 
-	/**
-	 * TODO SPR-7508: document
-	 */
+
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}

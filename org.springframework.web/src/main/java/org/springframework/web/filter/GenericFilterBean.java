@@ -114,9 +114,6 @@ public abstract class GenericFilterBean implements
 		this.beanName = beanName;
 	}
 
-	/**
-	 * TODO SPR-7508: document
-	 */
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}

@@ -68,8 +68,11 @@ public class AnnotatedBeanDefinitionReader {
 	}
 
 	/**
-	 * Set the Environment to use when registering classes.
+	 * Set the Environment to use when evaluating whether {@link
+	 * org.springframework.context.Profile @Profile}-annotated component
+	 * classes should be registered.
 	 * <p>The default is a {@link DefaultEnvironment}.
+	 * @see #registerBean(Class, String, Class...)
 	 */
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;

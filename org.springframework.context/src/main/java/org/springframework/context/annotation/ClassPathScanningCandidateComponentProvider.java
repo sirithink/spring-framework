@@ -303,6 +303,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				}
 				String[] specifiedProfiles = 
 					(String[])metadata.getAnnotationAttributes(Profile.class.getName()).get(Profile.CANDIDATE_PROFILES_ATTRIB_NAME);
+				// TODO SPR-7508: log that this bean is being rejected on profile mismatch
 				return this.environment.acceptsProfiles(specifiedProfiles);
 			}
 		}

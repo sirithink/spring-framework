@@ -41,6 +41,9 @@ package org.springframework.core.env;
  */
 public interface EnvironmentCapable {
 
+	/**
+	 * @return the environment for this component
+	 */
 	Environment getEnvironment();
 
 }

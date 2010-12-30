@@ -489,10 +489,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
 		// Read document based on new BeanDefinitionDocumentReader SPI. // TODO SPR-7508: polish - remove comment
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
-		// TODO SPR-7508: remove ugly cast
-		if (documentReader instanceof DefaultBeanDefinitionDocumentReader) {
-			((DefaultBeanDefinitionDocumentReader)documentReader).setEnvironment(this.getEnvironment());
-		}
+		documentReader.setEnvironment(this.getEnvironment());
 		int countBefore = getRegistry().getBeanDefinitionCount();
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 		return getRegistry().getBeanDefinitionCount() - countBefore;

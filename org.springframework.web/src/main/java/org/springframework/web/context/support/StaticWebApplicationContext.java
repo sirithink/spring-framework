@@ -159,6 +159,9 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 		return new ServletContextResourcePatternResolver(this);
 	}
 
+	/**
+	 * Create and return a new {@link DefaultWebEnvironment}.
+	 */
 	@Override
 	protected ConfigurableEnvironment createEnvironment() {
 		return new DefaultWebEnvironment();

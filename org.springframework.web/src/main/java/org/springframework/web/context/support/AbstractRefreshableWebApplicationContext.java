@@ -131,6 +131,9 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 		return super.getConfigLocations();
 	}
 
+	/**
+	 * Create and return a new {@link DefaultWebEnvironment}.
+	 */
 	@Override
 	protected ConfigurableEnvironment createEnvironment() {
 		return new DefaultWebEnvironment();

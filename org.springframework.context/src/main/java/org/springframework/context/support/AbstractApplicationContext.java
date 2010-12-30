@@ -280,6 +280,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.environment;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Default value is determined by {@link #createEnvironment()}. Replacing the
+	 * default with this method is one option but configuration through {@link
+	 * #getEnvironment()} should also be considered. In either case, such modifications
+	 * should be performed <em>before</em> {@link #refresh()}.
+	 * @see org.springframework.context.support.AbstractApplicationContext#createEnvironment
+	 */
 	public void setEnvironment(ConfigurableEnvironment environment) {
 		this.environment = environment;
 	}
@@ -402,7 +410,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * SPR-7408: document
+	 * Create and return a new {@link DefaultEnvironment}.
 	 */
 	protected ConfigurableEnvironment createEnvironment() {
 		return new DefaultEnvironment();

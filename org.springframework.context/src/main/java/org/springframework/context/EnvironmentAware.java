@@ -19,12 +19,19 @@ package org.springframework.context;
 import org.springframework.core.env.Environment;
 
 /**
- * TODO SPR-7515: document
+ * Interface to be implemented by any bean that wishes to be notified
+ * of the {@link Environment} that it runs in.
  *
  * @author Chris Beams
+ * @since 3.1
  */
 public interface EnvironmentAware {
 
+	/**
+	 * Set the {@link Environment} object that this object runs in.
+	 * <p>Invoked
+	 * @param environment the Environment object to be used by this object
+	 */
 	void setEnvironment(Environment environment);
 
 }

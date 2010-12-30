@@ -49,10 +49,6 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 	private final ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this);
 
-	{ // TODO: rework this, it's a bit confusing
-		this.setEnvironment(this.getEnvironment());
-	}
-
 	/**
  	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
@@ -81,12 +77,31 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		refresh();
 	}
 
+
 	/**
-	 * TODO SPR-7508: document
+	 * {@inheritDoc}
+	 * <p>Delegates newly created environment to underlying {@link AnnotatedBeanDefinitionReader}
+	 * and {@link ClassPathBeanDefinitionScanner} members.
+	 */
+	@Override
+	protected ConfigurableEnvironment createEnvironment() {
+		ConfigurableEnvironment environment = super.createEnvironment();
+		this.delegateEnvironment(environment);
+		return environment;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>Delegates given environment to underlying {@link AnnotatedBeanDefinitionReader}
+	 * and {@link ClassPathBeanDefinitionScanner} members.
 	 */
 	@Override
 	public void setEnvironment(ConfigurableEnvironment environment) {
 		super.setEnvironment(environment);
+		this.delegateEnvironment(environment);
+	}
+
+	private void delegateEnvironment(ConfigurableEnvironment environment) {
 		this.reader.setEnvironment(environment);
 		this.scanner.setEnvironment(environment);
 	}

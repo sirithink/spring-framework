@@ -31,11 +31,11 @@ import java.lang.annotation.Inherited;
  * {@link Bean}.
  *
  * <p>If this annotation is not present on a Component or Bean definition, eager
- * initialization will occur. If present and set to {@literal true}, the
+ * initialization will occur. If present and set to {@code true}, the
  * Bean/Component will not be initialized until referenced by another bean or
  * explicitly retrieved from the enclosing
  * {@link org.springframework.beans.factory.BeanFactory}. If present and set to
- * {@literal false}, the bean will be instantiated on startup by bean factories
+ * {@code false}, the bean will be instantiated on startup by bean factories
  * that perform eager initialization of singletons.
  *
  * <p>If Lazy is present on a {@link Configuration @Configuration} class, this

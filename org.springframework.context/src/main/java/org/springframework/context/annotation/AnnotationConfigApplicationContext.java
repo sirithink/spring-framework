@@ -26,7 +26,7 @@ import org.springframework.core.env.Environment;
  * Standalone application context, accepting annotated classes as input - in particular
  * {@link org.springframework.context.annotation.Configuration @Configuration}-annotated
  * classes, but also plain {@link org.springframework.stereotype.Component @Components}
- * and JSR-330 compliant classes using {@literal javax.inject} annotations. Allows for
+ * and JSR-330 compliant classes using {@code javax.inject} annotations. Allows for
  * registering classes one by one ({@link #register}) as well as for classpath scanning
  * ({@link #scan}).
  *

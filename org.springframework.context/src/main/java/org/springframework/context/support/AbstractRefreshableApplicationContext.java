@@ -28,7 +28,7 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
 /**
  * Base class for {@link org.springframework.context.ApplicationContext}
- * implementations which are supposed to support multiple calls to {@literal refresh},
+ * implementations which are supposed to support multiple calls to {@link #refresh()},
  * creating a new internal bean factory instance every time.
  * Typically (but not necessarily), such a context will be driven by
  * a set of config locations to load bean definitions from.
@@ -50,7 +50,7 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
  * and {@link FileSystemXmlApplicationContext}, which both derive from the
  * common {@link AbstractXmlApplicationContext} base class;
  * {@link org.springframework.context.annotation.AnnotationConfigApplicationContext}
- * supports {@literal @Configuration}-annotated classes as a source of bean definitions.
+ * supports {@code @Configuration}-annotated classes as a source of bean definitions.
  *
  * @author Juergen Hoeller
  * @author Chris Beams

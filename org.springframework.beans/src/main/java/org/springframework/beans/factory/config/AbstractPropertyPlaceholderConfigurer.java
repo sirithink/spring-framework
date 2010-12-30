@@ -76,7 +76,7 @@ import org.springframework.util.StringValueResolver;
  *
  * <p>Default property values can be defined globally for each configurer instance
  * via the {@link #setProperties properties} property, or on a property-by-property basis
- * using the default value separator which is {@literal ":"} by default and
+ * using the default value separator which is {@code ":"} by default and
  * customizable via {@link #setValueSeparator(String)}.
  *
  * <p>Example XML property with default value:

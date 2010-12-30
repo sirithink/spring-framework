@@ -25,8 +25,8 @@ package org.springframework.core.env;
  * resolution and profile-related operations, this implementation configures two default property
  * sources, to be searched in the following order:
  * <ol>
- *   <li>{@link AbstractEnvironment#getSystemProperties() system properties}
- *   <li>{@link AbstractEnvironment#getSystemEnvironment() system environment variables}
+ *   <li>{@linkplain AbstractEnvironment#getSystemProperties() system properties}
+ *   <li>{@linkplain AbstractEnvironment#getSystemEnvironment() system environment variables}
  * </ol>
  *
  * That is, if the key "xyz" is present both in the JVM system properties as well as in the

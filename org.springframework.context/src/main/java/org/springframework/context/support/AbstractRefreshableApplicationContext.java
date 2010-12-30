@@ -182,7 +182,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation creates a
 	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
-	 * with the {@link #getInternalParentBeanFactory() internal bean factory} of this
+	 * with the {@linkplain #getInternalParentBeanFactory() internal bean factory} of this
 	 * context's parent as parent bean factory. Can be overridden in subclasses,
 	 * for example to customize DefaultListableBeanFactory's settings.
 	 * @return the bean factory for this context
@@ -199,8 +199,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * Customize the internal bean factory used by this context.
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation applies this context's
-	 * {@link #setAllowBeanDefinitionOverriding "allowBeanDefinitionOverriding"}
-	 * and {@link #setAllowCircularReferences "allowCircularReferences"} settings,
+	 * {@linkplain #setAllowBeanDefinitionOverriding "allowBeanDefinitionOverriding"}
+	 * and {@linkplain #setAllowCircularReferences "allowCircularReferences"} settings,
 	 * if specified. Can be overridden in subclasses to customize any of
 	 * {@link DefaultListableBeanFactory}'s settings.
 	 * @param beanFactory the newly created bean factory for this context

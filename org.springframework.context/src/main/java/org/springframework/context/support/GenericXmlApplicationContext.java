@@ -44,8 +44,8 @@ public class GenericXmlApplicationContext extends GenericApplicationContext {
 
 
 	/**
- 	 * Create a new GenericXmlApplicationContext that needs to be populated
-	 * through {@link #load} calls and then manually {@link #refresh refreshed}.
+	 * Create a new GenericXmlApplicationContext that needs to be
+	 * {@linkplain #load loaded} and then manually {@link #refresh refreshed}.
 	 */
 	public GenericXmlApplicationContext() {
 		reader.setEnvironment(this.getEnvironment());

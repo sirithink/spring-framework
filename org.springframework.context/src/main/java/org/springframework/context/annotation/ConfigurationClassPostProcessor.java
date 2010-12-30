@@ -110,7 +110,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Set the {@link MetadataReaderFactory} to use.
 	 * <p>Default is a {@link CachingMetadataReaderFactory} for the specified
-	 * {@link #setBeanClassLoader bean class loader}.
+	 * {@linkplain #setBeanClassLoader bean class loader}.
 	 */
 	public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
 		Assert.notNull(metadataReaderFactory, "MetadataReaderFactory must not be null");

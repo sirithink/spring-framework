@@ -55,7 +55,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 	/**
  	 * Create a new AnnotationConfigApplicationContext that needs to be populated
-	 * through {@link #register} calls and then manually {@link #refresh refreshed}.
+	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
 	}

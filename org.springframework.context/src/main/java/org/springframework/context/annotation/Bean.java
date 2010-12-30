@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowire;
  * to those of the {@literal <bean/>} element in the Spring XML schema.
  *
  * <p>Note that the <code>@Bean</code> annotation does not provide attributes for scope,
- * primary or lazy. Rather, it should be used in conjunction with {@link Scope &#064;Scope},
- * {@link Primary &#064;Primary}, and {@link Lazy &#064;Lazy} annotations to achieve
+ * primary or lazy. Rather, it should be used in conjunction with {@link Scope @Scope},
+ * {@link Primary @Primary}, and {@link Lazy @Lazy} annotations to achieve
  * those semantics. The same annotations can also be used at the type level, e.g. for
  * component scanning.
  *

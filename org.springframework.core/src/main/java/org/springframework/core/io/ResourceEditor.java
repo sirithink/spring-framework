@@ -28,10 +28,9 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link java.beans.PropertyEditor Editor} for {@link Resource}
- * descriptors, to automatically convert <code>String</code> locations
- * e.g. <code>"file:C:/myfile.txt"</code> or
- * <code>"classpath:myfile.txt"</code>) to <code>Resource</code>
- * properties instead of using a <code>String</code> location property.
+ * descriptors, to automatically convert {@code String} locations
+ * e.g. {@literal file:C:/myfile.txt} or {@literal classpath:myfile.txt} to
+ * {@code Resource} properties instead of using a {@code String} location property.
  *
  * <p>The path may contain <code>${...}</code> placeholders, to be
  * resolved as {@link Environment} properties: e.g. <code>${user.dir}</code>.

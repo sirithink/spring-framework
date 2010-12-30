@@ -32,8 +32,8 @@ import java.util.Map;
  * whether defined in XML or annotations; see the spring-beans 3.1 schema or the {@link
  * org.springframework.context.annotation.Profile @Profile} annotation for syntax details.
  * The role of the Environment object with relation to profiles is in determining which profiles
- * (if any) are currently {@link #getActiveProfiles active}, and which profiles (if any) should be
- * {@link #getDefaultProfiles active by default}.
+ * (if any) are currently {@linkplain #getActiveProfiles active}, and which profiles (if any)
+ * should be {@linkplain #getDefaultProfiles active by default}.
  *
  * <p><em>Properties</em> play an important role in almost all applications, and may originate
  * from a variety of sources: properties files, JVM system properties, system environment

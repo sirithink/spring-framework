@@ -31,8 +31,8 @@ import org.springframework.util.StringValueResolver;
 /**
  * Abstract base class for property resource configurers that resolve placeholders
  * in bean definition property values. Implementations <em>pull</em> values from a
- * properties file or other {@link org.springframework.core.env.PropertySource property
- * source} into bean definitions.
+ * properties file or other {@linkplain org.springframework.core.env.PropertySource
+ * property source} into bean definitions.
  *
  * <p>The default placeholder syntax follows the Ant / Log4J / JSP EL style:
  *

@@ -186,11 +186,11 @@ public abstract class PropertySource<T> {
 
 
 	/**
-	 * PropertySource to be used as a placeholder in cases where an actual
+	 * {@code PropertySource} to be used as a placeholder in cases where an actual
 	 * property source cannot be eagerly initialized at application context
-	 * creation time.  For example, a ServletCcontext-based property source
-	 * must wait until the ServletContext object is available to its enclosing
-	 * ApplicationContext.  In such cases, a stub should be used to hold the
+	 * creation time.  For example, a {@code ServletContext}-based property source
+	 * must wait until the {@code ServletContext} object is available to its enclosing
+	 * {@code ApplicationContext}.  In such cases, a stub should be used to hold the
 	 * intended default position/order of the property source, then be replaced
 	 * during context refresh.
 	 *
@@ -206,16 +206,19 @@ public abstract class PropertySource<T> {
 
 		@Override
 		public boolean containsProperty(String key) {
+			// TODO SPR-7408: logging
 			return false;
 		}
 
 		@Override
 		public String getProperty(String key) {
+			// TODO SPR-7408: logging
 			return null;
 		}
 
 		@Override
 		public int size() {
+			// TODO SPR-7408: logging
 			return 0;
 		}
 	}

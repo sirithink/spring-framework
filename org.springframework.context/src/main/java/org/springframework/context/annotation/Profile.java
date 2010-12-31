@@ -54,8 +54,12 @@ public @interface Profile {
 
 
 	static class Helper {
+		/**
+		 * @return whether the given metadata includes Profile information, whether directly or
+		 * through meta-annotation
+		 */
 		static boolean isProfileAnnotationPresent(AnnotationMetadata metadata) {
-			return metadata.hasAnnotation(Profile.class.getName());
+			return metadata.isAnnotated(Profile.class.getName());
 		}
 
 		static String[] getCandidateProfiles(AnnotationMetadata metadata) {

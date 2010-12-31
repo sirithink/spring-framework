@@ -118,6 +118,9 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 	private BeanFactory beanFactory;
 
 
+	/**
+	 * Return the PlaceholderResolver for this configurer.
+	 */
 	protected abstract PlaceholderResolver getPlaceholderResolver(Properties props);
 
 	/**

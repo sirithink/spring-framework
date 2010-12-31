@@ -29,26 +29,31 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
-
 /**
  * TODO SPR-7508: document
  *
- * Local properties are added as a property source in any case. Precedence is based
- * on the value of the {@link #setLocalOverride(boolean) localOverride} property.
+ * <p>Local properties are added as a property source in any case. Precedence is based
+ * on the value of the {@link #setLocalOverride localOverride} property.
  *
  * @author Chris Beams
  * @since 3.1
+ * @see AbstractPropertyPlaceholderConfigurer
  * @see PropertyPlaceholderConfigurer
  */
-public class PropertySourcesPlaceholderConfigurer
-		extends AbstractPropertyPlaceholderConfigurer implements EnvironmentAware {
+public class PropertySourcesPlaceholderConfigurer extends AbstractPropertyPlaceholderConfigurer
+		implements EnvironmentAware {
+
+	public static final String LOCAL_PROPERTIES_PROPERTY_SOURCE_NAME = "localProperties";
 
 	private MutablePropertySources propertySources;
+
 	private PropertyResolver propertyResolver;
+
 	private Environment environment;
 
 
@@ -57,7 +62,8 @@ public class PropertySourcesPlaceholderConfigurer
 	}
 
 	/**
-	 * TODO SPR-7508: document
+	 * Customize the set of {@link PropertySources} to be used by this configurer.
+	 * Setting this property indicates that TODO SPR-7508
 	 */
 	public void setPropertySources(PropertySources propertySources) {
 		this.propertySources = new MutablePropertySources(propertySources);
@@ -80,7 +86,8 @@ public class PropertySourcesPlaceholderConfigurer
 				this.propertySources.addAll(this.environment.getPropertySources());
 			}
 			try {
-				PropertiesPropertySource localPropertySource = new PropertiesPropertySource("localProperties", mergeProperties());
+				PropertySource<?> localPropertySource =
+					new PropertiesPropertySource(LOCAL_PROPERTIES_PROPERTY_SOURCE_NAME, this.mergeProperties());
 				if (this.localOverride) {
 					this.propertySources.addFirst(localPropertySource);
 				} else {

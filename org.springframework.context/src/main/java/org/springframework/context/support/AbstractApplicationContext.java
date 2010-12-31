@@ -206,7 +206,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** Statically specified listeners */
 	private Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<ApplicationListener<?>>();
 
-	/** TODO SPR-7508: document */
+	/** Environment used by this context; initialized by {@link #createEnvironment()} */
 	private ConfigurableEnvironment environment;
 
 

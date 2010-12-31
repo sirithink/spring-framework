@@ -120,11 +120,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @see SystemPropertyUtils#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
-		// TODO SPR-7508: note that ARAC cannot delegate to its beanFactory's environment
-		// to call Environment.resolve[Required]Placeholders(String), as the bean factory
-		// has not yet been initialized.  This amounts to one more reason not to use the ARAC
-		// hierarchy - it won't have early access to environment property resolution.
-		return SystemPropertyUtils.resolvePlaceholders(path);
+		return this.getEnvironment().getPropertyResolver().resolveRequiredPlaceholders(path);
 	}
 
 

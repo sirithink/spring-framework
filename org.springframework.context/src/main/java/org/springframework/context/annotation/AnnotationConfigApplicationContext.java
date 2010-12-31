@@ -16,11 +16,9 @@
 
 package org.springframework.context.annotation;
 
-import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 
 /**
  * Standalone application context, accepting annotated classes as input - in particular

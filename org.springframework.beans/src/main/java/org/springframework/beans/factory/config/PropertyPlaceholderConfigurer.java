@@ -27,7 +27,10 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
 
 /**
- * A property resource configurer that resolves placeholders in bean property values of
+ * TODO: SPR-7408 update documentation with APPC in mind; explain that this PSPC is preferred
+ * over this class in cases other than preserving backward compat with SYSTEM_PROPERTIES_MODE_*
+ *
+ * <p>A property resource configurer that resolves placeholders in bean property values of
  * context definitions. It <i>pulls</i> values from a properties file into bean definitions.
  *
  * <p>The default placeholder syntax follows the Ant / Log4J / JSP EL style:

@@ -48,6 +48,10 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 public class PropertySourcesPlaceholderConfigurer extends AbstractPropertyPlaceholderConfigurer
 		implements EnvironmentAware {
 
+	/**
+	 * {@value} is the name given to the {@link PropertySource} for the set of
+	 * {@linkplain #mergeProperties() merged properties} supplied to this configurer.
+	 */
 	public static final String LOCAL_PROPERTIES_PROPERTY_SOURCE_NAME = "localProperties";
 
 	private MutablePropertySources propertySources;
@@ -57,13 +61,21 @@ public class PropertySourcesPlaceholderConfigurer extends AbstractPropertyPlaceh
 	private Environment environment;
 
 
+	/**
+	 * {@inheritDoc}
+	 * <p>{@code PropertySources} from this environment will be searched when replacing ${...} placeholders
+	 * @see #setPropertySources
+	 * @see #postProcessBeanFactory
+	 */
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
 
 	/**
 	 * Customize the set of {@link PropertySources} to be used by this configurer.
-	 * Setting this property indicates that TODO SPR-7508
+	 * Setting this property indicates that environment property sources and local
+	 * properties should be ignored.
+	 * @see #postProcessBeanFactory
 	 */
 	public void setPropertySources(PropertySources propertySources) {
 		this.propertySources = new MutablePropertySources(propertySources);
@@ -78,6 +90,22 @@ public class PropertySourcesPlaceholderConfigurer extends AbstractPropertyPlaceh
 		};
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Processing occurs by replacing ${...} placeholders in bean definitions by resolving each
+	 * against this configurer's set of {@link PropertySources}, which includes:
+	 * <ul>
+	 *   <li>all {@linkplain Environment#getPropertySources environment property sources}, if an
+	 *       {@code Environment} {@linkplain #setEnvironment is present}
+	 *   <li>{@linkplain #mergeProperties merged local properties}, if {@linkplain #setLocation any}
+	 *       {@linkplain #setLocations have} {@linkplain #setProperties been}
+	 *       {@linkplain #setPropertiesArray specified}
+	 *   <li>any property sources set by calling {@link #setPropertySources}
+	 * </ul>
+	 * <p>If {@link #setPropertySources} is called, <strong>environment and local properties will be
+	 * ignored</strong>. This method is designed to give the user fine-grained control over property
+	 * sources, and once set, the configurer makes no assumptions about adding additional sources.
+	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.propertySources == null) {

@@ -94,19 +94,22 @@ import org.springframework.util.StringValueResolver;
 public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyResourceConfigurer
 		implements BeanNameAware, BeanFactoryAware {
 
-	/** Default placeholder prefix: "${" */
+	/** Default placeholder prefix: {@value} */
 	public static final String DEFAULT_PLACEHOLDER_PREFIX = "${";
 
-	/** Default placeholder suffix: "}" */
+	/** Default placeholder suffix: {@value} */
 	public static final String DEFAULT_PLACEHOLDER_SUFFIX = "}";
 
-	/** Default value separator: ":" */
+	/** Default value separator: {@value} */
 	public static final String DEFAULT_VALUE_SEPARATOR = ":";
 
+	/** Defaults to {@value #DEFAULT_PLACEHOLDER_PREFIX} */
 	protected String placeholderPrefix = DEFAULT_PLACEHOLDER_PREFIX;
 
+	/** Defaults to {@value #DEFAULT_PLACEHOLDER_SUFFIX} */
 	protected String placeholderSuffix = DEFAULT_PLACEHOLDER_SUFFIX;
 
+	/** Defaults to {@value #DEFAULT_VALUE_SEPARATOR} */
 	protected String valueSeparator = DEFAULT_VALUE_SEPARATOR;
 
 	protected boolean ignoreUnresolvablePlaceholders = false;
@@ -119,14 +122,13 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 
 
 	/**
-	 * Return the PlaceholderResolver for this configurer.
+	 * Return the {@code PlaceholderResolver} for this configurer.
 	 */
 	protected abstract PlaceholderResolver getPlaceholderResolver(Properties props);
 
 	/**
 	 * Set the prefix that a placeholder string starts with.
-	 * The default is "${".
-	 * @see #DEFAULT_PLACEHOLDER_PREFIX
+	 * The default is {@value #DEFAULT_PLACEHOLDER_PREFIX}.
 	 */
 	public void setPlaceholderPrefix(String placeholderPrefix) {
 		this.placeholderPrefix = placeholderPrefix;
@@ -134,8 +136,7 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 
 	/**
 	 * Set the suffix that a placeholder string ends with.
-	 * The default is "}".
-	 * @see #DEFAULT_PLACEHOLDER_SUFFIX
+	 * The default is {@value #DEFAULT_PLACEHOLDER_SUFFIX}.
 	 */
 	public void setPlaceholderSuffix(String placeholderSuffix) {
 		this.placeholderSuffix = placeholderSuffix;
@@ -143,7 +144,7 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 
 	/**
 	 * Specify the separating character between the placeholder variable
-	 * and the associated default value, or <code>null</code> if no such
+	 * and the associated default value, or {@code null} if no such
 	 * special character should be processed as a value separator.
 	 * The default is {@value #DEFAULT_VALUE_SEPARATOR}.
 	 */
@@ -152,13 +153,13 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 	}
 
 	/**
-	 * Set a value that should be treated as <code>null</code> when
+	 * Set a value that should be treated as {@code null} when
 	 * resolved as a placeholder value: e.g. "" (empty String) or "null".
 	 * <p>Note that this will only apply to full property values,
 	 * not to parts of concatenated values.
 	 * <p>By default, no such null value is defined. This means that
-	 * there is no way to express <code>null</code> as a property
-	 * value unless you explictly map a corresponding value here.
+	 * there is no way to express {@code null} as a property
+	 * value unless you explicitly map a corresponding value here.
 	 */
 	public void setNullValue(String nullValue) {
 		this.nullValue = nullValue;
@@ -200,6 +201,10 @@ public abstract class AbstractPropertyPlaceholderConfigurer extends PropertyReso
 	}
 
 
+	/**
+	 * Visit each bean definition in the given bean factory and attempt to replace ${...} property
+	 * placeholders with values from the given properties.
+	 */
 	@Override
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
 			throws BeansException {

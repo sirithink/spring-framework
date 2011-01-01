@@ -37,23 +37,24 @@ public interface ConfigurableEnvironment extends Environment {
 	 *
 	 * @see #setDefaultProfiles
 	 * @see org.springframework.context.annotation.Profile
+	 * @see AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME
 	 */
 	void setActiveProfiles(String... profiles);
 
 	/**
 	 * Specify the set of profiles to be made active by default if no other profiles
 	 * are explicitly made active through {@link #setActiveProfiles}.
-	 * @param profiles
+	 * @see AbstractEnvironment#DEFAULT_PROFILES_PROPERTY_NAME
 	 */
 	void setDefaultProfiles(String... profiles);
 
 	/**
-	 * @return the {@link PropertySources} for this environment in mutable form
+	 * Return the {@link PropertySources} for this environment in mutable form
 	 */
 	MutablePropertySources getPropertySources();
 
 	/**
-	 * @return the {@link PropertyResolver} for this environment in configurable form
+	 * Return the {@link PropertyResolver} for this environment in configurable form
 	 */
 	ConfigurablePropertyResolver getPropertyResolver();
 

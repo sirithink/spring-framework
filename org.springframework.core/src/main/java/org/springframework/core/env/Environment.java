@@ -71,21 +71,21 @@ public interface Environment {
 	/**
 	 * Return the set of profiles explicitly made active for this environment. Profiles are used for
 	 * creating logical groupings of bean definitions to be registered conditionally, often based on
-	 * deployment environment.  Profiles can be activated by using passing
-	 * {@value AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME} as a system property or by calling
-	 * {@link ConfigurableEnvironment#setActiveProfiles(String...)}.
+	 * deployment environment.  Profiles can be activated by setting {@linkplain
+	 * AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME "spring.profiles.active"} as a system property
+	 * or by calling {@link ConfigurableEnvironment#setActiveProfiles(String...)}.
 	 *
 	 * <p>If no profiles have explicitly been specified as active, then any 'default' profiles will implicitly
 	 * be considered active.
 	 *
-	 * @return the set of profiles explicitly made active for this {@link Environment}
 	 * @see #getDefaultProfiles
 	 * @see ConfigurableEnvironment#setActiveProfiles
+	 * @see AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME
 	 */
 	String[] getActiveProfiles();
 
 	/**
-	 * @return the set of profiles to be active by default when no active profiles have been set explicitly
+	 * Return the set of profiles to be active by default when no active profiles have been set explicitly
 	 *
 	 * @see #getActiveProfiles
 	 * @see ConfigurableEnvironment#setDefaultProfiles
@@ -110,7 +110,7 @@ public interface Environment {
 	PropertyResolver getPropertyResolver();
 
 	/**
-	 * @return the set of {@link PropertySource} objects used by by this Environment's PropertyResolver
+	 * Return the set of {@link PropertySource} objects used by by this Environment's PropertyResolver
 	 * @see #getPropertyResolver
 	 */
 	PropertySources getPropertySources();
@@ -135,7 +135,7 @@ public interface Environment {
 	 * otherwise return a map implementation that will attempt to access individual keys using calls to
 	 * {@link System#getenv(String)}.
 	 *
-	 * <p>Note that most {@link Environment} implementations will include this system properties map as a
+	 * <p>Note that most {@code Environment} implementations will include this system properties map as a
 	 * default {@link PropertySource} to be searched. Therefore, it is recommended that this method not be
 	 * used directly unless bypassing other property sources is expressly intended.
 	 *

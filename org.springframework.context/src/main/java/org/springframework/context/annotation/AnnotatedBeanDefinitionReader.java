@@ -50,9 +50,9 @@ public class AnnotatedBeanDefinitionReader {
 
 
 	/**
-	 * Create a new AnnotatedBeanDefinitionReader for the given bean factory.
-	 * @param registry the BeanFactory to load bean definitions into,
-	 * in the form of a BeanDefinitionRegistry
+	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given bean factory.
+	 * @param registry the {@code BeanFactory} to load bean definitions into,
+	 * in the form of a {@code BeanDefinitionRegistry}
 	 */
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry) {
 		this.registry = registry;
@@ -68,9 +68,8 @@ public class AnnotatedBeanDefinitionReader {
 	}
 
 	/**
-	 * Set the Environment to use when evaluating whether {@link
-	 * org.springframework.context.Profile @Profile}-annotated component
-	 * classes should be registered.
+	 * Set the Environment to use when evaluating whether
+	 * {@link Profile @Profile}-annotated component classes should be registered.
 	 * <p>The default is a {@link DefaultEnvironment}.
 	 * @see #registerBean(Class, String, Class...)
 	 */
@@ -83,7 +82,8 @@ public class AnnotatedBeanDefinitionReader {
 	 * <p>The default is a {@link AnnotationBeanNameGenerator}.
 	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
-		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : new AnnotationBeanNameGenerator());
+		this.beanNameGenerator = (beanNameGenerator != null ?
+				beanNameGenerator : new AnnotationBeanNameGenerator());
 	}
 
 	/**
@@ -91,7 +91,8 @@ public class AnnotatedBeanDefinitionReader {
 	 * <p>The default is an {@link AnnotationScopeMetadataResolver}.
 	 */
 	public void setScopeMetadataResolver(ScopeMetadataResolver scopeMetadataResolver) {
-		this.scopeMetadataResolver = (scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
+		this.scopeMetadataResolver = (scopeMetadataResolver != null ?
+				scopeMetadataResolver : new AnnotationScopeMetadataResolver());
 	}
 
 

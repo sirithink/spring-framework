@@ -25,7 +25,7 @@ import org.springframework.web.context.ServletContextAware;
 
 
 /**
- * Subclass of PropertyPlaceholderConfigurer that resolves placeholders as
+ * Subclass of {@link PropertyPlaceholderConfigurer} that resolves placeholders as
  * ServletContext init parameters (that is, <code>web.xml</code> context-param
  * entries).
  *
@@ -59,7 +59,7 @@ import org.springframework.web.context.ServletContextAware;
  * @see javax.servlet.ServletContext#getInitParameter(String)
  * @see javax.servlet.ServletContext#getAttribute(String)
  * @deprecated in Spring 3.1 in favor of {@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer}
- * in conjunction with {@link org.springframework.web.servlet.support.DefaultWebEnvironment}.
+ * in conjunction with {@link org.springframework.web.context.support.DefaultWebEnvironment}.
  */
 @Deprecated
 public class ServletContextPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer

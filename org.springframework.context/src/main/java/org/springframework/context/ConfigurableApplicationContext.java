@@ -101,7 +101,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	ConfigurableEnvironment getEnvironment();
 
 	/**
-	 * Set the Environment for this application context.
+	 * Set the {@code Environment} for this application context.
 	 * @param environment the new environment
 	 */
 	void setEnvironment(ConfigurableEnvironment environment);

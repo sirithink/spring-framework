@@ -164,6 +164,10 @@ public class GenericWebApplicationContext extends GenericApplicationContext
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Replace {@code Servlet}-related property sources.
+	 */
 	@Override
 	protected void initPropertySources() {
 		super.initPropertySources();

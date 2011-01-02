@@ -91,8 +91,9 @@ public class GenericXmlApplicationContext extends GenericApplicationContext {
 	}
 
 	/**
-	 * Set a custom environment.  Should be called before any call to
-	 * {@link #load}. TODO SPR-7508: document
+	 * {@inheritDoc}
+	 * <p>Delegates the given environment to underlying {@link XmlBeanDefinitionReader}.
+	 * Should be called before any call to {@link #load}.
 	 */
 	@Override
 	public void setEnvironment(ConfigurableEnvironment environment) {

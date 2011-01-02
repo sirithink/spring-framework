@@ -489,7 +489,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Replace any placeholder property sources with actual instances.
+	 * <p>Replace any stub property sources with actual instances.
+	 * @see org.springframework.core.env.PropertySource.StubPropertySource
+	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initSerlvetPropertySources
 	 */
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.

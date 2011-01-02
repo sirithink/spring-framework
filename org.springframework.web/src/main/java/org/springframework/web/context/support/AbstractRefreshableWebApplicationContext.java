@@ -179,11 +179,16 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Replace {@code Servlet}-related property sources.
+	 */
 	@Override
 	protected void initPropertySources() {
 		super.initPropertySources();
 		WebApplicationContextUtils.initServletPropertySources(
-				this.getEnvironment().getPropertySources(), this.servletContext, this.servletConfig);
+				this.getEnvironment().getPropertySources(), this.servletContext,
+				this.servletConfig);
 	}
 
 	public Theme getTheme(String themeName) {

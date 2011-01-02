@@ -225,12 +225,23 @@ public abstract class WebApplicationContextUtils {
 		}
 	}
 
+	/**
+	 * Replace {@code Servlet}-based stub property sources with actual instances
+	 * populated with the given context object.
+	 * @see org.springframework.core.env.PropertySource.StubPropertySource
+	 * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
+	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources(MutablePropertySources, ServletContext)
+	 */
 	public static void initServletPropertySources(
 			MutablePropertySources propertySources, ServletContext servletContext) {
 		initServletPropertySources(propertySources, servletContext, null);
 	}
 
 	/**
+	 * Replace {@code Servlet}-based stub property sources with actual instances
+	 * populated with the given context and config objects.
+	 * @see org.springframework.core.env.PropertySource.StubPropertySource
+	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources(MutablePropertySources, ServletContext)
 	 * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
 	 */
 	public static void initServletPropertySources(

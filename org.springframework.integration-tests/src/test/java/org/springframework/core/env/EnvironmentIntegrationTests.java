@@ -72,6 +72,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.context.support.StaticWebApplicationContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.portlet.context.AbstractRefreshablePortletApplicationContext;
+import org.springframework.web.portlet.context.DefaultPortletEnvironment;
 import org.springframework.web.portlet.context.StaticPortletApplicationContext;
 import org.springframework.web.portlet.context.XmlPortletApplicationContext;
 
@@ -560,8 +561,7 @@ public class EnvironmentIntegrationTests {
 	public void staticPortletApplicationContext() {
 		StaticPortletApplicationContext ctx = new StaticPortletApplicationContext();
 
-		// TODO SPR-7508: should be a Portlet-specific environment?
-		assertHasDefaultWebEnvironment(ctx);
+		assertHasDefaultPortletEnvironment(ctx);
 
 		registerEnvironmentBeanDefinition(ctx);
 
@@ -616,6 +616,12 @@ public class EnvironmentIntegrationTests {
 		Environment defaultEnv = ctx.getEnvironment();
 		assertThat(defaultEnv, notNullValue());
 		assertThat(defaultEnv, instanceOf(DefaultWebEnvironment.class));
+	}
+
+	private void assertHasDefaultPortletEnvironment(WebApplicationContext ctx) {
+		Environment defaultEnv = ctx.getEnvironment();
+		assertThat(defaultEnv, notNullValue());
+		assertThat(defaultEnv, instanceOf(DefaultPortletEnvironment.class));
 	}
 
 	private void assertHasEnvironment(ApplicationContext ctx, Environment expectedEnv) {

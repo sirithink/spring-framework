@@ -16,7 +16,6 @@
 
 package org.springframework.core.env;
 
-
 /**
  * Configuration interface to be implemented by most if not all {@link Environment
  * Environments}. Provides facilities for setting active and default profiles as well

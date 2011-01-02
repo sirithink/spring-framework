@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-
 /**
- * Abstract base class for all {@link Environment} implementations.
+ * Abstract base class for {@link Environment} implementations.
  *
  * @author Chris Beams
  * @since 3.1
@@ -149,17 +148,6 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return systemEnvironment;
 	}
 
-	/**
-	 * TODO SPR-7508: document
-	 *
-	 * Returns a string, string map even though the underlying system properties
-	 * are a properties object that can technically contain non-string keys and values.
-	 * Thus, the unchecked conversions and raw map type being used.  In practice, it will
-	 * always be 'safe' to interact with the properties map as if it contains only strings,
-	 * because Properties copes with this in its getProperty method.  We never access the
-	 * properties object via its Hashtable.get() method, so any non-string keys/values
-	 * get effectively ignored.
-	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public Map<String, String> getSystemProperties() {
 		Map systemProperties;

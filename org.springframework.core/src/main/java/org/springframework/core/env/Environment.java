@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.core.env;
 
 import java.util.Map;
-
 
 /**
  * Interface representing the environment in which the current application is running.
@@ -133,7 +132,7 @@ public interface Environment {
 	/**
 	 * Return the value of {@link System#getProperties()} if allowed by the current {@link SecurityManager},
 	 * otherwise return a map implementation that will attempt to access individual keys using calls to
-	 * {@link System#getenv(String)}.
+	 * {@link System#getProperty(String)}.
 	 *
 	 * <p>Note that most {@code Environment} implementations will include this system properties map as a
 	 * default {@link PropertySource} to be searched. Therefore, it is recommended that this method not be

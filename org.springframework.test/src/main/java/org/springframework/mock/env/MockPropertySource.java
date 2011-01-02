@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,10 +82,18 @@ public class MockPropertySource extends PropertiesPropertySource {
 		super(name, properties);
 	}
 
+	/**
+	 * Set the given property on the underlying {@link Properties} object.
+	 */
 	public void setProperty(String key, String value) {
 		this.source.setProperty(key, value);
 	}
 
+	/**
+	 * Convenient synonym for {@link #setProperty} that returns the current instance.
+	 * Useful for method chaining and fluent-style use.
+	 * @return this {@link MockPropertySource} instance
+	 */
 	public MockPropertySource withProperty(String key, String value) {
 		this.setProperty(key, value);
 		return this;

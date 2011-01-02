@@ -216,8 +216,8 @@ public class EnvironmentTests {
 			// cannot do what they're attempting.
 			try {
 				systemProperties.get(NON_STRING_PROPERTY_NAME);
-				fail("Expected IllegalStateException when searching with non-string key against ReadOnlySystemAttributesMap");
-			} catch (IllegalStateException ex) {
+				fail("Expected IllegalArgumentException when searching with non-string key against ReadOnlySystemAttributesMap");
+			} catch (IllegalArgumentException ex) {
 				// expected
 			}
 		}

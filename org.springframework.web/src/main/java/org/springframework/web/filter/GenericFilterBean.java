@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,16 +88,10 @@ public abstract class GenericFilterBean implements
 	 */
 	private final Set<String> requiredProperties = new HashSet<String>();
 
-	/* The FilterConfig of this filter */
 	private FilterConfig filterConfig;
 
 	private String beanName;
 
-	/**
-	 * TODO SPR-7508: document
-	 * Defaults to {@link DefaultWebEnvironment}; can be overriden if deployed
-	 * as a spring bean by {@link #setEnvironment(Environment)}
-	 */
 	private Environment environment = new DefaultWebEnvironment();
 
 	private ServletContext servletContext;
@@ -114,6 +108,11 @@ public abstract class GenericFilterBean implements
 		this.beanName = beanName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Any environment set here overrides the {@link DefaultWebEnvironment}
+	 * provided by default.
+	 */
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}

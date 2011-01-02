@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
 /**
- * TODO SPR-7508: document
+ * Specialization of {@link AbstractPropertyPlaceholderConfigurer}
  *
  * <p>Local properties are added as a property source in any case. Precedence is based
  * on the value of the {@link #setLocalOverride localOverride} property.

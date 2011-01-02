@@ -23,9 +23,8 @@ import javax.servlet.ServletConfig;
 import org.springframework.core.env.PropertySource;
 
 /**
- * {@link PropertySource} implementation that extracts {@link ServletConfig}
- * init parameters as properties.
- * 
+ * {@link PropertySource} that reads init parameters from a {@link ServletConfig} object.
+ *
  * @author Chris Beams
  * @since 3.1
  * @see ServletContextPropertySource

@@ -23,9 +23,8 @@ import javax.portlet.PortletContext;
 import org.springframework.core.env.PropertySource;
 
 /**
- * {@link PropertySource} implementation that extracts {@link PortletContext}
- * init parameters as properties.
- * 
+ * {@link PropertySource} that reads init parameters from a {@link PortletContext} object.
+ *
  * @author Chris Beams
  * @since 3.1
  * @see PortletConfigPropertySource

@@ -175,7 +175,7 @@ public abstract class PropertySource<T> {
 	 * </pre>
 	 *
 	 * <p>The returned {@code PropertySource} will throw {@code UnsupportedOperationException}
-	 * if any methods other than {@code equals(Object)}, {@code hashcode()}, and {@code toString()}
+	 * if any methods other than {@code equals(Object)}, {@code hashCode()}, and {@code toString()}
 	 * are called.
 	 *
 	 * @param name the name of the comparison {@code PropertySource} to be created and returned.

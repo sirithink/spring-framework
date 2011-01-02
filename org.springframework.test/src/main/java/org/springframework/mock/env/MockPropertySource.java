@@ -36,6 +36,7 @@ import org.springframework.core.env.PropertySource;
  *
  * @author Chris Beams
  * @since 3.1
+ * @see MockEnvironment
  */
 public class MockPropertySource extends PropertiesPropertySource {
 
@@ -74,8 +75,9 @@ public class MockPropertySource extends PropertiesPropertySource {
 	}
 
 	/**
-	 * Create a new {@code MockPropertySource} with backed by the given {@link Properties}
-	 * object that will be given a default name.
+	 * Create a new {@code MockPropertySource} with with the given name and backed by the given
+	 * {@link Properties} object
+	 * @param name the {@linkplain #getName() name} of the property source
 	 * @param properties the properties to use
 	 */
 	public MockPropertySource(String name, Properties properties) {

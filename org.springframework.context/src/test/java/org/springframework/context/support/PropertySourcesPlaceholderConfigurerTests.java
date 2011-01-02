@@ -113,7 +113,7 @@ public class PropertySourcesPlaceholderConfigurerTests {
 
 		PropertySourcesPlaceholderConfigurer pc = new PropertySourcesPlaceholderConfigurer();
 		pc.setPropertySources(propertySources);
-		pc.setEnvironment(MockEnvironment.withProperty("my.name", "env"));
+		pc.setEnvironment(new MockEnvironment().withProperty("my.name", "env"));
 		pc.setIgnoreUnresolvablePlaceholders(true);
 		pc.postProcessBeanFactory(bf);
 		assertThat(bf.getBean(TestBean.class).getName(), equalTo("${my.name}"));
@@ -151,7 +151,7 @@ public class PropertySourcesPlaceholderConfigurerTests {
 
 		ppc.setLocalOverride(override);
 		ppc.setProperties(new Properties() {{ setProperty("foo", "local"); }});
-		ppc.setEnvironment(MockEnvironment.withProperty("foo", "enclosing"));
+		ppc.setEnvironment(new MockEnvironment().withProperty("foo", "enclosing"));
 		ppc.postProcessBeanFactory(bf);
 		if (override) {
 			assertThat(bf.getBean(TestBean.class).getName(), equalTo("local"));

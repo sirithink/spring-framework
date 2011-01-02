@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-
 
 /**
  * {@link PropertyResolver} implementation that resolves property values against
@@ -98,18 +97,12 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	public Properties asProperties() {
-		// TODO SPR-7508: refactor, simplify. only handles map-based propertysources right now.
 		Properties mergedProps = new Properties();
 		List<PropertySource<?>> propertySourcesList = this.propertySources.asList();
 		for (int i = propertySourcesList.size() -1; i >= 0; i--) {
-			PropertySource<?> propertySource = propertySourcesList.get(i);
-			Object object = propertySource.getSource();
-			if (object instanceof Map) {
-				for (Entry<?, ?> entry : ((Map<?, ?>)object).entrySet()) {
-					mergedProps.put(entry.getKey(), entry.getValue());
-				}
-			} else {
-				throw new IllegalArgumentException("unknown PropertySource source type: " + object.getClass().getName());
+			PropertySource<?> source = propertySourcesList.get(i);
+			for (String key : source.getPropertyNames()) {
+				mergedProps.put(key, source.getProperty(key));
 			}
 		}
 		return mergedProps;

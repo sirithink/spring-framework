@@ -16,37 +16,26 @@
 
 package org.springframework.core.env;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
- * {@link PropertySource} implementation that extracts properties
- * from a {@link java.util.Properties} object.
+ * {@link PropertySource} implementation that extracts properties from a {@link java.util.Properties} object.
+ *
  * <p>Note that because a {@code Properties} object is technically an {@code <Object, Object>}
- * {@link Hashtable}, one may contain non-{@code String} keys or values. This implementation,
- * however is restricted to accessing only {@code String}-based keys and values, in the same fashion
- * as {@link Properties#getProperty(String)} and {@link Properties#setProperty(String, String)}.
+ * {@link java.util.Hashtable Hashtable}, one may contain non-{@code String} keys or values. This
+ * implementation, however is restricted to accessing only {@code String}-based keys and values, in
+ * the same fashion as {@link Properties#getProperty} and {@link Properties#setProperty}.
  *
  * @author Chris Beams
  * @since 3.1
  * @see org.springframework.mock.env.MockPropertySource
  */
-public class PropertiesPropertySource extends PropertySource<Properties> {
+public class PropertiesPropertySource extends MapPropertySource {
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PropertiesPropertySource(String name, Properties source) {
-		super(name, source);
-	}
-
-	public boolean containsProperty(String key) {
-		return source.containsKey(key);
-	}
-
-	public String getProperty(String key) {
-		return source.getProperty(key);
-	}
-
-	@Override
-	public int size() {
-		return source.size();
+		super(name, (Map)source);
 	}
 
 }

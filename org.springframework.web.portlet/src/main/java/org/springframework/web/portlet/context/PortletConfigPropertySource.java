@@ -16,7 +16,7 @@
 
 package org.springframework.web.portlet.context;
 
-import java.util.Enumeration;
+import java.util.LinkedHashSet;
 
 import javax.portlet.PortletConfig;
 
@@ -36,29 +36,16 @@ public class PortletConfigPropertySource extends PropertySource<PortletConfig> {
 	}
 
 	@Override
-	public boolean containsProperty(String name) {
-		Enumeration<?> initParamNames = this.source.getInitParameterNames();
-		while (initParamNames.hasMoreElements()) {
-			if (initParamNames.nextElement().equals(name)) {
-				return true;
-			}
+	public String[] getPropertyNames() {
+		LinkedHashSet<String> names = new LinkedHashSet<String>();
+		while (this.source.getInitParameterNames().hasMoreElements()) {
+			names.add(this.source.getInitParameterNames().nextElement());
 		}
-		return false;
+		return names.toArray(EMPTY_NAMES_ARRAY);
 	}
 
 	@Override
 	public String getProperty(String name) {
 		return this.source.getInitParameter(name);
-	}
-
-	@Override
-	public int size() {
-		int size=0;
-		Enumeration<?> initParamNames = this.source.getInitParameterNames();
-		while (initParamNames.hasMoreElements()) {
-			initParamNames.nextElement();
-			size++;
-		}
-		return size;
 	}
 }

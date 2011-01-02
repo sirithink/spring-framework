@@ -88,7 +88,7 @@ public class MockPropertySource extends PropertiesPropertySource {
 	 * Set the given property on the underlying {@link Properties} object.
 	 */
 	public void setProperty(String key, String value) {
-		this.source.setProperty(key, value);
+		this.source.put(key, value);
 	}
 
 	/**

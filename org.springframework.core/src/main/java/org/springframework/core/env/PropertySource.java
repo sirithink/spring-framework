@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.core.env;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.util.Assert;
 
 /**
@@ -47,6 +46,8 @@ import org.springframework.util.Assert;
  * @see MutablePropertySources
  */
 public abstract class PropertySource<T> {
+
+	protected static final String[] EMPTY_NAMES_ARRAY = new String[]{};
 
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
@@ -79,10 +80,10 @@ public abstract class PropertySource<T> {
 	}
 
 	/**
-	 * Return whether this {@code PropertySource} contains a property with the given key.
-	 * @param key the property key to find
+	 * Return the names of all properties contained by the {@linkplain #getSource() source}
+	 * object (never {@code null}).
 	 */
-	public abstract boolean containsProperty(String key);
+	public abstract String[] getPropertyNames();
 
 	/**
 	 * Return the value associated with the given key, {@code null} if not found.
@@ -92,10 +93,25 @@ public abstract class PropertySource<T> {
 	public abstract String getProperty(String key);
 
 	/**
+	 * Return whether this {@code PropertySource} contains a property with the given key.
+	 * @param key the property key to find
+	 */
+	public boolean containsProperty(String name) {
+		Assert.notNull(name, "property name must not be null");
+		for (String candidate : this.getPropertyNames()) {
+			if (candidate.equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Return the number of unique property keys available to this {@code PropertySource}.
 	 */
-	public abstract int size();
-
+	public int size() {
+		return this.getPropertyNames().length;
+	}
 
 	/**
 	 * Return a hashcode derived from the {@code name} property of this {@code PropertySource}
@@ -205,21 +221,14 @@ public abstract class PropertySource<T> {
 		}
 
 		@Override
-		public boolean containsProperty(String key) {
-			// TODO SPR-7408: logging
-			return false;
-		}
-
-		@Override
 		public String getProperty(String key) {
 			// TODO SPR-7408: logging
 			return null;
 		}
 
 		@Override
-		public int size() {
-			// TODO SPR-7408: logging
-			return 0;
+		public String[] getPropertyNames() {
+			return EMPTY_NAMES_ARRAY;
 		}
 	}
 
@@ -227,27 +236,28 @@ public abstract class PropertySource<T> {
 	/**
 	 * @see PropertySource#named(String)
 	 */
-	static class ComparisonPropertySource extends PropertySource<Object> {
+	static class ComparisonPropertySource extends StubPropertySource {
 
 		private static final String USAGE_ERROR =
 			"ComparisonPropertySource instances are for collection comparison " +
 			"use only";
 
 		public ComparisonPropertySource(String name) {
-			super(name, new Object());
+			super(name);
 		}
 
 		@Override
 		public Object getSource() {
 			throw new UnsupportedOperationException(USAGE_ERROR);
 		}
+
+		@Override
+		public String[] getPropertyNames() {
+			throw new UnsupportedOperationException(USAGE_ERROR);
+		}
+
+		@Override
 		public String getProperty(String key) {
-			throw new UnsupportedOperationException(USAGE_ERROR);
-		}
-		public boolean containsProperty(String key) {
-			throw new UnsupportedOperationException(USAGE_ERROR);
-		}
-		public int size() {
 			throw new UnsupportedOperationException(USAGE_ERROR);
 		}
 
@@ -256,4 +266,5 @@ public abstract class PropertySource<T> {
 			return String.format("%s [name='%s']", getClass().getSimpleName(), this.name);
 		}
 	}
+
 }

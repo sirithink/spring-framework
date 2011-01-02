@@ -32,18 +32,13 @@ public class MapPropertySource extends PropertySource<Map<String, String>> {
 	}
 
 	@Override
-	public boolean containsProperty(String key) {
-		return source.containsKey(key);
+	public String[] getPropertyNames() {
+		return this.source.keySet().toArray(EMPTY_NAMES_ARRAY);
 	}
 
 	@Override
 	public String getProperty(String key) {
-		return source.get(key);
-	}
-
-	@Override
-	public int size() {
-		return source.size();
+		return this.source.get(key);
 	}
 
 }

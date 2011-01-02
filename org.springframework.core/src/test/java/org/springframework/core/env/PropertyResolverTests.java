@@ -199,6 +199,27 @@ public class PropertyResolverTests {
 	}
 
 	@Test
+	public void asProperties_withMixedPropertySourceTypes() {
+		class Foo { }
+		class FooPropertySource extends PropertySource<Foo> {
+			public FooPropertySource() { super("fooProperties", new Foo()); }
+			public String[] getPropertyNames() { return new String[] {"fooKey"}; }
+			public String getProperty(String key) { return "fooValue"; }
+		}
+		propertySources = new MutablePropertySources();
+		propertyResolver = new PropertySourcesPropertyResolver(propertySources);
+		assertThat(propertyResolver.asProperties(), notNullValue());
+
+		propertySources.addLast(new MockPropertySource());
+		propertySources.addLast(new FooPropertySource());
+
+		Properties props = propertyResolver.asProperties();
+		assertThat(props.getProperty("pName"), is("fooValue"));
+		assertThat(props.size(), is(1));
+	}
+
+
+	@Test
 	public void resolvePlaceholders() {
 		MutablePropertySources propertySources = new MutablePropertySources();
 		propertySources.addFirst(new MockPropertySource().withProperty("key", "value"));

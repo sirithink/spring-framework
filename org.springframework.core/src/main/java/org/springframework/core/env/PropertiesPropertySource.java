@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,17 @@ package org.springframework.core.env;
 
 import java.util.Properties;
 
-
 /**
- * TODO SPR-7508: document how this does accept a Properties object,
- * which is capable of holding non-string keys and values (because
- * Properties is a Hashtable),  but is limited to resolving string-based
- * keys and values.
- *
- * Consider adding a TypeConvertingPropertiesPropertySource to accommodate
- * non-string keys and values (such as is technically possible with
- * System.getProperties())
+ * {@link PropertySource} implementation that extracts properties
+ * from a {@link java.util.Properties} object.
+ * <p>Note that because a {@code Properties} object is technically an {@code <Object, Object>}
+ * {@link Hashtable}, one may contain non-{@code String} keys or values. This implementation,
+ * however is restricted to accessing only {@code String}-based keys and values, in the same fashion
+ * as {@link Properties#getProperty(String)} and {@link Properties#setProperty(String, String)}.
  *
  * @author Chris Beams
  * @since 3.1
+ * @see org.springframework.mock.env.MockPropertySource
  */
 public class PropertiesPropertySource extends PropertySource<Properties> {
 

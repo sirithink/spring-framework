@@ -22,9 +22,9 @@ import javax.portlet.PortletConfig;
 
 import org.springframework.core.env.PropertySource;
 
-
 /**
- * TODO SPR-7508: document
+ * {@link PropertySource} implementation that extracts {@link PortletConfig}
+ * init parameters as properties.
  * 
  * @author Chris Beams
  * @since 3.1

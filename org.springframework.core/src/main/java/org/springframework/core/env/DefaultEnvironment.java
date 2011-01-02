@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 package org.springframework.core.env;
-
 
 /**
  * Default implementation of the {@link Environment} interface. Used throughout all non-Web*
@@ -76,10 +75,23 @@ package org.springframework.core.env;
  */
 public class DefaultEnvironment extends AbstractEnvironment {
 
+	/** System environment property source name: {@value} */
 	public static final String SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME = "systemEnvironment";
+
+	/** JVM system properties property source name: {@value} */
 	public static final String SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME = "systemProperties";
 
 
+	/**
+	 * Create a new {@code Environment} populated with the property sources in the following order:
+	 * <ul>
+	 *   <li>{@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME}
+	 *   <li>{@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}
+	 * </ul>
+	 *
+	 * <p>Properties present in {@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME} will
+	 * take precedence over those in {@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}.
+	 */
 	public DefaultEnvironment() {
 		this.getPropertySources().addFirst(new MapPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, this.getSystemEnvironment()));
 		this.getPropertySources().addFirst(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, this.getSystemProperties()));

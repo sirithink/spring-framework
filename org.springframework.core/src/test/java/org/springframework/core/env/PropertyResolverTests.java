@@ -203,7 +203,7 @@ public class PropertyResolverTests {
 		class Foo { }
 		class FooPropertySource extends PropertySource<Foo> {
 			public FooPropertySource() { super("fooProperties", new Foo()); }
-			public String[] getPropertyNames() { return new String[] {"fooKey"}; }
+			public String[] getPropertyNames() { return new String[] {"pName"}; }
 			public String getProperty(String key) { return "fooValue"; }
 		}
 		propertySources = new MutablePropertySources();

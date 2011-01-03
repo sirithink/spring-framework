@@ -16,11 +16,12 @@
 
 package org.springframework.web.context.support;
 
-import java.util.LinkedHashSet;
+import java.util.Enumeration;
 
 import javax.servlet.ServletConfig;
 
 import org.springframework.core.env.PropertySource;
+import org.springframework.util.CollectionUtils;
 
 /**
  * {@link PropertySource} that reads init parameters from a {@link ServletConfig} object.
@@ -36,12 +37,10 @@ public class ServletConfigPropertySource extends PropertySource<ServletConfig> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public String[] getPropertyNames() {
-		LinkedHashSet<String> names = new LinkedHashSet<String>();
-		while (this.source.getInitParameterNames().hasMoreElements()) {
-			names.add((String)this.source.getInitParameterNames().nextElement());
-		}
-		return names.toArray(EMPTY_NAMES_ARRAY);
+		return CollectionUtils.toArray(
+				(Enumeration<String>)this.source.getInitParameterNames(), EMPTY_NAMES_ARRAY);
 	}
 
 	@Override

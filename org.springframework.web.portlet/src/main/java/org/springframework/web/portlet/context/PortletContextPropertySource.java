@@ -16,11 +16,10 @@
 
 package org.springframework.web.portlet.context;
 
-import java.util.LinkedHashSet;
-
 import javax.portlet.PortletContext;
 
 import org.springframework.core.env.PropertySource;
+import org.springframework.util.CollectionUtils;
 
 /**
  * {@link PropertySource} that reads init parameters from a {@link PortletContext} object.
@@ -37,11 +36,7 @@ public class PortletContextPropertySource extends PropertySource<PortletContext>
 
 	@Override
 	public String[] getPropertyNames() {
-		LinkedHashSet<String> names = new LinkedHashSet<String>();
-		while (this.source.getInitParameterNames().hasMoreElements()) {
-			names.add(this.source.getInitParameterNames().nextElement());
-		}
-		return names.toArray(EMPTY_NAMES_ARRAY);
+		return CollectionUtils.toArray(this.source.getInitParameterNames(), EMPTY_NAMES_ARRAY);
 	}
 
 	@Override

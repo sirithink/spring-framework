@@ -19,8 +19,6 @@ package org.springframework.core.env;
 import static java.lang.String.format;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 /**

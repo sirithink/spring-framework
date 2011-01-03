@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ import org.springframework.core.type.AnnotationMetadata;
  *   <li>as a type-level annotation on any class directly or indirectly annotated with
  *   {@code @Component}, including {@link Configuration @Configuration} classes
  *   <li>as a meta-annotation, for the purpose of composing custom stereotype annotations
- *   <li>as a method-level annotation in conjunction with the {@link Bean @Bean} annotation
  * </ul>
  *
  * <p>If a {@code @Configuration} class is marked with {@code @Profile}, all of the
@@ -52,8 +51,11 @@ import org.springframework.core.type.AnnotationMetadata;
  * {@code @Configuration} class is marked with <code>@Profile({"p1", "p2"})</code>, that class will
  * not be registered/processed unless profiles 'p1' and/or 'p2' have been activated.
  *
- * <p>If the {@code @Profile} annotation is omitted from a {@code @Component} class or {@code @Bean}
- * method, registration will always occur, regardless of which, if any, profiles are active.
+ * <p>If the {@code @Profile} annotation is omitted, registration will occur, regardless of which,
+ * if any, profiles are active.
+ *
+ * <p>When defining Spring beans via XML, the {@code "profile"} attribute of the {@code <beans>}
+ * element may be used. See the documentation in {@code spring-beans-3.1.xsd} for details.
  *
  * @author Chris Beams
  * @since 3.1
@@ -67,22 +69,22 @@ import org.springframework.core.type.AnnotationMetadata;
 public @interface Profile {
 
 	/**
-	 * The set profiles for which this component should be registered
+	 * The set profiles for which this component should be registered.
 	 */
 	String[] value();
 
 
 	static class Helper {
 		/**
-		 * @return whether the given metadata includes Profile information, whether directly or
-		 * through meta-annotation
+		 * Return whether the given metadata includes Profile information, whether directly or
+		 * through meta-annotation.
 		 */
 		static boolean isProfileAnnotationPresent(AnnotationMetadata metadata) {
 			return metadata.isAnnotated(Profile.class.getName());
 		}
 
 		/**
-		 * @return the String[] of candidate profiles from {@link Profile#value()}
+		 * Return the String[] of candidate profiles from {@link Profile#value()}.
 		 */
 		static String[] getCandidateProfiles(AnnotationMetadata metadata) {
 			return (String[])metadata.getAnnotationAttributes(Profile.class.getName()).get("value");

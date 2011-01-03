@@ -83,7 +83,7 @@ public class DefaultEnvironment extends AbstractEnvironment {
 
 
 	/**
-	 * Create a new {@code Environment} populated with the property sources in the following order:
+	 * Create a new {@code Environment} populated with property sources in the following order:
 	 * <ul>
 	 *   <li>{@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME}
 	 *   <li>{@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}

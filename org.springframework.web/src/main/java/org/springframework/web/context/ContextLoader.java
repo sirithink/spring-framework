@@ -17,24 +17,29 @@
 package org.springframework.web.context;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextConfigurer;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Performs the actual initialization work for the root application context.
@@ -89,6 +94,8 @@ public class ContextLoader {
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext#DEFAULT_CONFIG_LOCATION
 	 */
 	public static final String CONFIG_LOCATION_PARAM = "contextConfigLocation";
+
+	public static final String CONTEXT_CONFIGURER_CLASSES_PARAM = "contextConfigurerClasses";
 
 	/**
 	 * Optional servlet context parameter (i.e., "<code>locatorFactorySelector</code>")
@@ -308,6 +315,27 @@ public class ContextLoader {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	protected List<Class<ApplicationContextConfigurer>> determineContextConfigurerClasses(ServletContext servletContext) {
+		String classNames = servletContext.getInitParameter(CONTEXT_CONFIGURER_CLASSES_PARAM);
+		ArrayList<Class<ApplicationContextConfigurer>> classes = new ArrayList<Class<ApplicationContextConfigurer>>();
+		if (classNames != null) {
+			for (String className : StringUtils.tokenizeToStringArray(classNames, ",")) {
+				try {
+					Class<?> clazz = ClassUtils.forName(className, ClassUtils.getDefaultClassLoader());
+					Assert.isAssignable(ApplicationContextConfigurer.class, clazz,
+							"class [" + className + "] must implement ApplicationContextConfigurer");
+					classes.add((Class<ApplicationContextConfigurer>)clazz);
+				}
+				catch (ClassNotFoundException ex) {
+					throw new ApplicationContextException(
+							"Failed to load context configurer class [" + className + "]", ex);
+				}
+			}
+		}
+		return classes;
+	}
+
 	/**
 	 * Customize the {@link ConfigurableWebApplicationContext} created by this
 	 * ContextLoader after config locations have been supplied to the context
@@ -320,6 +348,10 @@ public class ContextLoader {
 	 */
 	protected void customizeContext(
 			ServletContext servletContext, ConfigurableWebApplicationContext applicationContext) {
+		for (Class<ApplicationContextConfigurer> accClass : determineContextConfigurerClasses(servletContext)) {
+			ApplicationContextConfigurer acc = BeanUtils.instantiateClass(accClass);
+			acc.configureContext(applicationContext);
+		}
 	}
 
 	/**

@@ -655,7 +655,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
+		invokeBeanDefinitionRegistryPostProcessors(nonOrderedPostProcessors, (BeanDefinitionRegistry)beanFactory);
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
+	}
+
+	/**
+	 * Invoke the given BeanDefinitionRegistryPostProcessor beans.
+	 */
+	private void invokeBeanDefinitionRegistryPostProcessors(
+			Collection<? extends BeanFactoryPostProcessor> postProcessors, BeanDefinitionRegistry registry) {
+
+		for (BeanFactoryPostProcessor postProcessor : postProcessors) {
+			if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
+				((BeanDefinitionRegistryPostProcessor)postProcessor).postProcessBeanDefinitionRegistry(registry);
+			}
+		}
 	}
 
 	/**

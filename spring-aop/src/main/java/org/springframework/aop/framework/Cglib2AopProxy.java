@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.Advisor;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.RawTargetAccess;
 import org.springframework.aop.TargetSource;
@@ -71,6 +72,7 @@ import org.springframework.util.ObjectUtils;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
+ * @author Dave Syer
  * @see net.sf.cglib.proxy.Enhancer
  * @see AdvisedSupport#setProxyTargetClass
  * @see DefaultAopProxyFactory
@@ -338,6 +340,10 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 			// Note that we can't help if the target sets a reference
 			// to itself in another returned object.
 			retVal = proxy;
+		}
+		Class<?> returnType = method.getReturnType();
+		if (retVal == null && returnType != Void.TYPE && returnType.isPrimitive()) {
+			throw new AopInvocationException("Null return value from advice does not match primitive return type for: " + method);
 		}
 		return retVal;
 	}
